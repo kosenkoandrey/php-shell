@@ -1,3 +1,5 @@
 /nbproject/
 /logs/
 /phpunit.phar
+/conf.php
+/protected/modules/DB/conf.php
