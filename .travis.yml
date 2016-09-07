@@ -1,0 +1,21 @@
+language: php
+
+notifications:
+    email: false
+  
+php:
+    - 5.6
+    - 7.0
+    
+services:
+    - mysql
+
+before_install:
+    - mysql -uroot -e "CREATE DATABASE IF NOT EXISTS phpshell;" 
+    - mysql -uroot phpshell < phpshell.sql
+before_script: 
+    - phpenv config-add php.ini
+    - wget https://phar.phpunit.de/phpunit.phar
+    
+script: 
+    - php phpunit.phar init.php test LogsTest testLogDir

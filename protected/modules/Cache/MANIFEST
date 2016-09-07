@@ -1,0 +1,13 @@
+[name]Cache[/name]
+[description]It is often used to speed up dynamic database-driven websites by caching data and objects in RAM to reduce the number of times an external data source (such as a database or API) must be read.[/description]
+[dependencies]Routing Registry[/dependencies]
+
+[file]protected/modules/Cache/MANIFEST[/file]
+[file]protected/modules/Cache/README.md[/file]
+[file]protected/modules/Cache/class.php[/file]
+[file]protected/modules/Cache/conf.php[/file]
+[file]protected/modules/Cache/install.php[/file]
+[file]protected/modules/Cache/uninstall.php[/file]
+[file]protected/modules/Cache/test.php[/file]
+[file]protected/render/cache/admin/index.php[/file]
+[file]protected/render/cache/admin/nav.php[/file]

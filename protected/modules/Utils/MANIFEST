@@ -1,0 +1,8 @@
+[name]Utils[/name]
+
+[file]protected/modules/Utils/MANIFEST[/file]
+[file]protected/modules/Utils/README.md[/file]
+[file]protected/modules/Utils/class.php[/file]
+[file]protected/modules/Utils/install.php[/file]
+[file]protected/modules/Utils/uninstall.php[/file]
+[file]protected/modules/Utils/test.php[/file]

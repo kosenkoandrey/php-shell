@@ -1,0 +1,13 @@
+[name]Crypt[/name]
+[description]Tools for data encryption[/description]
+[dependencies]Routing Registry[/dependencies]
+
+[file]protected/modules/Crypt/MANIFEST[/file]
+[file]protected/modules/Crypt/README.md[/file]
+[file]protected/modules/Crypt/class.php[/file]
+[file]protected/modules/Crypt/conf.php[/file]
+[file]protected/modules/Crypt/install.php[/file]
+[file]protected/modules/Crypt/uninstall.php[/file]
+[file]protected/modules/Crypt/test.php[/file]
+[file]protected/render/crypt/admin/index.php[/file]
+[file]protected/render/crypt/admin/nav.php[/file]

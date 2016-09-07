@@ -1,0 +1,11 @@
+[name]Registry[/name]
+[description]Simple data store[/description]
+[dependencies]DB[/dependencies]
+
+[file]protected/modules/Registry/MANIFEST[/file]
+[file]protected/modules/Registry/README.md[/file]
+[file]protected/modules/Registry/class.php[/file]
+[file]protected/modules/Registry/conf.php[/file]
+[file]protected/modules/Registry/install.php[/file]
+[file]protected/modules/Registry/uninstall.php[/file]
+[file]protected/modules/Registry/test.php[/file]

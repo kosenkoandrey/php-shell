@@ -1,0 +1,13 @@
+[name]Sessions[/name]
+[description]Storing Sessions in a Database[/description]
+[dependencies]Routing Crypt DB Registry Triggers[/dependencies]
+
+[file]protected/modules/Sessions/MANIFEST[/file]
+[file]protected/modules/Sessions/README.md[/file]
+[file]protected/modules/Sessions/class.php[/file]
+[file]protected/modules/Sessions/conf.php[/file]
+[file]protected/modules/Sessions/install.php[/file]
+[file]protected/modules/Sessions/uninstall.php[/file]
+[file]protected/modules/Sessions/test.php[/file]
+[file]protected/render/sessions/admin/index.php[/file]
+[file]protected/render/sessions/admin/nav.php[/file]

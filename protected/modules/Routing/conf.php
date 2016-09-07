@@ -1,0 +1,5 @@
+<?
+return [
+    'routes' => [],
+    'init' => true
+];

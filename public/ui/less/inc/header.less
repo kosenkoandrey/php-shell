@@ -1,0 +1,185 @@
+#header {
+    .user-select(none);
+
+    position: relative;
+    padding: 40px 45px;
+    margin-bottom: 20px;
+    z-index: 10;
+    
+    @media (max-width: @screen-xs-max) {
+        padding: 15px 25px;    
+    }
+}
+
+
+/*----------------------------------
+    Logo
+-----------------------------------*/
+.h-logo {
+    @media (min-width: @screen-xs-max) {
+        width: 225px;
+    }
+    
+    a {
+        color: #fff;
+        font-weight: 700;
+        font-size: 23px;
+        display: inline-block;
+        
+        small {
+            display: block;
+            font-weight: 400;
+            font-size: 18px;
+            line-height: 100%;
+            margin-top: -3px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+    }
+    
+    .menu-collapse {
+        @media (min-width: @screen-mobile-min) {
+            display: none;
+        }
+        
+        @media (max-width: @screen-mobile-max) {
+            margin-top: 8px;
+            float: left;
+        }
+    }
+}
+
+/*----------------------------------
+    Hedaer menu
+-----------------------------------*/
+.h-menu {
+    list-style: none;
+    padding: 0;
+    
+    & > li { 
+        display: inline-block;
+        margin-top: 10px;
+        vertical-align: top;
+        min-width: 50px;
+        
+        & > a {
+            color: #fff;
+            display: block;
+            text-align: center;
+            z-index: 1;
+            position: relative;
+        }
+    }
+}
+
+.hm-icon {
+    font-size: 24px;
+    line-height: 36px;
+}
+
+.hm-label {
+    line-height: 35px;
+    white-space: nowrap;
+    padding: 0 10px;
+    font-size: @font-size-base + 1;
+    text-transform: uppercase; 
+} 
+
+.hmn-counts {
+    position: absolute;
+    font-style: normal;
+    background: @m-red;
+    padding: 1px 5px;
+    border-radius: 2px;
+    right: 7px;
+    top: -3px;
+    font-size: 10px; 
+    line-height: 15px;
+}
+
+.hm-profile {
+    & > a {
+        margin: -5px 0 0 5px;
+        
+        img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+        }
+    }
+}
+
+.hm-alerts {
+    @media(min-width: @screen-mobile-min) {
+        display: none !important; 
+    }
+}
+
+
+/*----------------------------------
+    Header Apps Menu
+-----------------------------------*/
+.h-apps {
+    .dropdown-menu {
+            width: 305px;
+            padding: 25px 10px 15px;
+        
+        & > li {
+            display: inline-block;
+            width: 95px;
+            margin-right: -4px;
+            margin-bottom: 5px;
+            
+            & > a {
+                display: block;
+                text-align: center;
+                
+                
+                & > small,
+                & > i {
+                    .transition(all);
+                    .transition-duration(500ms);
+                }
+                
+                & > i {
+                    width: 50px;
+                    height: 50px;
+                    text-align: center;
+                    line-height: 52px;
+                    border-radius: 50%;
+                    font-size: 22px;
+                    color: #fff;
+                }
+                
+                & > small {
+                    display: block;
+                    text-align: center;
+                    color: #ABABAB;
+                    margin-top: 5px;
+                }
+                
+                &:hover {
+                    background: transparent;
+                    
+                    & > small {
+                        color: #333;
+                    }
+                    
+                    & > i {
+                        .rotate(-360deg);
+                    }
+                }
+            }
+        }
+    }   
+}
+
+
+/*----------------------------------
+    Fullscreen
+-----------------------------------*/
+:-webkit-full-screen [data-action="fullscreen"] { display: none; }
+:-moz-full-screen [data-action="fullscreen"] { display: none; }
+:-ms-fullscreen [data-action="fullscreen"] { display: none; }
+:full-screen [data-action="fullscreen"] { display: none; }
+:fullscreen [data-action="fullscreen"] { display: none; }
+

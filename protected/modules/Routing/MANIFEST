@@ -1,0 +1,11 @@
+[name]Routing[/name]
+[description]Fast and powerful router that maps route callbacks to specific HTTP request methods and URIs. It supports parameters and pattern matching.[/description]
+
+[file]protected/modules/Routing/MANIFEST[/file]
+[file]protected/modules/Routing/README.md[/file]
+[file]protected/modules/Routing/class.php[/file]
+[file]protected/modules/Routing/conf.php[/file]
+[file]protected/modules/Routing/install.php[/file]
+[file]protected/modules/Routing/uninstall.php[/file]
+[file]protected/modules/Routing/test.php[/file]
+[file]protected/render/routing/errors.php[/file]

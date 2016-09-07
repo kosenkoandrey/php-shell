@@ -1,0 +1,24 @@
+[name]DB[/name]
+[description]Represents a connection with database servers:
+- Cubrid
+- FreeTDS / Microsoft SQL Server / Sybase
+- Firebird
+- IBM DB2
+- IBM Informix Dynamic Server
+- MySQL 3.x/4.x/5.x
+- Oracle Call Interface
+- ODBC v3 (IBM DB2, unixODBC и win32 ODBC)
+- PostgreSQL
+- SQLite 2/3
+- Microsoft SQL Server / SQL Azure
+- 4D
+and simple ORM.[/description]
+
+[file]protected/modules/DB/MANIFEST[/file]
+[file]protected/modules/DB/README.md[/file]
+[file]protected/modules/DB/class.php[/file]
+[file]protected/modules/DB/conf.php[/file]
+[file]protected/modules/DB/install.php[/file]
+[file]protected/modules/DB/uninstall.php[/file]
+[file]protected/modules/DB/test.php[/file]
+[file]protected/render/db/errors.php[/file]
