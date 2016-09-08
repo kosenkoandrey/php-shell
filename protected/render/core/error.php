@@ -1,4 +1,21 @@
 <?
+ob_end_clean();
+
+if (APP::$console) {
+    echo "An error has occured!\n";
+    echo "---------------------\n";
+
+    switch ($data[0]) {
+        case 0: echo $data[1][1]; break;
+        case 1: echo $data[1][0]; break;
+        case 2: echo $data[1]['message']; break;
+    }
+    
+    echo "\n--------------------\n";
+    echo "Please see log files " . APP::$conf['logs'] . "\n\n";
+    exit;
+}
+
 header('HTTP/1.1 503 Service Temporarily Unavailable');
 header('Status: 503 Service Temporarily Unavailable');
 header('Retry-After: 10');
@@ -7,12 +24,6 @@ switch ($data[0]) {
     case 0:     $title = 'PHP ErrorHandler';                break;
     case 1:     $title = 'PHP ExceptionHandler';            break;
     case 2:     $title = 'PHP ShutdownHandler';             break;
-    case 3:     $title = 'Module class not found';          break;
-    case 4:     $title = 'Invalid module class name';       break;
-    case 5:     $title = 'Can\'t render file';              break;
-    case 6:     $title = 'Module test class not found';     break;
-    case 7:     $title = 'Invalid module test class name';  break;
-    default:    $title = 'Unknown error';                   break;
 }
 ?>
 <!DOCTYPE html>

@@ -1,7 +1,6 @@
 <?
 return [
     'connections' => [
-        // default
         'auto' => [
             'type'      => 'mysql',
             'host'      => 'localhost',

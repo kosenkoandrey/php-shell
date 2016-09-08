@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>PHP-shell - Users</title>
+        <title>PHP-shell - Mail</title>
 
         <!-- Vendor CSS -->
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
@@ -13,13 +13,14 @@
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/google-material-color/dist/palette.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/css/bootstrap-select.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.css" rel="stylesheet">
-        
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/chosen/chosen.min.css" rel="stylesheet">
+
         <? APP::Render('core/widgets/css') ?>
     </head>
     <body data-ma-header="teal">
         <? 
         APP::Render('admin/widgets/header', 'include', [
-            'Users' => 'admin/users'
+            'Mail transport' => 'admin/mail/transport',
         ]);
         ?>
         <section id="main">
@@ -28,53 +29,47 @@
             <section id="content">
                 <div class="container">
                     <div class="card">
-                        <form id="add-user" class="form-horizontal" role="form">
+                        <form id="add-transport" class="form-horizontal" role="form">
                             <div class="card-header">
-                                <h2>Add new user</h2>
+                                <h2>Add transport</h2>
                             </div>
+
                             <div class="card-body card-padding">
                                 <div class="form-group">
-                                    <label for="email" class="col-sm-2 control-label">E-mail</label>
+                                    <label for="transport_0" class="col-sm-2 control-label">Action</label>
                                     <div class="col-sm-3">
                                         <div class="fg-line">
-                                            <input type="email" class="form-control" name="email" id="email">
+                                            <input type="text" class="form-control" name="transport[0]" id="transport_0">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="password" class="col-sm-2 control-label">Password</label>
+                                    <label for="transport_1" class="col-sm-2 control-label">Module</label>
                                     <div class="col-sm-3">
                                         <div class="fg-line">
-                                            <input type="password" class="form-control" name="password" id="password">
+                                            <select id="transport_1" name="transport[1]">
+                                                <? foreach (APP::$modules as $key => $value) { ?><option value="<?= $key ?>"><?= $key ?></option><? } ?>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="re-password" class="col-sm-2 control-label">Retype password</label>
+                                    <label for="transport_2" class="col-sm-2 control-label">Method</label>
                                     <div class="col-sm-3">
                                         <div class="fg-line">
-                                            <input type="password" class="form-control" name="re-password" id="re-password">
+                                            <input type="text" class="form-control" name="transport[2]" id="transport_2">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="role" class="col-sm-2 control-label">Role</label>
+                                    <label for="transport_3" class="col-sm-2 control-label">Settings URI</label>
                                     <div class="col-sm-3">
-                                        <select id="role" name="role" class="selectpicker">
-                                            <? foreach ($data['roles'] as $role) { ?><option value="<?= $role ?>"><?= $role ?></option><? } ?>
-                                        </select>
+                                        <div class="fg-line">
+                                            <input type="text" class="form-control" name="transport[3]" id="transport_3">
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="notification" class="col-sm-2 control-label">Notification</label>
-                                    <div class="col-sm-3">
-                                        <select id="notification" name="notification" class="selectpicker">
-                                            <option value="0">none</option>
-                                            <option value="<?= APP::Module('Users')->settings['module_users_register_activation_letter'] ?>">with activation link</option>
-                                            <option value="<?= APP::Module('Users')->settings['module_users_register_letter'] ?>">without activation link</option>
-                                        </select>
-                                    </div>
-                                </div>
+                                
                                 <div class="form-group">
                                     <div class="col-sm-offset-2 col-sm-5">
                                         <button type="submit" class="btn palette-Teal bg waves-effect btn-lg">Add</button>
@@ -99,66 +94,72 @@
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/Waves/dist/waves.min.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.min.js"></script>
-        
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/chosen/chosen.jquery.min.js"></script>
+
         <? APP::Render('core/widgets/js') ?>
         
         <script>
             $(document).ready(function() {
-                $('#add-user').submit(function(event) {
+                $('#transport_1').chosen({
+                    width: '100%',
+                    allow_single_deselect: true
+                });
+                
+                $('#add-transport').submit(function(event) {
                     event.preventDefault();
 
-                    var email = $(this).find('#email');
-                    var password = $(this).find('#password');
-                    var re_password = $(this).find('#re-password');
-                    var role = $(this).find('#role');
-                    var notification = $(this).find('#email');
+                    var transport_0 = $(this).find('#transport_0');
+                    var transport_1 = $(this).find('#transport_1');
+                    var transport_2 = $(this).find('#transport_2');
+                    var transport_3 = $(this).find('#transport_3');
+                    
+                    transport_0.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    transport_1.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    transport_2.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    transport_3.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
 
-                    email.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
-                    password.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
-                    re_password.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
-                    role.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
-                    notification.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
-
-                    if (email.val() === '') { email.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
-                    if (password.val() === '') { password.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
-                    if (password.val() !== re_password.val()) { re_password.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Passwords do not match</small>'); return false; }
-                    if (role.val() === '') { role.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
-                    if (notification.val() === '') { notification.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
-
+                    if (transport_0.val() === '') { transport_0.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    if (transport_1.val() === '') { transport_1.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    if (transport_2.val() === '') { transport_2.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    if (transport_3.val() === '') { transport_3.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+ 
                     $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
 
                     $.ajax({
                         type: 'post',
-                        url: '<?= APP::Module('Routing')->root ?>admin/users/api/add.json',
+                        url: '<?= APP::Module('Routing')->root ?>admin/mail/api/transport/add.json',
                         data: $(this).serialize(),
                         success: function(result) {
                             switch(result.status) {
                                 case 'success':
                                     swal({
                                         title: 'Done!',
-                                        text: 'User "' + email.val() + '" has been added',
+                                        text: 'Transport method "' + transport_0.val() + '" has been added',
                                         type: 'success',
                                         showCancelButton: false,
                                         confirmButtonText: 'Ok',
                                         closeOnConfirm: false
                                     }, function(){
-                                        window.location.href = '<?= APP::Module('Routing')->root ?>admin/users';
+                                        window.location.href = '<?= APP::Module('Routing')->root ?>admin/mail/transport';
                                     });
                                     break;
                                 case 'error': 
                                     $.each(result.errors, function(i, error) {
                                         switch(error) {
-                                            case 2: email.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Already registered</small>'); break;
+                                            case 1: $('#transport_0').closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); break;
+                                            case 2: $('#transport_1').closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); break;
+                                            case 3: $('#transport_2').closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); break;
+                                            case 4: $('#transport_3').closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); break;
                                         }
                                     });
                                     break;
                             }
 
-                            $('#add-user').find('[type="submit"]').html('Add').attr('disabled', false);
+                            $('#add-transport').find('[type="submit"]').html('Add').attr('disabled', false);
                         }
                     });
                   });
             });
         </script>
     </body>
-  </html>
+</html>

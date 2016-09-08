@@ -86,4 +86,5 @@ if ($error) {
 // Install module
 
 $data->extractTo(ROOT);
-file_put_contents(ROOT . '/protected/modules/DB/conf.php', "<? return ['connections' => ['auto' => ['type' => '" . $_SESSION['core']['install']['db']['connection']['type'] . "', 'host' => '" . $_SESSION['core']['install']['db']['connection']['host'] . "', 'database' => '" . $_SESSION['core']['install']['db']['connection']['database'] . "', 'username' => '" . $_SESSION['core']['install']['db']['connection']['username'] . "', 'password'  => '" . $_SESSION['core']['install']['db']['connection']['password'] . "','charset' => '" . $_SESSION['core']['install']['db']['connection']['charset'] . "']], 'init' => true];");
+
+file_put_contents(ROOT . '/protected/modules/DB/conf.php', "<? return ['connections' => ['auto' => ['type' => '" . $_SESSION['core']['install']['db']['connection']['type'] . "', 'host' => '" . $_SESSION['core']['install']['db']['connection']['host'] . "', 'database' => '" . $_SESSION['core']['install']['db']['connection']['database'] . "', 'username' => '" . $_SESSION['core']['install']['db']['connection']['username'] . "', 'password'  => '" . $_SESSION['core']['install']['db']['connection']['password'] . "','charset' => '" . $_SESSION['core']['install']['db']['connection']['charset'] . "']]];");

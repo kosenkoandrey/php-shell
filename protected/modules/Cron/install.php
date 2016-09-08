@@ -52,11 +52,8 @@ if ($error) {
 
 $data->extractTo(ROOT);
 
-if (!APP::Module('Registry')->Get('module_cron_tmp_file')) {
-    APP::Module('Registry')->Add('module_cron_tmp_file', $_SESSION['core']['install']['cron']['tmp_file']);
-}
+APP::Module('Registry')->Add('module_cron_tmp_file', $_SESSION['core']['install']['cron']['tmp_file']);
 
-// Add triggers support
 APP::Module('Triggers')->Register('add_cron_job', 'Cron', 'Add job');
 APP::Module('Triggers')->Register('update_cron_job', 'Cron', 'Update job');
 APP::Module('Triggers')->Register('remove_cron_job', 'Cron', 'Remove job');

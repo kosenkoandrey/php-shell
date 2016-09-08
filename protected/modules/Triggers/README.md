@@ -30,6 +30,9 @@ The triggers allow you to configure actions to be automatically performed on som
 // Register trigger type
 mixed APP::Module('Triggers')->Register(str $id, str $group, str $name)
 
+// Unregister trigger type
+mixed APP::Module('Triggers')->Unregister(str $id)
+
 // Execute some trigger
 mixed APP::Module('Triggers')->Exec(str $id, mixed $data)
 ```
@@ -105,4 +108,7 @@ class TriggerHandler {
         */
     }
 }
+
+// Unregister trigger type (usually used in the uninstall script of module)
+APP::Module('Triggers')->Unregister('add_ssh_connection');
 ```

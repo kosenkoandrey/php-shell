@@ -70,7 +70,7 @@
         
         <script>
             $(document).ready(function() {
-                $('#module_crypt_key').val('<?= $data ?>');
+                $('#module_crypt_key').val('<?= APP::Module('Crypt')->settings['module_crypt_key'] ?>');
 
                 $('#update-settings').submit(function(event) {
                     event.preventDefault();

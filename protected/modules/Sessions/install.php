@@ -3,7 +3,7 @@ $error = false;
 
 if (isset($_POST['action'])) {
     switch ($_POST['action']) {
-        case 'sessions_set_connection': $_SESSION['core']['install']['sessions']['connection'] = $_POST['connection']; break;
+        case 'sessions_set_db_connection': $_SESSION['core']['install']['sessions']['db_connection'] = $_POST['db_connection']; break;
         case 'sessions_set_settings': $_SESSION['core']['install']['sessions']['settings'] = $_POST['settings']; break;
     }
 }
@@ -19,13 +19,13 @@ if (isset($_POST['action'])) {
     <h1>Install Sessions</h1>
     <?
     if (!$error) {
-        if (!isset($_SESSION['core']['install']['sessions']['connection'])) {
+        if (!isset($_SESSION['core']['install']['sessions']['db_connection'])) {
             $error = true;
             ?>
-            <h3>Select connection</h3>
+            <h3>Select DB connection</h3>
             <form method="post">
-                <input type="hidden" name="action" value="sessions_set_connection">
-                <select name="connection">
+                <input type="hidden" name="action" value="sessions_set_db_connection">
+                <select name="db_connection">
                     <? foreach (array_keys(APP::Module('DB')->conf['connections']) as $connection) { ?><option value="<?= $connection ?>"><?= $connection ?></option><? } ?>
                 </select>
                 <br><br>
@@ -77,35 +77,20 @@ if ($error) {
 
 // Install module
 
-APP::Module('DB')->Open($_SESSION['core']['install']['sessions']['connection'])->query('SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";');
-APP::Module('DB')->Open($_SESSION['core']['install']['sessions']['connection'])->query('SET time_zone = "+00:00";');
-
-if (!APP::Module('DB')->Open($_SESSION['core']['install']['sessions']['connection'])->query('SHOW TABLES LIKE "sessions"')->rowCount()) {
-    APP::Module('DB')->Open($_SESSION['core']['install']['sessions']['connection'])->query('CREATE TABLE `sessions` (`id` varchar(255) COLLATE utf8_unicode_ci NOT NULL, `touched` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, `data` blob NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;');
-    APP::Module('DB')->Open($_SESSION['core']['install']['sessions']['connection'])->query('ALTER TABLE `sessions` ADD PRIMARY KEY (`id`);');
-}
-
-if (!APP::Module('Registry')->Get('module_sessions_cookie_domain')) {
-    APP::Module('Registry')->Add('module_sessions_cookie_domain', $_SESSION['core']['install']['sessions']['settings']['domain']);
-}
-
-if (!APP::Module('Registry')->Get('module_sessions_cookie_lifetime')) {
-    APP::Module('Registry')->Add('module_sessions_cookie_lifetime', $_SESSION['core']['install']['sessions']['settings']['lifetime']);
-}
-
-if (!APP::Module('Registry')->Get('module_sessions_compress')) {
-    APP::Module('Registry')->Add('module_sessions_compress', $_SESSION['core']['install']['sessions']['settings']['compress']);
-}
-
-if (!APP::Module('Registry')->Get('module_sessions_gc_maxlifetime')) {
-    APP::Module('Registry')->Add('module_sessions_gc_maxlifetime', $_SESSION['core']['install']['sessions']['settings']['gc']);
-}
-
-// Add triggers support
-APP::Module('Triggers')->Register('update_sessions_settings', 'Sessions', 'Update settings');
-
 $data->extractTo(ROOT);
 
-$sessions_conf_file = ROOT . '/protected/modules/Sessions/conf.php';
-$sessions_conf = preg_replace('/\'connection\' => \'auto\'/', '\'connection\' => \'' . $_SESSION['core']['install']['sessions']['connection']. '\'', file_get_contents($sessions_conf_file));
-file_put_contents($sessions_conf_file, $sessions_conf);
+$db = APP::Module('DB')->Open($_SESSION['core']['install']['sessions']['db_connection']);
+
+$db->query('SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";');
+$db->query('SET time_zone = "+00:00";');
+
+$db->query('CREATE TABLE `sessions` (`id` varchar(255) COLLATE utf8_unicode_ci NOT NULL, `touched` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, `data` blob NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;');
+$db->query('ALTER TABLE `sessions` ADD PRIMARY KEY (`id`);');
+
+APP::Module('Registry')->Add('module_sessions_db_connection', $_SESSION['core']['install']['sessions']['db_connection']);
+APP::Module('Registry')->Add('module_sessions_cookie_domain', $_SESSION['core']['install']['sessions']['settings']['domain']);
+APP::Module('Registry')->Add('module_sessions_cookie_lifetime', $_SESSION['core']['install']['sessions']['settings']['lifetime']);
+APP::Module('Registry')->Add('module_sessions_compress', $_SESSION['core']['install']['sessions']['settings']['compress']);
+APP::Module('Registry')->Add('module_sessions_gc_maxlifetime', $_SESSION['core']['install']['sessions']['settings']['gc']);
+
+APP::Module('Triggers')->Register('update_sessions_settings', 'Sessions', 'Update settings');

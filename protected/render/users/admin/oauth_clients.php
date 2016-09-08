@@ -52,7 +52,7 @@
                                                             class="form-control" 
                                                             name="module_users_social_auth_fb_id" 
                                                             id="module_users_social_auth_fb_id" 
-                                                            value="<?= isset($data['module_users_social_auth_fb_id']) ? $data['module_users_social_auth_fb_id'] : '' ?>"
+                                                            value="<?= isset(APP::Module('Users')->settings['module_users_social_auth_fb_id']) ? APP::Module('Users')->settings['module_users_social_auth_fb_id'] : '' ?>"
                                                         >
                                                     </div>
                                                 </div>
@@ -66,7 +66,7 @@
                                                             class="form-control" 
                                                             name="module_users_social_auth_fb_key" 
                                                             id="module_users_social_auth_fb_key" 
-                                                            value="<?= isset($data['module_users_social_auth_fb_key']) ? $data['module_users_social_auth_fb_key'] : '' ?>"
+                                                            value="<?= isset(APP::Module('Users')->settings['module_users_social_auth_fb_key']) ? APP::Module('Users')->settings['module_users_social_auth_fb_key'] : '' ?>"
                                                         >
                                                     </div>
                                                 </div>
@@ -82,7 +82,7 @@
                                                             class="form-control" 
                                                             name="module_users_social_auth_vk_id" 
                                                             id="module_users_social_auth_vk_id" 
-                                                            value="<?= isset($data['module_users_social_auth_vk_id']) ? $data['module_users_social_auth_vk_id'] : '' ?>"
+                                                            value="<?= isset(APP::Module('Users')->settings['module_users_social_auth_vk_id']) ? APP::Module('Users')->settings['module_users_social_auth_vk_id'] : '' ?>"
                                                         >
                                                     </div>
                                                 </div>
@@ -96,7 +96,7 @@
                                                             class="form-control" 
                                                             name="module_users_social_auth_vk_key" 
                                                             id="module_users_social_auth_vk_key" 
-                                                            value="<?= isset($data['module_users_social_auth_vk_key']) ? $data['module_users_social_auth_vk_key'] : '' ?>"
+                                                            value="<?= isset(APP::Module('Users')->settings['module_users_social_auth_vk_key']) ? APP::Module('Users')->settings['module_users_social_auth_vk_key'] : '' ?>"
                                                         >
                                                     </div>
                                                 </div>
@@ -112,7 +112,7 @@
                                                             class="form-control" 
                                                             name="module_users_social_auth_google_id" 
                                                             id="module_users_social_auth_google_id" 
-                                                            value="<?= isset($data['module_users_social_auth_google_id']) ? $data['module_users_social_auth_google_id'] : '' ?>"
+                                                            value="<?= isset(APP::Module('Users')->settings['module_users_social_auth_google_id']) ? APP::Module('Users')->settings['module_users_social_auth_google_id'] : '' ?>"
                                                         >
                                                     </div>
                                                 </div>
@@ -126,7 +126,7 @@
                                                             class="form-control" 
                                                             name="module_users_social_auth_google_key" 
                                                             id="module_users_social_auth_google_key" 
-                                                            value="<?= isset($data['module_users_social_auth_google_key']) ? $data['module_users_social_auth_google_key'] : '' ?>"
+                                                            value="<?= isset(APP::Module('Users')->settings['module_users_social_auth_google_key']) ? APP::Module('Users')->settings['module_users_social_auth_google_key'] : '' ?>"
                                                         >
                                                     </div>
                                                 </div>
@@ -142,7 +142,7 @@
                                                             class="form-control" 
                                                             name="module_users_social_auth_ya_id" 
                                                             id="module_users_social_auth_ya_id" 
-                                                            value="<?= isset($data['module_users_social_auth_ya_id']) ? $data['module_users_social_auth_ya_id'] : '' ?>"
+                                                            value="<?= isset(APP::Module('Users')->settings['module_users_social_auth_ya_id']) ? APP::Module('Users')->settings['module_users_social_auth_ya_id'] : '' ?>"
                                                         >
                                                     </div>
                                                 </div>
@@ -156,7 +156,7 @@
                                                             class="form-control" 
                                                             name="module_users_social_auth_ya_key" 
                                                             id="module_users_social_auth_ya_key" 
-                                                            value="<?= isset($data['module_users_social_auth_ya_key']) ? $data['module_users_social_auth_ya_key'] : '' ?>"
+                                                            value="<?= isset(APP::Module('Users')->settings['module_users_social_auth_ya_key']) ? APP::Module('Users')->settings['module_users_social_auth_ya_key'] : '' ?>"
                                                         >
                                                     </div>
                                                 </div>

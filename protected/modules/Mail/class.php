@@ -1,24 +1,51 @@
 <?
 class Mail {
     
+    public $settings;
+    public $transport;
+    
     function __construct($conf) {
         foreach ($conf['routes'] as $route) APP::Module('Routing')->Add($route[0], $route[1], $route[2]);
     }
+    
+    function Init() {
+        $this->settings = APP::Module('Registry')->Get([
+            'module_mail_db_connection',
+            'module_mail_charset',
+            'module_mail_x_mailer'
+        ]);
+
+        foreach ((array) APP::Module('Registry')->Get(['module_mail_transport'])['module_mail_transport'] as $transport) {
+            $transport_settings = json_decode($transport, true);
+            $this->transport[$transport_settings[0]] = [
+                $transport_settings[1], 
+                $transport_settings[2], 
+                $transport_settings[3]
+            ];
+        }
+    }
+    
 
     public function Admin() {
         return APP::Render('mail/admin/nav', 'content');
     }
     
-    public function Send($from, $to, $subject, $message, $headers = false) {
+    public function Send($transport, $from, $to, $subject, $message, $headers = false) {
         if (!filter_var($from[0], FILTER_VALIDATE_EMAIL)) return ['error', 1];
         if (!$from[1]) return ['error', 2];
         if (!filter_var($to, FILTER_VALIDATE_EMAIL)) return ['error', 3];
         if (!$subject) return ['error', 4];
         if (!$message[0]) return ['error', 5];
         if (!$message[1]) return ['error', 6];
+        if (!array_key_exists($transport, $this->transport)) return ['error', 7];
         
-        $message_from = mb_encode_mimeheader($from[1], APP::Module('Registry')->Get('module_mail_charset'), "B") . ' <' . $from[0] . '>';
-        $message_subject = mb_encode_mimeheader($subject, APP::Module('Registry')->Get('module_mail_charset'), "B");
+        return APP::Module($this->transport[$transport][0])->{$this->transport[$transport][1]}($from, $to, $subject, $message, $headers);
+    }
+
+    
+    private function Transport($from, $to, $subject, $message, $headers) {
+        $message_from = mb_encode_mimeheader($from[1], $this->settings['module_mail_charset'], "B") . ' <' . $from[0] . '>';
+        $message_subject = mb_encode_mimeheader($subject, $this->settings['module_mail_charset'], "B");
 
         $message_id = sprintf("%s.%s@%s", base_convert(microtime(), 10, 36), base_convert(bin2hex(openssl_random_pseudo_bytes(8)), 16, 36), APP::$conf['location'][1]);
         $boundary = md5(uniqid());
@@ -28,7 +55,7 @@ class Mail {
             'MIME-Version: 1.0',
             'Content-Type: multipart/alternative; boundary="' . $boundary . '"',
             'Message-ID: <' . $message_id . '>',
-            'X-Mailer: ' . APP::Module('Registry')->Get('module_mail_x_mailer')
+            'X-Mailer: ' . $this->settings['module_mail_x_mailer']
         ];
         
         if ($headers) {
@@ -58,6 +85,7 @@ class Mail {
     
         APP::Module('Triggers')->Exec('mail_send_letter', [
             'result' => $res,
+            'transport' => 'default',
             'from' => $from,
             'to' => $to,
             'subject' => $subject,
@@ -68,7 +96,6 @@ class Mail {
         return $res;
     }
 
-    
     private function RenderLettersGroupsPath($group) {
         return $this->GetLettersGroupsPath(0, $this->RenderLettersGroups(), $group);
     }
@@ -128,7 +155,7 @@ class Mail {
         ];
         
         $letter_groups = APP::Module('DB')->Select(
-            $this->conf['connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            $this->settings['module_mail_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
             ['id', 'sub_id', 'name'], 'letters_groups',
             [['id', '!=', 0, PDO::PARAM_INT]]
         );
@@ -156,7 +183,7 @@ class Mail {
         ];
         
         $sender_groups = APP::Module('DB')->Select(
-            $this->conf['connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            $this->settings['module_mail_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
             ['id', 'sub_id', 'name'], 'senders_groups',
             [['id', '!=', 0, PDO::PARAM_INT]]
         );
@@ -197,7 +224,7 @@ class Mail {
     
     private function RemoveLettersGroup($group) {
         foreach (APP::Module('DB')->Select(
-            $this->conf['connection'], ['fetchAll', PDO::FETCH_COLUMN], 
+            $this->settings['module_mail_db_connection'], ['fetchAll', PDO::FETCH_COLUMN], 
             ['id'], 'letters_groups',
             [['sub_id', '=', $group, PDO::PARAM_INT],['id', '!=', 0, PDO::PARAM_INT]]
         ) as $value) {
@@ -205,14 +232,14 @@ class Mail {
         }
         
         APP::Module('DB')->Delete(
-            $this->conf['connection'], 'letters_groups',
+            $this->settings['module_mail_db_connection'], 'letters_groups',
             [['id', '=', $group, PDO::PARAM_INT]]
         );
     }
     
     private function RemoveSendersGroup($group) {
         foreach (APP::Module('DB')->Select(
-            $this->conf['connection'], ['fetchAll', PDO::FETCH_COLUMN], 
+            $this->settings['module_mail_db_connection'], ['fetchAll', PDO::FETCH_COLUMN], 
             ['id'], 'senders_groups',
             [['sub_id', '=', $group, PDO::PARAM_INT],['id', '!=', 0, PDO::PARAM_INT]]
         ) as $value) {
@@ -220,7 +247,7 @@ class Mail {
         }
         
         APP::Module('DB')->Delete(
-            $this->conf['connection'], 'senders_groups',
+            $this->settings['module_mail_db_connection'], 'senders_groups',
             [['id', '=', $group, PDO::PARAM_INT]]
         );
     }
@@ -232,7 +259,7 @@ class Mail {
         $list = [];
         
         foreach (APP::Module('DB')->Select(
-            $this->conf['connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            $this->settings['module_mail_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
             ['id', 'name'], 'letters_groups',
             [['sub_id', '=', $group_sub_id, PDO::PARAM_INT],['id', '!=', 0, PDO::PARAM_INT]]
         ) as $value) {
@@ -240,7 +267,7 @@ class Mail {
         }
         
         foreach (APP::Module('DB')->Select(
-            $this->conf['connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            $this->settings['module_mail_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
             ['id', 'subject'], 'letters',
             [['group_id', '=', $group_sub_id, PDO::PARAM_INT]]
         ) as $value) {
@@ -260,7 +287,7 @@ class Mail {
         $list = [];
         
         foreach (APP::Module('DB')->Select(
-            $this->conf['connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            $this->settings['module_mail_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
             ['id', 'name'], 'senders_groups',
             [['sub_id', '=', $group_sub_id, PDO::PARAM_INT],['id', '!=', 0, PDO::PARAM_INT]]
         ) as $value) {
@@ -268,7 +295,7 @@ class Mail {
         }
         
         foreach (APP::Module('DB')->Select(
-            $this->conf['connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            $this->settings['module_mail_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
             ['id', 'name', 'email'], 'senders',
             [['group_id', '=', $group_sub_id, PDO::PARAM_INT]]
         ) as $value) {
@@ -290,7 +317,7 @@ class Mail {
             'mail/admin/letters/preview', 'include', 
             [
                 'letter' => APP::Module('DB')->Select(
-                    $this->conf['connection'], ['fetch', PDO::FETCH_ASSOC], 
+                    $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
                     ['subject', 'html', 'plaintext'], 'letters',
                     [['id', '=', $letter_id, PDO::PARAM_INT]]
                 ),
@@ -326,7 +353,7 @@ class Mail {
             'mail/admin/letters/edit', 'include', 
             [
                 'letter' => APP::Module('DB')->Select(
-                    $this->conf['connection'], ['fetch', PDO::FETCH_ASSOC], 
+                    $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
                     ['sender_id', 'subject', 'html', 'plaintext', 'list_id'], 'letters',
                     [['id', '=', $letter_id, PDO::PARAM_INT]]
                 ),
@@ -344,7 +371,7 @@ class Mail {
             'mail/admin/senders/edit', 'include', 
             [
                 'sender' => APP::Module('DB')->Select(
-                    $this->conf['connection'], ['fetch', PDO::FETCH_ASSOC], 
+                    $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
                     ['name', 'email'], 'senders',
                     [['id', '=', $sender_id, PDO::PARAM_INT]]
                 ),
@@ -380,7 +407,7 @@ class Mail {
             'mail/admin/letters/groups/edit', 'include', 
             [
                 'group' => APP::Module('DB')->Select(
-                    $this->conf['connection'], ['fetch', PDO::FETCH_ASSOC], 
+                    $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
                     ['name'], 'letters_groups',
                     [['id', '=', $group_id, PDO::PARAM_INT]]
                 ),
@@ -398,7 +425,7 @@ class Mail {
             'mail/admin/senders/groups/edit', 'include', 
             [
                 'group' => APP::Module('DB')->Select(
-                    $this->conf['connection'], ['fetch', PDO::FETCH_ASSOC], 
+                    $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
                     ['name'], 'senders_groups',
                     [['id', '=', $group_id, PDO::PARAM_INT]]
                 ),
@@ -409,13 +436,25 @@ class Mail {
     }
     
     public function Settings() {
-        APP::Render(
-            'mail/admin/settings', 'include', 
-            APP::Module('Registry')->Get([
-                'module_mail_x_mailer',
-                'module_mail_charset'
-            ])
-        );
+        APP::Render('mail/admin/settings');
+    }
+    
+    public function ManageTransports() {
+        APP::Render('mail/admin/transport/index');
+    }
+    
+    public function AddTransport() {
+        APP::Render('mail/admin/transport/add');
+    }
+    
+    public function EditTransport() {
+        $transport_id = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['transport_id_hash']);
+        
+        APP::Render('mail/admin/transport/edit', 'include', json_decode(APP::Module('DB')->Select(
+            APP::Module('Registry')->conf['connection'], ['fetchColumn', 0], 
+            ['value'], 'registry',
+            [['id', '=', $transport_id, PDO::PARAM_INT]]
+        ), 1));
     }
 
     
@@ -429,7 +468,7 @@ class Mail {
 
         if ($group_id) {
             if (!APP::Module('DB')->Select(
-                $this->conf['connection'], ['fetchColumn', 0], 
+                $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
                 ['COUNT(id)'], 'letters_groups',
                 [['id', '=', $group_id, PDO::PARAM_INT]]
             )) {
@@ -439,7 +478,7 @@ class Mail {
         }
 
         if (!APP::Module('DB')->Select(
-            $this->conf['connection'], ['fetchColumn', 0], 
+            $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
             ['COUNT(id)'], 'senders',
             [['id', '=', $_POST['sender_id'], PDO::PARAM_INT]]
         )) {
@@ -464,7 +503,7 @@ class Mail {
         
         if ($out['status'] == 'success') {
             $out['letter_id'] = APP::Module('DB')->Insert(
-                $this->conf['connection'], 'letters',
+                $this->settings['module_mail_db_connection'], 'letters',
                 Array(
                     'id' => 'NULL',
                     'group_id' => [$group_id, PDO::PARAM_INT],
@@ -506,7 +545,7 @@ class Mail {
 
         if ($group_id) {
             if (!APP::Module('DB')->Select(
-                $this->conf['connection'], ['fetchColumn', 0], 
+                $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
                 ['COUNT(id)'], 'senders_groups',
                 [['id', '=', $group_id, PDO::PARAM_INT]]
             )) {
@@ -532,7 +571,7 @@ class Mail {
         
         if ($out['status'] == 'success') {
             $out['sender_id'] = APP::Module('DB')->Insert(
-                $this->conf['connection'], 'senders',
+                $this->settings['module_mail_db_connection'], 'senders',
                 Array(
                     'id' => 'NULL',
                     'group_id' => [$group_id, PDO::PARAM_INT],
@@ -565,7 +604,7 @@ class Mail {
         ];
         
         if (!APP::Module('DB')->Select(
-            $this->conf['connection'], ['fetchColumn', 0], 
+            $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
             ['COUNT(id)'], 'letters',
             [['id', '=', $_POST['id'], PDO::PARAM_INT]]
         )) {
@@ -575,7 +614,7 @@ class Mail {
         
         if ($out['status'] == 'success') {
             $out['count'] = APP::Module('DB')->Delete(
-                $this->conf['connection'], 'letters',
+                $this->settings['module_mail_db_connection'], 'letters',
                 [['id', '=', $_POST['id'], PDO::PARAM_INT]]
             );
             
@@ -600,7 +639,7 @@ class Mail {
         ];
         
         if (!APP::Module('DB')->Select(
-            $this->conf['connection'], ['fetchColumn', 0], 
+            $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
             ['COUNT(id)'], 'senders',
             [['id', '=', $_POST['id'], PDO::PARAM_INT]]
         )) {
@@ -610,7 +649,7 @@ class Mail {
         
         if ($out['status'] == 'success') {
             $out['count'] = APP::Module('DB')->Delete(
-                $this->conf['connection'], 'senders',
+                $this->settings['module_mail_db_connection'], 'senders',
                 [['id', '=', $_POST['id'], PDO::PARAM_INT]]
             );
             
@@ -637,7 +676,7 @@ class Mail {
         $letter_id = APP::Module('Crypt')->Decode($_POST['id']);
         
         if (!APP::Module('DB')->Select(
-            $this->conf['connection'], ['fetchColumn', 0], 
+            $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
             ['COUNT(id)'], 'letters',
             [['id', '=', $letter_id, PDO::PARAM_INT]]
         )) {
@@ -646,7 +685,7 @@ class Mail {
         }
 
         if (!APP::Module('DB')->Select(
-            $this->conf['connection'], ['fetchColumn', 0], 
+            $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
             ['COUNT(id)'], 'senders',
             [['id', '=', $_POST['sender_id'], PDO::PARAM_INT]]
         )) {
@@ -671,7 +710,7 @@ class Mail {
         
         if ($out['status'] == 'success') {
             APP::Module('DB')->Update(
-                $this->conf['connection'], 'letters', 
+                $this->settings['module_mail_db_connection'], 'letters', 
                 [
                     'sender_id' => $_POST['sender_id'],
                     'subject' => $_POST['subject'],
@@ -709,7 +748,7 @@ class Mail {
         $sender_id = APP::Module('Crypt')->Decode($_POST['id']);
         
         if (!APP::Module('DB')->Select(
-            $this->conf['connection'], ['fetchColumn', 0], 
+            $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
             ['COUNT(id)'], 'senders',
             [['id', '=', $sender_id, PDO::PARAM_INT]]
         )) {
@@ -734,7 +773,7 @@ class Mail {
         
         if ($out['status'] == 'success') {
             APP::Module('DB')->Update(
-                $this->conf['connection'], 'senders', 
+                $this->settings['module_mail_db_connection'], 'senders', 
                 [
                     'name' => $_POST['name'],
                     'email' => $_POST['email']
@@ -767,7 +806,7 @@ class Mail {
 
         if ($sub_id) {
             if (!APP::Module('DB')->Select(
-                $this->conf['connection'], ['fetchColumn', 0], 
+                $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
                 ['COUNT(id)'], 'letters_groups',
                 [['id', '=', $sub_id, PDO::PARAM_INT]]
             )) {
@@ -783,7 +822,7 @@ class Mail {
         
         if ($out['status'] == 'success') {
             $out['group_id'] = APP::Module('DB')->Insert(
-                $this->conf['connection'], 'letters_groups',
+                $this->settings['module_mail_db_connection'], 'letters_groups',
                 Array(
                     'id' => 'NULL',
                     'sub_id' => [$sub_id, PDO::PARAM_INT],
@@ -817,7 +856,7 @@ class Mail {
 
         if ($sub_id) {
             if (!APP::Module('DB')->Select(
-                $this->conf['connection'], ['fetchColumn', 0], 
+                $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
                 ['COUNT(id)'], 'senders_groups',
                 [['id', '=', $sub_id, PDO::PARAM_INT]]
             )) {
@@ -833,7 +872,7 @@ class Mail {
         
         if ($out['status'] == 'success') {
             $out['group_id'] = APP::Module('DB')->Insert(
-                $this->conf['connection'], 'senders_groups',
+                $this->settings['module_mail_db_connection'], 'senders_groups',
                 Array(
                     'id' => 'NULL',
                     'sub_id' => [$sub_id, PDO::PARAM_INT],
@@ -864,7 +903,7 @@ class Mail {
         ];
         
         if (!APP::Module('DB')->Select(
-            $this->conf['connection'], ['fetchColumn', 0], 
+            $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
             ['COUNT(id)'], 'letters_groups',
             [['id', '=', $_POST['id'], PDO::PARAM_INT]]
         )) {
@@ -892,7 +931,7 @@ class Mail {
         ];
         
         if (!APP::Module('DB')->Select(
-            $this->conf['connection'], ['fetchColumn', 0], 
+            $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
             ['COUNT(id)'], 'senders_groups',
             [['id', '=', $_POST['id'], PDO::PARAM_INT]]
         )) {
@@ -922,7 +961,7 @@ class Mail {
         $group_id = APP::Module('Crypt')->Decode($_POST['id']);
         
         if (!APP::Module('DB')->Select(
-            $this->conf['connection'], ['fetchColumn', 0], 
+            $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
             ['COUNT(id)'], 'letters_groups',
             [['id', '=', $group_id, PDO::PARAM_INT]]
         )) {
@@ -937,7 +976,7 @@ class Mail {
         
         if ($out['status'] == 'success') {
             APP::Module('DB')->Update(
-                $this->conf['connection'], 'letters_groups', 
+                $this->settings['module_mail_db_connection'], 'letters_groups', 
                 ['name' => $_POST['name']], 
                 [['id', '=', $group_id, PDO::PARAM_INT]]
             );
@@ -965,7 +1004,7 @@ class Mail {
         $group_id = APP::Module('Crypt')->Decode($_POST['id']);
         
         if (!APP::Module('DB')->Select(
-            $this->conf['connection'], ['fetchColumn', 0], 
+            $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
             ['COUNT(id)'], 'senders_groups',
             [['id', '=', $group_id, PDO::PARAM_INT]]
         )) {
@@ -980,7 +1019,7 @@ class Mail {
         
         if ($out['status'] == 'success') {
             APP::Module('DB')->Update(
-                $this->conf['connection'], 'senders_groups', 
+                $this->settings['module_mail_db_connection'], 'senders_groups', 
                 ['name' => $_POST['name']], 
                 [['id', '=', $group_id, PDO::PARAM_INT]]
             );
@@ -1000,10 +1039,12 @@ class Mail {
     }
     
     public function APIUpdateSettings() {
+        APP::Module('Registry')->Update(['value' => $_POST['module_mail_db_connection']], [['item', '=', 'module_mail_db_connection', PDO::PARAM_STR]]);
         APP::Module('Registry')->Update(['value' => $_POST['module_mail_x_mailer']], [['item', '=', 'module_mail_x_mailer', PDO::PARAM_STR]]);
         APP::Module('Registry')->Update(['value' => $_POST['module_mail_charset']], [['item', '=', 'module_mail_charset', PDO::PARAM_STR]]);
 
         APP::Module('Triggers')->Exec('mail_update_settings', [
+            'db_connection' => $_POST['module_mail_db_connection'],
             'x_mailer' => $_POST['module_mail_x_mailer'],
             'charset' => $_POST['module_mail_charset']
         ]);
@@ -1016,6 +1057,176 @@ class Mail {
             'status' => 'success',
             'errors' => []
         ]);
+        exit;
+    }
+    
+    public function APIListTransports() {
+        $transports = [];
+        $rows = [];
+        
+        $tmp_transports = APP::Module('Registry')->Get(['module_mail_transport'], ['id', 'value']);
+        
+        foreach (array_key_exists('module_mail_transport', $tmp_transports) ? (array) $tmp_transports['module_mail_transport'] : [] as $transport) {
+            $transport_value = json_decode($transport['value'], 1);
+
+            if (($_POST['searchPhrase']) && (preg_match('/^' . $_POST['searchPhrase'] . '/', $transport_value[0]) === 0)) continue;
+            
+            array_push($transports, [
+                'id' => $transport['id'],
+                'action' => $transport_value[0],
+                'module' => $transport_value[1],
+                'method' => $transport_value[2],
+                'settings' => $transport_value[3],
+                'token' => APP::Module('Crypt')->Encode($transport['id'])
+            ]);
+        }
+        
+        for ($x = ($_POST['current'] - 1) * $_POST['rowCount']; $x < $_POST['rowCount'] * $_POST['current']; $x ++) {
+            if (!isset($transports[$x])) continue;
+            array_push($rows, $transports[$x]);
+        }
+        
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode([
+            'current' => $_POST['current'],
+            'rowCount' => $_POST['rowCount'],
+            'rows' => $rows,
+            'total' => count($transports)
+        ]);
+        exit;
+    }
+    
+    public function APIAddTransport() {
+        $out = [
+            'status' => 'success',
+            'errors' => []
+        ];
+
+        if (empty($_POST['transport'][0])) {
+            $out['status'] = 'error';
+            $out['errors'][] = 1;
+        }
+        
+        if (empty($_POST['transport'][1])) {
+            $out['status'] = 'error';
+            $out['errors'][] = 2;
+        }
+        
+        if (empty($_POST['transport'][2])) {
+            $out['status'] = 'error';
+            $out['errors'][] = 3;
+        }
+        
+        if (empty($_POST['transport'][3])) {
+            $out['status'] = 'error';
+            $out['errors'][] = 4;
+        }
+        
+        if ($out['status'] == 'success') {
+            $out['transport_id'] = APP::Module('Registry')->Add('module_mail_transport', json_encode($_POST['transport']));
+        
+            APP::Module('Triggers')->Exec('mail_add_transport', [
+                'id' => $out['transport_id'],
+                'action' => $_POST['transport'][0],
+                'module' => $_POST['transport'][1],
+                'method' => $_POST['transport'][2],
+                'settings' => $_POST['transport'][3]
+            ]);
+        }
+
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode($out);
+        exit;
+    }
+    
+    public function APIUpdateTransport() {
+        $out = [
+            'status' => 'success',
+            'errors' => []
+        ];
+        
+        $transport_id = APP::Module('Crypt')->Decode($_POST['transport_id']);
+
+        if (!APP::Module('DB')->Select(
+            APP::Module('Registry')->conf['connection'], ['fetchColumn', 0], 
+            ['COUNT(id)'], 'registry',
+            [['id', '=', $transport_id, PDO::PARAM_INT]]
+        )) {
+            $out['status'] = 'error';
+            $out['errors'][] = 1;
+        }
+        
+        if (empty($_POST['transport'][0])) {
+            $out['status'] = 'error';
+            $out['errors'][] = 2;
+        }
+        
+        if (empty($_POST['transport'][1])) {
+            $out['status'] = 'error';
+            $out['errors'][] = 3;
+        }
+        
+        if (empty($_POST['transport'][2])) {
+            $out['status'] = 'error';
+            $out['errors'][] = 4;
+        }
+        
+        if (empty($_POST['transport'][3])) {
+            $out['status'] = 'error';
+            $out['errors'][] = 5;
+        }
+        
+        if ($out['status'] == 'success') {
+            APP::Module('Registry')->Update(['value' => json_encode($_POST['transport'])], [['id', '=', $transport_id, PDO::PARAM_INT]]);
+            
+            APP::Module('Triggers')->Exec('mail_update_transport', [
+                'id' => $transport_id,
+                'action' => $_POST['transport'][0],
+                'module' => $_POST['transport'][1],
+                'method' => $_POST['transport'][2],
+                'settings' => $_POST['transport'][3]
+            ]);
+        }
+
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode($out);
+        exit;
+    }
+
+    public function APIRemoveTransport() {
+        $out = [
+            'status' => 'success',
+            'errors' => []
+        ];
+
+        if (!APP::Module('DB')->Select(
+            APP::Module('Registry')->conf['connection'], ['fetchColumn', 0], 
+            ['COUNT(id)'], 'registry',
+            [['id', '=', $_POST['id'], PDO::PARAM_INT]]
+        )) {
+            $out['status'] = 'error';
+            $out['errors'][] = 1;
+        }
+        
+        if ($out['status'] == 'success') {
+            $out['count'] = APP::Module('Registry')->Delete([['id', '=', $_POST['id'], PDO::PARAM_INT]]);
+            APP::Module('Triggers')->Exec('mail_remove_transport', ['id' => $_POST['id'], 'result' => $out['count']]);
+        }
+
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode($out);
         exit;
     }
     

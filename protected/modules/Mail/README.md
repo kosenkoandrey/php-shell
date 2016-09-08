@@ -37,6 +37,10 @@ Simple E-Mail sending. Senders and letters management system.
             │   ├── add.php
             │   ├── edit.php
             │   └── index.php
+            ├── /transport
+            │   ├── add.php
+            │   ├── edit.php
+            │   └── index.php
             ├── nav.php
             └── settings.php
 ```
@@ -44,12 +48,13 @@ Simple E-Mail sending. Senders and letters management system.
 ### Methods
 ```php
 // Send E-Mail message
-array APP::Module('Mail')->Send(array $from, string $to, string $subject, array $message[, array $headers = false])
+array APP::Module('Mail')->Send(string $transport, array $from, string $to, string $subject, array $message[, array $headers = false])
 ```
 
 ### Examples
 ```php
 APP::Module('Mail')->Send(
+    'default',
     Array(
         'from email', 
         'from name'
@@ -82,6 +87,9 @@ APP::Module('Mail')->Send(
 - Update group of senders
 - Update mail settings
 - Send mail
+- Add transport
+- Remove transport
+- Update transport
 
 ### WEB interfaces
 ```
@@ -96,6 +104,9 @@ APP::Module('Mail')->Send(
 /admin/mail/senders/<group_sub_id_hash>/add                              // Add sender
 /admin/mail/senders/<group_sub_id_hash>/edit/<sender_id_hash>            // Edit sender
 /admin/mail/senders/<group_sub_id_hash>                                  // Manage senders
+/admin/mail/transport/add                                                // Add transport
+/admin/mail/transport/edit/<transport_id_hash_id_hash>                   // Edit transport
+/admin/mail/transport                                                    // Manage transport
 /admin/mail/settings                                                     // Mail settings
 
 /admin/mail/api/letters/add.json                                         // [API] Add letter
@@ -110,5 +121,8 @@ APP::Module('Mail')->Send(
 /admin/mail/api/senders/groups/add.json                                  // [API] Add senders group
 /admin/mail/api/senders/groups/remove.json                               // [API] Remove senders group
 /admin/mail/api/senders/groups/update.json                               // [API] Update senders group
+/admin/mail/api/transport/add.json                                       // [API] Add transport
+/admin/mail/api/transport/remove.json                                    // [API] Remove transport
+/admin/mail/api/transport/update.json                                    // [API] Update transport
 /admin/mail/api/settings/update.json                                     // [API] Update mail settings
 ```

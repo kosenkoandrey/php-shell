@@ -61,26 +61,15 @@ APP::Render('<?= echo 'data' ?>', 'eval')
 ```
 
 ### Errors
-To configure the logging must be enabled `APP::$conf['logs']`. Set full path to 
-logs directory or `false` to disable logging. Set write permission for the logs 
-directory. In the log directory are created files `php-errors-[d-m-Y].log`. 
-Each call `APP::Error` will be added record to the log file.
+To configure the error logging must be enabled `APP::$conf['logs']`. Set full 
+path to logs directory or `false` to disable logging. Set write permission for 
+the logs directory. In the log directory are created files `php-errors-[d-m-Y].log`. 
 
-Root directory: `/protected/render/`
-
-Default file extension: `.php`
+Each call 
 ```php
-void Error(string $view, mixed $code[, mixed $details = null])
-
-// Render error file with code
-APP::Error('filename', 'code')
-
-// Render error file with code and details
-APP::Error('filename', 'code', 'details')
+throw new Exception('message');
 ```
-Error code and details are available in the file (var `$data`).
-
-Set `APP::$conf['debug'] = false` to disable verbose error information.
+will be added record to the log file.
 
 ### Console
 ```php
@@ -89,25 +78,20 @@ class Console {
     public function Test($arg1, $arg2, $arg3) {}
 }
 ```
-Run method `Test` in the module `Console` with args
+Run method `Test` in the module `Console` with three args
 
-`php init.php Console Test par1 par2 par3`
+`php init.php Console Test '[{"x":"y"},1,"test"]'`
 
 ### Unit testing
 Each module provides a class for testing.
 ```php
-// Example module test
+include_once 'init.php';
 use PHPUnit\Framework\TestCase;
-
-class LogsTest extends TestCase {
-    public function testLogDir($arg1, $arg2, $arg3) {
-        $this->assertEquals(true, file_exists(APP::$conf['logs']));
-    }
-}
+class ExampleTest extends TestCase {}
 ```
-Run method `testLogDir` in the test class of module `Logs` with args
+Run test of module `Example`
 
-`php phpunit.phar init.php test LogsTest testLogDir par1 par2 par3`
+`php phpunit.phar protected/modules/Example/test.php`
 
 ### Files
 ```

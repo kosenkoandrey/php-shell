@@ -52,6 +52,4 @@ if ($error) {
 
 $data->extractTo(ROOT);
 
-if (!APP::Module('Registry')->Get('module_crypt_key')) {
-    APP::Module('Registry')->Add('module_crypt_key', $_SESSION['core']['install']['crypt']['key']);
-}
+APP::Module('Registry')->Add('module_crypt_key', $_SESSION['core']['install']['crypt']['key']);

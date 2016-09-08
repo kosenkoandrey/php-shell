@@ -90,8 +90,8 @@
         
         <script>
             $(document).ready(function() {
-                $('#module_users_min_pass_length').val('<?= $data['module_users_min_pass_length'] ?>');
-                $('#module_users_gen_pass_length').val('<?= $data['module_users_gen_pass_length'] ?>');
+                $('#module_users_min_pass_length').val('<?= APP::Module('Users')->settings['module_users_min_pass_length'] ?>');
+                $('#module_users_gen_pass_length').val('<?= APP::Module('Users')->settings['module_users_gen_pass_length'] ?>');
                 
                 $('#update-passwords').submit(function(event) {
                     event.preventDefault();

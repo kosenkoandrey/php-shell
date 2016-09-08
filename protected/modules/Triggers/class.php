@@ -33,6 +33,23 @@ class Triggers {
         APP::Module('Registry')->Add('module_trigger_type', '["' . $id . '", "' . $group . '", "' . $name . '"]');
     }
     
+    public function Unregister($id) {
+        if (is_array($id)) {
+            foreach ($id as $value) {
+                APP::Module('Registry')->Delete([
+                    ['item', '=', 'module_trigger_type', PDO::PARAM_STR],
+                    ['value', 'LIKE', '[\"' . $value . '\"%', PDO::PARAM_STR]
+                ]);
+            }
+        } else {
+            APP::Module('Registry')->Delete([
+                ['item', '=', 'module_trigger_type', PDO::PARAM_STR],
+                ['value', 'LIKE', '[\"' . $id . '\"%', PDO::PARAM_STR]
+            ]);
+        }
+    }
+    
+    
     public function Exec($id, $data) {
         foreach (isset($this->list[$id]) ? $this->list[$id]['rules'] : [] as $rule) {
             APP::Module($rule[0])->{$rule[1]}($id, $data);
@@ -157,7 +174,7 @@ class Triggers {
         if ($out['status'] == 'success') {
             $out['trigger_id'] = APP::Module('Registry')->Add('module_trigger_rule', json_encode($_POST['target']), $_POST['sub_id']);
             
-            APP::Module('Triggers')->Exec('add_trigger', [
+            $this->Exec('add_trigger', [
                 'id' => $out['trigger_id'],
                 'module' => $_POST['target'][0],
                 'method' => $_POST['target'][1],
@@ -211,7 +228,7 @@ class Triggers {
                 'value' => json_encode($_POST['target'])
             ], [['id', '=', $trigger_id, PDO::PARAM_INT]]);
             
-            APP::Module('Triggers')->Exec('update_trigger', [
+            $this->Exec('update_trigger', [
                 'id' => $trigger_id,
                 'module' => $_POST['target'][0],
                 'method' => $_POST['target'][1],
@@ -244,7 +261,7 @@ class Triggers {
         
         if ($out['status'] == 'success') {
             $out['count'] = APP::Module('Registry')->Delete([['id', '=', $_POST['id'], PDO::PARAM_INT]]);
-            APP::Module('Triggers')->Exec('remove_trigger', ['id' => $_POST['id'], 'result' => $out['count']]);
+            $this->Exec('remove_trigger', ['id' => $_POST['id'], 'result' => $out['count']]);
         }
 
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');

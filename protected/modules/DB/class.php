@@ -109,9 +109,9 @@ class DB {
 
         // JOIN
         // [
-        //     'join/admin_pult_billing.invoices_labels' => [
-        //         ['admin_pult_billing.invoices_labels.inv_id','=','admin_pult_billing.invoices.id'],
-        //         ['admin_pult_billing.invoices_labels.inv_label','=','"call"']
+        //     'join/db.tbl' => [
+        //         ['db.tbl.fld','=','db.tbl.fld'],
+        //         ['db.tbl.fld','=','"call"']
         //     ]
         // ]
         if ($join) {
@@ -133,15 +133,15 @@ class DB {
         $operators[] = $this->WhereStatement($where);
 
         // GROUP
-        // ['id', 'name']
+        // ['fld1', 'fld2']
         if ($group) {
             $operators[] = 'GROUP BY ' . implode(',', $group);
         }
 
         // HAVING
         // [
-        //     ['COUNT(admin_pult_billing.invoices_labels.id)','!=','0'],
-        //     ['COUNT(admin_pult_billing.invoices_labels.sid)','=','"str"']
+        //     ['COUNT(db.tbl.fld)','!=','0'],
+        //     ['COUNT(db.tbl.fld)','=','"str"']
         // ]
         if ($having) {
             $having_list = [];
@@ -154,7 +154,7 @@ class DB {
         }
 
         // ORDER
-        // ['id', 'DESC']
+        // ['fld', 'DESC']
         if ($order) {
             $operators[] = 'ORDER BY ' . implode(' ', $order);
         }

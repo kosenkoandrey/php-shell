@@ -1,6 +1,7 @@
 <?
 class Sessions {
 
+    public $settings;
     public $session;
 
     function __construct($conf) {
@@ -8,9 +9,17 @@ class Sessions {
     }
     
     public function Init() {
-        ini_set('session.gc_maxlifetime', APP::Module('Registry')->Get('module_sessions_gc_maxlifetime'));
-        ini_set('session.cookie_lifetime', APP::Module('Registry')->Get('module_sessions_cookie_lifetime'));
-        ini_set('session.cookie_domain', APP::Module('Registry')->Get('module_sessions_cookie_domain'));
+        $this->settings = APP::Module('Registry')->Get([
+            'module_sessions_db_connection',
+            'module_sessions_cookie_domain',
+            'module_sessions_cookie_lifetime',
+            'module_sessions_compress',
+            'module_sessions_gc_maxlifetime'
+        ]);
+        
+        ini_set('session.gc_maxlifetime', $this->settings['module_sessions_gc_maxlifetime']);
+        ini_set('session.cookie_lifetime', $this->settings['module_sessions_cookie_lifetime']);
+        ini_set('session.cookie_domain', $this->settings['module_sessions_cookie_domain']);
 
         session_set_save_handler(
             [$this, 'Open'],
@@ -45,20 +54,20 @@ class Sessions {
     }
 
     public function Read($id) {
-        $sql = APP::Module('DB')->Open($this->conf['connection'])->prepare('SELECT * FROM sessions WHERE id = :id');
+        $sql = APP::Module('DB')->Open($this->settings['module_sessions_db_connection'])->prepare('SELECT * FROM sessions WHERE id = :id');
         $sql->bindParam(':id', $id, PDO::PARAM_STR);
         $sql->execute();
         
         $session = $sql->fetch(PDO::FETCH_ASSOC);
         
         if (!is_array($session)) return '';
-        return APP::Module('Registry')->Get('module_sessions_compress') ? gzuncompress($session['data']) : $session['data'];
+        return $this->settings['module_sessions_compress'] ? gzuncompress($session['data']) : $session['data'];
     }
 
     public function Write($id, $data) {
-        $data = APP::Module('Registry')->Get('module_sessions_compress') ? gzcompress($data, APP::Module('Registry')->Get('module_sessions_compress')) : $data;
+        $data = $this->settings['module_sessions_compress'] ? gzcompress($data, $this->settings['module_sessions_compress']) : $data;
         
-        $sql = APP::Module('DB')->Open($this->conf['connection'])->prepare('REPLACE INTO sessions (id, data) VALUES (:id, :data)');
+        $sql = APP::Module('DB')->Open($this->settings['module_sessions_db_connection'])->prepare('REPLACE INTO sessions (id, data) VALUES (:id, :data)');
         $sql->bindParam(':id', $id, PDO::PARAM_STR);
         $sql->bindParam(':data', $data, PDO::PARAM_STR);
         $sql->execute();
@@ -67,7 +76,7 @@ class Sessions {
     }
 
     public function Destroy($id) {
-        $sql = APP::Module('DB')->Open($this->conf['connection'])->prepare('DELETE FROM sessions WHERE id = :id');
+        $sql = APP::Module('DB')->Open($this->settings['module_sessions_db_connection'])->prepare('DELETE FROM sessions WHERE id = :id');
         $sql->bindParam(':id', $id, PDO::PARAM_STR);
         $sql->execute();
         
@@ -77,7 +86,7 @@ class Sessions {
     public function Gc($lifetime) {
         $touched = date('Y-m-d H:i:s', time() - $lifetime);
         
-        $sql = APP::Module('DB')->Open($this->conf['connection'])->prepare('DELETE FROM sessions WHERE touched < :touched');
+        $sql = APP::Module('DB')->Open($this->settings['module_sessions_db_connection'])->prepare('DELETE FROM sessions WHERE touched < :touched');
         $sql->bindParam(':touched', $touched, PDO::PARAM_STR);
         $sql->execute();
 
@@ -136,16 +145,7 @@ class Sessions {
 
     
     public function Settings() {
-        APP::Render(
-            'sessions/admin/index', 
-            'include', 
-            APP::Module('Registry')->Get([
-                'module_sessions_cookie_domain',
-                'module_sessions_gc_maxlifetime',
-                'module_sessions_cookie_lifetime',
-                'module_sessions_compress'
-            ])
-        );
+        APP::Render('sessions/admin/index');
     }
     
     

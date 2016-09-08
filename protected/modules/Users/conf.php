@@ -27,30 +27,31 @@ return [
         ['admin\/users\/auth(\?.*)?',                                           'Users', 'SetupAuth'],                  // Setup auth
         ['admin\/users\/passwords(\?.*)?',                                      'Users', 'SetupPasswords'],             // Setup passwords
         ['admin\/users\/timeouts(\?.*)?',                                       'Users', 'SetupTimeouts'],              // Setup timeouts
+        ['admin\/users\/settings(\?.*)?',                                       'Users', 'SetupOther'],                 // Setup other
         ['admin\/users\/roles(\?.*)?',                                          'Users', 'ManageRoles'],                // Manage roles
         ['admin\/users\/roles\/add(\?.*)?',                                     'Users', 'AddRole'],                    // Add role
         ['admin\/users\/roles\/rules\/(?P<role_id_hash>.*)\/edit\/(?P<rule_id_hash>.*)(\?.*)?', 'Users', 'EditRule'],   // Edit rule
         ['admin\/users\/roles\/rules\/(?P<role_id_hash>.*)\/add(\?.*)?',        'Users', 'AddRule'],                    // Add rule
         ['admin\/users\/roles\/rules\/(?P<role_id_hash>.*)(\?.*)?',             'Users', 'ManageRules'],                // Manage rules of role
         
-        ['admin\/users\/api\/list\.json(\?.*)?',                                'Users', 'APIListUsers'],               // [API] List users
-        ['admin\/users\/api\/add\.json(\?.*)?',                                 'Users', 'APIAddUser'],                 // [API] Add user
-        ['admin\/users\/api\/remove\.json(\?.*)?',                              'Users', 'APIRemoveUser'],              // [API] Remove user
-        ['admin\/users\/api\/update\.json(\?.*)?',                              'Users', 'APIUpdateUser'],              // [API] Update user
-        ['admin\/users\/api\/roles\/list\.json(\?.*)?',                         'Users', 'APIListRoles'],               // [API] List roles
-        ['admin\/users\/api\/roles\/add\.json(\?.*)?',                          'Users', 'APIAddRole'],                 // [API] Add role
-        ['admin\/users\/api\/roles\/remove\.json(\?.*)?',                       'Users', 'APIRemoveRole'],              // [API] Remove role
-        ['admin\/users\/api\/roles\/rules\/list\.json(\?.*)?',                  'Users', 'APIListRules'],               // [API] Add rule
-        ['admin\/users\/api\/roles\/rules\/add\.json(\?.*)?',                   'Users', 'APIAddRule'],                 // [API] Add rule
-        ['admin\/users\/api\/roles\/rules\/update\.json(\?.*)?',                'Users', 'APIUpdateRule'],              // [API] Update rule
-        ['admin\/users\/api\/roles\/rules\/remove\.json(\?.*)?',                'Users', 'APIRemoveRule'],              // [API] Remove rule
-        ['admin\/users\/api\/oauth\/clients\/update\.json(\?.*)?',              'Users', 'APIUpdateOAuthClientSettings'], // [API] Update oauth client settings
+        ['admin\/users\/api\/list\.json(\?.*)?',                                'Users', 'APIListUsers'],                   // [API] List users
+        ['admin\/users\/api\/add\.json(\?.*)?',                                 'Users', 'APIAddUser'],                     // [API] Add user
+        ['admin\/users\/api\/remove\.json(\?.*)?',                              'Users', 'APIRemoveUser'],                  // [API] Remove user
+        ['admin\/users\/api\/update\.json(\?.*)?',                              'Users', 'APIUpdateUser'],                  // [API] Update user
+        ['admin\/users\/api\/roles\/list\.json(\?.*)?',                         'Users', 'APIListRoles'],                   // [API] List roles
+        ['admin\/users\/api\/roles\/add\.json(\?.*)?',                          'Users', 'APIAddRole'],                     // [API] Add role
+        ['admin\/users\/api\/roles\/remove\.json(\?.*)?',                       'Users', 'APIRemoveRole'],                  // [API] Remove role
+        ['admin\/users\/api\/roles\/rules\/list\.json(\?.*)?',                  'Users', 'APIListRules'],                   // [API] Add rule
+        ['admin\/users\/api\/roles\/rules\/add\.json(\?.*)?',                   'Users', 'APIAddRule'],                     // [API] Add rule
+        ['admin\/users\/api\/roles\/rules\/update\.json(\?.*)?',                'Users', 'APIUpdateRule'],                  // [API] Update rule
+        ['admin\/users\/api\/roles\/rules\/remove\.json(\?.*)?',                'Users', 'APIRemoveRule'],                  // [API] Remove rule
+        ['admin\/users\/api\/oauth\/clients\/update\.json(\?.*)?',              'Users', 'APIUpdateOAuthClientSettings'],   // [API] Update oauth client settings
         ['admin\/users\/api\/notifications\/update\.json(\?.*)?',               'Users', 'APIUpdateNotificationsSettings'], // [API] Update notifications settings
-        ['admin\/users\/api\/services\/update\.json(\?.*)?',                    'Users', 'APIUpdateServicesSettings'],  // [API] Update services settings
-        ['admin\/users\/api\/auth\/update\.json(\?.*)?',                        'Users', 'APIUpdateAuthSettings'],      // [API] Update auth settings
-        ['admin\/users\/api\/passwords\/update\.json(\?.*)?',                   'Users', 'APIUpdatePasswordsSettings'], // [API] Update passwords settings
-        ['admin\/users\/api\/timeouts\/update\.json(\?.*)?',                    'Users', 'APIUpdateTimeoutsSettings'],  // [API] Update timeouts settings
+        ['admin\/users\/api\/services\/update\.json(\?.*)?',                    'Users', 'APIUpdateServicesSettings'],      // [API] Update services settings
+        ['admin\/users\/api\/auth\/update\.json(\?.*)?',                        'Users', 'APIUpdateAuthSettings'],          // [API] Update auth settings
+        ['admin\/users\/api\/passwords\/update\.json(\?.*)?',                   'Users', 'APIUpdatePasswordsSettings'],     // [API] Update passwords settings
+        ['admin\/users\/api\/timeouts\/update\.json(\?.*)?',                    'Users', 'APIUpdateTimeoutsSettings'],      // [API] Update timeouts settings
+        ['admin\/users\/api\/settings\/update\.json(\?.*)?',                    'Users', 'APIUpdateOtherSettings'],         // [API] Update other settings
     ],
-    'connection' => 'auto',
     'init' => true
 ];

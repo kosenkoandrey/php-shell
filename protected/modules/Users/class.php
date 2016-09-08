@@ -1,13 +1,41 @@
 <?
 class Users {
 
-    public $user = Array();
+    public $settings;
+    public $user = [];
     
     function __construct($conf) {
         foreach ($conf['routes'] as $route) APP::Module('Routing')->Add($route[0], $route[1], $route[2]);
     }
     
     public function Init() {
+        $this->settings = APP::Module('Registry')->Get([
+            'module_users_db_connection',
+            'module_users_auth_token', 
+            'module_users_change_password_service',
+            'module_users_check_rules', 
+            'module_users_gen_pass_length',
+            'module_users_login_service', 
+            'module_users_min_pass_length',
+            'module_users_register_service', 
+            'module_users_reset_password_service',
+            'module_users_social_auth_fb_id', 
+            'module_users_social_auth_fb_key',
+            'module_users_social_auth_google_id', 
+            'module_users_social_auth_google_key',
+            'module_users_social_auth_vk_id', 
+            'module_users_social_auth_vk_key',
+            'module_users_social_auth_ya_id', 
+            'module_users_social_auth_ya_key',
+            'module_users_timeout_activation', 
+            'module_users_timeout_email',
+            'module_users_timeout_token',
+            'module_users_register_activation_letter',
+            'module_users_reset_password_letter',
+            'module_users_change_password_letter',
+            'module_users_register_letter'
+        ]);
+        
         $this->user = &APP::Module('Sessions')->session['modules']['users']['user'];
         
         if (!isset(APP::Module('Sessions')->session['modules']['users']['double_auth'])) {
@@ -24,7 +52,7 @@ class Users {
             }
         }
         
-        if (((int) APP::Module('Registry')->Get('module_users_auth_token')) && ((int) APP::Module('Registry')->Get('module_users_login_service'))) {
+        if (((int) $this->settings['module_users_auth_token']) && ((int) $this->settings['module_users_login_service'])) {
             if (isset(APP::Module('Routing')->get['user_token'])) {
                 $token = json_decode(APP::Module('Crypt')->Decode(APP::Module('Routing')->get['user_token']), 1);
 
@@ -34,7 +62,7 @@ class Users {
             }
         }
 
-        if ((int) APP::Module('Registry')->Get('module_users_check_rules')) {
+        if ((int) $this->settings['module_users_check_rules']) {
             if ($target_uri = $this->CheckRules()) {
                 $url = parse_url(APP::Module('Routing')->root . $target_uri);
                 $target_query = ['return' => APP::Module('Crypt')->SafeB64Encode(APP::Module('Routing')->SelfUrl())];
@@ -60,7 +88,7 @@ class Users {
     
     public function Login($email, $password) {
         return (int) APP::Module('DB')->Select(
-            $this->conf['connection'], ['fetchColumn', 0], ['id'], 'users',
+            $this->settings['module_users_db_connection'], ['fetchColumn', 0], ['id'], 'users',
             [
                 ['email', '=', $email, PDO::PARAM_STR],
                 ['password', '=', $password, PDO::PARAM_STR]
@@ -70,7 +98,7 @@ class Users {
     
     public function Register($email, $password, $role = 'new') {
         return APP::Module('DB')->Insert(
-            $this->conf['connection'], 'users',
+            $this->settings['module_users_db_connection'], 'users',
             Array(
                 'id'            => 'NULL',
                 'email'         => [$email, PDO::PARAM_STR],
@@ -83,13 +111,13 @@ class Users {
     }
     
     public function Auth($id, $set_cookie = true, $save_password = false) {
-        $user = APP::Module('DB')->Select($this->conf['connection'], ['fetch', PDO::FETCH_ASSOC], ['*'], 'users', [['id', '=', $id, PDO::PARAM_INT]]);
+        $user = APP::Module('DB')->Select($this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_ASSOC], ['*'], 'users', [['id', '=', $id, PDO::PARAM_INT]]);
         
         if ($set_cookie) {
             setcookie(
                 'modules[users][email]', 
                 $user['email'], 
-                strtotime('+' . APP::Module('Registry')->Get('module_users_timeout_email')), 
+                strtotime('+' . $this->settings['module_users_timeout_email']), 
                 APP::$conf['location'][2],
                 APP::$conf['location'][1]
             );
@@ -97,7 +125,7 @@ class Users {
             setcookie(
                 'modules[users][token]', 
                 APP::Module('Crypt')->Encode($user['password']), 
-                $save_password ? strtotime('+' . APP::Module('Registry')->Get('module_users_timeout_token')) : 0, 
+                $save_password ? strtotime('+' . $this->settings['module_users_timeout_token']) : 0, 
                 APP::$conf['location'][2], 
                 APP::$conf['location'][1]
             );
@@ -127,32 +155,42 @@ class Users {
         return false;
     }
     
-    public function GeneratePassword($number) {
-        $chars = [
-            'a','b','c','d','e','f',
-            'g','h','i','j','k','l',
-            'm','n','o','p','r','s',
-            't','u','v','x','y','z',
-            'A','B','C','D','E','F',
-            'G','H','I','J','K','L',
-            'M','N','O','P','R','S',
-            'T','U','V','X','Y','Z',
-
-            '1','2','3','4','5','6',
-            '7','8','9','0'
-
-            /*
-            '.',',',
-            '(',')','[',']','!','?',
-            '&','^','%','@','*','$',
-            '<','>','/','|','+','-',
-            '{','}','`','~'
-            */
-        ];
+    public function GeneratePassword($length, $letters = true, $numbers = true, $other = false) {
+        $chars = [];
+        
+        if ($letters) {
+            array_merge($chars, [
+                'a','b','c','d','e','f',
+                'g','h','i','j','k','l',
+                'm','n','o','p','r','s',
+                't','u','v','x','y','z',
+                'A','B','C','D','E','F',
+                'G','H','I','J','K','L',
+                'M','N','O','P','R','S',
+                'T','U','V','X','Y','Z'
+            ]);
+        }
+        
+        if ($numbers) {
+            array_merge($chars, [
+                '1','2','3','4','5','6',
+                '7','8','9','0'
+            ]);
+        }
+        
+        if ($other) {
+            array_merge($chars, [
+                '.',',',
+                '(',')','[',']','!','?',
+                '&','^','%','@','*','$',
+                '<','>','/','|','+','-',
+                '{','}','`','~'
+            ]);
+        }
 
         $pass = '';
         
-        for($i = 0; $i < $number; $i++) {
+        for($i = 0; $i < $length; $i++) {
             $index = rand(0, count($chars) - 1);
             $pass .= $chars[$index];
         }
@@ -166,14 +204,14 @@ class Users {
         if (isset(APP::Module('Routing')->get['account']) ? (bool) APP::Module('Routing')->get['account'] : false) {
             setcookie(
                 'modules[users][email]', '', 
-                strtotime('-' . APP::Module('Registry')->Get('module_users_timeout_email')), 
+                strtotime('-' . $this->settings['module_users_timeout_email']), 
                 APP::$conf['location'][2], APP::$conf['location'][1]
             );
         }
         
         setcookie(
             'modules[users][token]', '', 
-            strtotime('-' . APP::Module('Registry')->Get('module_users_timeout_token')), 
+            strtotime('-' . $this->settings['module_users_timeout_token']), 
             APP::$conf['location'][2], APP::$conf['location'][1]
         );
         
@@ -199,7 +237,7 @@ class Users {
             'users/admin/edit', 'include', 
             [
                 'user' => APP::Module('DB')->Select(
-                    $this->conf['connection'], ['fetch', PDO::FETCH_ASSOC], 
+                    $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
                     ['id', 'email', 'password', 'role', 'reg_date', 'last_visit'], 'users',
                     [['id', '=', $user_id, PDO::PARAM_INT]]
                 ),
@@ -210,19 +248,7 @@ class Users {
     
     public function Actions() {
         $return = isset(APP::Module('Routing')->get['return']) ? APP::Module('Crypt')->SafeB64Decode(APP::Module('Routing')->get['return']) : false;
-
-        APP::Render(
-            'users/actions', 'include', 
-            [
-                'return' => $return ? filter_var($return, FILTER_VALIDATE_URL) ? $return : false : false,
-                'social_networks' => APP::Module('Registry')->Get([
-                    'module_users_social_auth_vk_id',
-                    'module_users_social_auth_fb_id',
-                    'module_users_social_auth_google_id',
-                    'module_users_social_auth_ya_id'
-                ])
-            ]
-        );
+        APP::Render('users/actions', 'include', ['return' => $return ? filter_var($return, FILTER_VALIDATE_URL) ? $return : false : false]);
     }
     
     public function DoubleLoginForm() {
@@ -241,9 +267,9 @@ class Users {
         $result = 'success';
         $user_id = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['user_id_hash']);
         
-        if (APP::Module('DB')->Select($this->conf['connection'], ['fetchColumn', 0], ['id'], 'users', [['id', '=', $user_id, PDO::PARAM_INT]])) {
+        if (APP::Module('DB')->Select($this->settings['module_users_db_connection'], ['fetchColumn', 0], ['id'], 'users', [['id', '=', $user_id, PDO::PARAM_INT]])) {
             APP::Module('DB')->Update(
-                $this->conf['connection'], 'users', 
+                $this->settings['module_users_db_connection'], 'users', 
                 ['role' => 'user'], 
                 [
                     ['id', '=', $user_id, PDO::PARAM_INT],
@@ -264,7 +290,7 @@ class Users {
             'users/profile', 'include', 
             [
                 'social-profiles' => APP::Module('DB')->Select(
-                    $this->conf['connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+                    $this->settings['module_users_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
                     ['network', 'extra'], 'social_accounts',
                     [['user_id', '=', $this->user['id'], PDO::PARAM_INT]]
                 )
@@ -319,76 +345,31 @@ class Users {
     }
     
     public function SetupOAuthClients() {
-        $prefix = 'module_users_social_auth_';
-        
-        APP::Render(
-            'users/admin/oauth_clients', 'include', 
-            APP::Module('Registry')->Get([
-                $prefix . 'fb_id',
-                $prefix . 'fb_key',
-                $prefix . 'vk_id',
-                $prefix . 'vk_key',
-                $prefix . 'google_id',
-                $prefix . 'google_key',
-                $prefix . 'ya_id',
-                $prefix . 'ya_key'
-            ])
-        );
+        APP::Render('users/admin/oauth_clients');
     }
     
     public function SetupNotifications() {
-        APP::Render(
-            'users/admin/notifications', 'include', 
-            APP::Module('Registry')->Get([
-                'module_users_register_activation_letter',
-                'module_users_reset_password_letter',
-                'module_users_register_letter',
-                'module_users_change_password_letter'
-            ])
-        );
+        APP::Render('users/admin/notifications');
     }
     
     public function SetupServices() {
-        APP::Render(
-            'users/admin/services', 'include', 
-            APP::Module('Registry')->Get([
-                'module_users_login_service',
-                'module_users_register_service',
-                'module_users_reset_password_service',
-                'module_users_change_password_service'
-            ])
-        );
+        APP::Render('users/admin/services');
     }
     
     public function SetupAuth() {
-        APP::Render(
-            'users/admin/auth', 'include', 
-            APP::Module('Registry')->Get([
-                'module_users_check_rules',
-                'module_users_auth_token'
-            ])
-        );
+        APP::Render('users/admin/auth');
     }
     
     public function SetupPasswords() {
-        APP::Render(
-            'users/admin/passwords', 'include', 
-            APP::Module('Registry')->Get([
-                'module_users_min_pass_length',
-                'module_users_gen_pass_length'
-            ])
-        );
+        APP::Render('users/admin/passwords');
     }
     
     public function SetupTimeouts() {
-        APP::Render(
-            'users/admin/timeouts', 'include', 
-            APP::Module('Registry')->Get([
-                'module_users_timeout_token',
-                'module_users_timeout_email',
-                'module_users_timeout_activation'
-            ])
-        );
+        APP::Render('users/admin/timeouts');
+    }
+    
+    public function SetupOther() {
+        APP::Render('users/admin/settings');
     }
     
     
@@ -396,7 +377,7 @@ class Users {
         $rows = [];
         
         foreach (APP::Module('DB')->Select(
-            $this->conf['connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            $this->settings['module_users_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
             ['id', 'email', 'password', 'role', 'reg_date', 'last_visit'], 'users',
             $_POST['searchPhrase'] ? [['email', 'LIKE', $_POST['searchPhrase'] . '%' ]] : false, 
             false, false, false,
@@ -417,7 +398,7 @@ class Users {
             'current' => $_POST['current'],
             'rowCount' => $_POST['rowCount'],
             'rows' => $rows,
-            'total' => APP::Module('DB')->Select($this->conf['connection'], ['fetchColumn', 0], ['COUNT(id)'], 'users', $_POST['searchPhrase'] ? [['email', 'LIKE', $_POST['searchPhrase'] . '%' ]] : false)
+            'total' => APP::Module('DB')->Select($this->settings['module_users_db_connection'], ['fetchColumn', 0], ['COUNT(id)'], 'users', $_POST['searchPhrase'] ? [['email', 'LIKE', $_POST['searchPhrase'] . '%' ]] : false)
         ]);
         exit;
     }
@@ -429,7 +410,7 @@ class Users {
         ];
 
         if (!APP::Module('DB')->Select(
-            $this->conf['connection'], ['fetchColumn', 0], 
+            $this->settings['module_users_db_connection'], ['fetchColumn', 0], 
             ['COUNT(id)'], 'users',
             [['id', '=', $_POST['id'], PDO::PARAM_INT]]
         )) {
@@ -439,7 +420,7 @@ class Users {
         
         if ($out['status'] == 'success') {
             $out['count'] = APP::Module('DB')->Delete(
-                $this->conf['connection'], 'users',
+                $this->settings['module_users_db_connection'], 'users',
                 [['id', '=', $_POST['id'], PDO::PARAM_INT]]
             );
             
@@ -463,7 +444,7 @@ class Users {
         if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) === false) {
             $out['status'] = 'error';
             $out['errors'][] = 1;
-        } else if (APP::Module('DB')->Select($this->conf['connection'], ['fetchColumn', 0], ['id'], 'users', [['email', '=', $_POST['email'], PDO::PARAM_STR]])) {
+        } else if (APP::Module('DB')->Select($this->settings['module_users_db_connection'], ['fetchColumn', 0], ['id'], 'users', [['email', '=', $_POST['email'], PDO::PARAM_STR]])) {
             $out['status'] = 'error';
             $out['errors'][] = 2;
         }
@@ -471,7 +452,7 @@ class Users {
         if (empty($_POST['password'])) {
             $out['status'] = 'error';
             $out['errors'][] = 3;
-        } else if (strlen($_POST['password']) < (int) APP::Module('Registry')->Get('module_users_min_pass_length')) {
+        } else if (strlen($_POST['password']) < (int) $this->settings['module_users_min_pass_length']) {
             $out['status'] = 'error';
             $out['errors'][] = 4;
         } else if ($_POST['password'] != $_POST['re-password']) {
@@ -484,7 +465,7 @@ class Users {
             
             if ((int) $_POST['notification']) {
                 $letter = APP::Module('DB')->Select(
-                    APP::Module('Mail')->conf['connection'], 
+                    APP::Module('Mail')->settings['module_mail_db_connection'], 
                     ['fetch', PDO::FETCH_ASSOC], 
                     [
                         'letters.subject', 
@@ -502,7 +483,7 @@ class Users {
                 $login_details = [
                     'email' => $_POST['email'],
                     'password' => $_POST['password'],
-                    'expire' => strtotime('+' . APP::Module('Registry')->Get('module_users_timeout_activation')),
+                    'expire' => strtotime('+' . $this->settings['module_users_timeout_activation']),
                     'link' => APP::Module('Routing')->root . 'users/activate/' . APP::Module('Crypt')->Encode($user_id)
                 ];
 
@@ -538,7 +519,7 @@ class Users {
     public function APILogin() {
         $status = 'error';
         
-        if (($user = $this->Login($_POST['email'], APP::Module('Crypt')->Encode($_POST['password']))) && ((int) APP::Module('Registry')->Get('module_users_login_service'))) {
+        if (($user = $this->Login($_POST['email'], APP::Module('Crypt')->Encode($_POST['password']))) && ((int) $this->settings['module_users_login_service'])) {
             $this->user = $this->Auth($user, true, isset($_POST['remember-me']));
             $status = 'success';
             
@@ -546,7 +527,7 @@ class Users {
                 'id' => $user,
                 'email' => $_POST['email'],
                 'password' => $_POST['password'],
-                'remember-me' => $_POST['remember-me']
+                'remember-me' => isset($_POST['remember-me'])
             ]);
         }
         
@@ -584,7 +565,7 @@ class Users {
         if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) === false) {
             $out['status'] = 'error';
             $out['errors'][] = 1;
-        } else if (APP::Module('DB')->Select($this->conf['connection'], ['fetchColumn', 0], ['id'], 'users', [['email', '=', $_POST['email'], PDO::PARAM_STR]])) {
+        } else if (APP::Module('DB')->Select($this->settings['module_users_db_connection'], ['fetchColumn', 0], ['id'], 'users', [['email', '=', $_POST['email'], PDO::PARAM_STR]])) {
             $out['status'] = 'error';
             $out['errors'][] = 2;
         }
@@ -592,7 +573,7 @@ class Users {
         if (empty($_POST['password'])) {
             $out['status'] = 'error';
             $out['errors'][] = 3;
-        } else if (strlen($_POST['password']) < (int) APP::Module('Registry')->Get('module_users_min_pass_length')) {
+        } else if (strlen($_POST['password']) < (int) $this->settings['module_users_min_pass_length']) {
             $out['status'] = 'error';
             $out['errors'][] = 4;
         } else if ($_POST['password'] != $_POST['re-password']) {
@@ -600,7 +581,7 @@ class Users {
             $out['errors'][] = 5;
         }
         
-        if (!(int) APP::Module('Registry')->Get('module_users_register_service')) {
+        if (!(int) $this->settings['module_users_register_service']) {
             $out['status'] = 'error';
             $out['errors'][] = 6;
         }
@@ -610,7 +591,7 @@ class Users {
             $this->user = $this->Auth($user_id, true, false);
 
             $letter = APP::Module('DB')->Select(
-                APP::Module('Mail')->conf['connection'], 
+                APP::Module('Mail')->settings['module_mail_db_connection'], 
                 ['fetch', PDO::FETCH_ASSOC], 
                 [
                     'letters.subject', 
@@ -621,14 +602,14 @@ class Users {
                     'senders.email'
                 ], 
                 'letters', 
-                [['letters.id', '=', APP::Module('Registry')->Get('module_users_register_activation_letter'), PDO::PARAM_INT]],
+                [['letters.id', '=', $this->settings['module_users_register_activation_letter'], PDO::PARAM_INT]],
                 ['join/senders' => [['senders.id','=','letters.sender_id']]]
             );
 
             $login_details = [
                 'email' => $_POST['email'],
                 'password' => $_POST['password'],
-                'expire' => strtotime('+' . APP::Module('Registry')->Get('module_users_timeout_activation')),
+                'expire' => strtotime('+' . $this->settings['module_users_timeout_activation']),
                 'link' => APP::Module('Routing')->root . 'users/activate/' . APP::Module('Crypt')->Encode($user_id)
             ];
             
@@ -667,12 +648,12 @@ class Users {
         if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) === false) {
             $out['status'] = 'error';
             $out['errors'][] = 1;
-        } else if (!APP::Module('DB')->Select($this->conf['connection'], ['fetchColumn', 0], ['id'], 'users', [['email', '=', $_POST['email'], PDO::PARAM_STR]])) {
+        } else if (!APP::Module('DB')->Select($this->settings['module_users_db_connection'], ['fetchColumn', 0], ['id'], 'users', [['email', '=', $_POST['email'], PDO::PARAM_STR]])) {
             $out['status'] = 'error';
             $out['errors'][] = 2;
         }
         
-        if (!(int) APP::Module('Registry')->Get('module_users_reset_password_service')) {
+        if (!(int) $this->settings['module_users_reset_password_service']) {
             $out['status'] = 'error';
             $out['errors'][] = 3;
         }
@@ -680,11 +661,11 @@ class Users {
         if ($out['status'] == 'success') {
             $token = [
                 $_POST['email'],
-                APP::Module('DB')->Select($this->conf['connection'], ['fetchColumn', 0], ['password'], 'users', [['email', '=', $_POST['email'], PDO::PARAM_STR]])
+                APP::Module('DB')->Select($this->settings['module_users_db_connection'], ['fetchColumn', 0], ['password'], 'users', [['email', '=', $_POST['email'], PDO::PARAM_STR]])
             ];
 
             $letter = APP::Module('DB')->Select(
-                APP::Module('Mail')->conf['connection'], 
+                APP::Module('Mail')->settings['module_mail_db_connection'], 
                 ['fetch', PDO::FETCH_ASSOC], 
                 [
                     'letters.subject', 
@@ -695,7 +676,7 @@ class Users {
                     'senders.email'
                 ], 
                 'letters', 
-                [['letters.id', '=', APP::Module('Registry')->Get('module_users_reset_password_letter'), PDO::PARAM_INT]],
+                [['letters.id', '=', $this->settings['module_users_reset_password_letter'], PDO::PARAM_INT]],
                 ['join/senders' => [['senders.id','=','letters.sender_id']]]
             );
 
@@ -736,7 +717,7 @@ class Users {
         } else if (empty($_POST['password'])) {
             $out['status'] = 'error';
             $out['errors'][] = 2;
-        } else if (strlen($_POST['password']) < (int) APP::Module('Registry')->Get('module_users_min_pass_length')) {
+        } else if (strlen($_POST['password']) < (int) $this->settings['module_users_min_pass_length']) {
             $out['status'] = 'error';
             $out['errors'][] = 3;
         } else if ($_POST['password'] != $_POST['re-password']) {
@@ -744,7 +725,7 @@ class Users {
             $out['errors'][] = 4;
         }
         
-        if (!(int) APP::Module('Registry')->Get('module_users_change_password_service')) {
+        if (!(int) $this->settings['module_users_change_password_service']) {
             $out['status'] = 'error';
             $out['errors'][] = 5;
         }
@@ -756,7 +737,7 @@ class Users {
             ]);
             
             APP::Module('DB')->Update(
-                $this->conf['connection'], 'users', 
+                $this->settings['module_users_db_connection'], 'users', 
                 ['password' => APP::Module('Crypt')->Encode($_POST['password'])], 
                 [['id', '=', $this->user['id'], PDO::PARAM_INT]]
             );
@@ -764,7 +745,7 @@ class Users {
             $this->user = $this->Auth($this->user['id'], true, true);
 
             $letter = APP::Module('DB')->Select(
-                APP::Module('Mail')->conf['connection'], 
+                APP::Module('Mail')->settings['module_mail_db_connection'], 
                 ['fetch', PDO::FETCH_ASSOC], 
                 [
                     'letters.subject', 
@@ -775,7 +756,7 @@ class Users {
                     'senders.email'
                 ], 
                 'letters', 
-                [['letters.id', '=', APP::Module('Registry')->Get('module_users_change_password_letter'), PDO::PARAM_INT]],
+                [['letters.id', '=', $this->settings['module_users_change_password_letter'], PDO::PARAM_INT]],
                 ['join/senders' => [['senders.id','=','letters.sender_id']]]
             );
 
@@ -811,14 +792,14 @@ class Users {
         if (isset(APP::Module('Routing')->get['account']) ? (bool) APP::Module('Routing')->get['account'] : false) {
             setcookie(
                 'modules[users][email]', '', 
-                strtotime('-' . APP::Module('Registry')->Get('module_users_timeout_email')), 
+                strtotime('-' . $this->settings['module_users_timeout_email']), 
                 APP::$conf['location'][2], APP::$conf['location'][1]
             );
         }
         
         setcookie(
             'modules[users][token]', '', 
-            strtotime('-' . APP::Module('Registry')->Get('module_users_timeout_token')), 
+            strtotime('-' . $this->settings['module_users_timeout_token']), 
             APP::$conf['location'][2], APP::$conf['location'][1]
         );
         
@@ -840,7 +821,7 @@ class Users {
         
         $user_id = APP::Module('Crypt')->Decode($_POST['id']);
 
-        if (!APP::Module('DB')->Select($this->conf['connection'], ['fetchColumn', 0], ['COUNT(id)'], 'users', [['id', '=', $user_id, PDO::PARAM_INT]])) {
+        if (!APP::Module('DB')->Select($this->settings['module_users_db_connection'], ['fetchColumn', 0], ['COUNT(id)'], 'users', [['id', '=', $user_id, PDO::PARAM_INT]])) {
             $out['status'] = 'error';
             $out['errors'][] = 1;
         }
@@ -849,7 +830,7 @@ class Users {
             if (empty($_POST['password'])) {
                 $out['status'] = 'error';
                 $out['errors'][] = 2;
-            } else if (strlen($_POST['password']) < (int) APP::Module('Registry')->Get('module_users_min_pass_length')) {
+            } else if (strlen($_POST['password']) < (int) $this->settings['module_users_min_pass_length']) {
                 $out['status'] = 'error';
                 $out['errors'][] = 3;
             } else if ($_POST['password'] != $_POST['re-password']) {
@@ -864,10 +845,10 @@ class Users {
         }
 
         if ($out['status'] == 'success') {
-            APP::Module('DB')->Update($this->conf['connection'], 'users', ['role' => $_POST['role']], [['id', '=', $user_id, PDO::PARAM_INT]]);
+            APP::Module('DB')->Update($this->settings['module_users_db_connection'], 'users', ['role' => $_POST['role']], [['id', '=', $user_id, PDO::PARAM_INT]]);
         
             if (APP::Module('Sessions')->session['modules']['users']['double_auth']) {
-                APP::Module('DB')->Update($this->conf['connection'], 'users', ['password' => APP::Module('Crypt')->Encode($_POST['password'])], [['id', '=', $user_id, PDO::PARAM_INT]]);
+                APP::Module('DB')->Update($this->settings['module_users_db_connection'], 'users', ['password' => APP::Module('Crypt')->Encode($_POST['password'])], [['id', '=', $user_id, PDO::PARAM_INT]]);
             }
             
             APP::Module('Triggers')->Exec('update_user', [
@@ -1186,10 +1167,10 @@ class Users {
         APP::Module('Registry')->Update(['value' => isset($_POST['module_users_change_password_service'])], [['item', '=', 'module_users_change_password_service', PDO::PARAM_STR]]);
         
         APP::Module('Triggers')->Exec('update_users_services_settings', [
-            'login_service' => $_POST['module_users_login_service'],
-            'register_service' => $_POST['module_users_register_service'],
-            'reset_password_service' => $_POST['module_users_reset_password_service'],
-            'change_password_service' => $_POST['module_users_change_password_service']
+            'login_service' => isset($_POST['module_users_login_service']),
+            'register_service' => isset($_POST['module_users_register_service']),
+            'reset_password_service' => isset($_POST['module_users_reset_password_service']),
+            'change_password_service' => isset($_POST['module_users_change_password_service'])
         ]);
         
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -1208,8 +1189,8 @@ class Users {
         APP::Module('Registry')->Update(['value' => isset($_POST['module_users_auth_token'])], [['item', '=', 'module_users_auth_token', PDO::PARAM_STR]]);
 
         APP::Module('Triggers')->Exec('update_users_auth_settings', [
-            'check_rules' => $_POST['module_users_check_rules'],
-            'auth_token' => $_POST['module_users_auth_token']
+            'check_rules' => isset($_POST['module_users_check_rules']),
+            'auth_token' => isset($_POST['module_users_auth_token'])
         ]);
         
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -1264,22 +1245,35 @@ class Users {
         ]);
         exit;
     }
+    
+    public function APIUpdateOtherSettings() {
+        APP::Module('Registry')->Update(['value' => $_POST['module_users_db_connection']], [['item', '=', 'module_users_db_connection', PDO::PARAM_STR]]);
+
+        APP::Module('Triggers')->Exec('update_users_other_settings', [
+            'db_connection' => $_POST['module_users_db_connection']
+        ]);
+        
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode([
+            'status' => 'success',
+            'errors' => []
+        ]);
+        exit;
+    }
 
     
     public function LoginVK() {
-        if (!(int) APP::Module('Registry')->Get('module_users_login_service')) APP::Render('users/errors', 'include', 'auth_service');
+        if (!(int) $this->settings['module_users_login_service']) APP::Render('users/errors', 'include', 'auth_service');
         
         if (isset(APP::Module('Routing')->get['code'])) {
-            $vk_auth = APP::Module('Registry')->Get([
-                'module_users_social_auth_vk_id',
-                'module_users_social_auth_vk_key'
-            ]);
-
-            $vk_result = json_decode(file_get_contents('https://oauth.vk.com/access_token?' . urldecode(http_build_query(['client_id' => $vk_auth['module_users_social_auth_vk_id'], 'client_secret' => $vk_auth['module_users_social_auth_vk_key'], 'code' => APP::Module('Routing')->get['code'], 'redirect_uri' => APP::Module('Routing')->root . 'users/login/vk']))), true);
+            $vk_result = json_decode(file_get_contents('https://oauth.vk.com/access_token?' . urldecode(http_build_query(['client_id' => $this->settings['module_users_social_auth_vk_id'], 'client_secret' => $this->settings['module_users_social_auth_vk_key'], 'code' => APP::Module('Routing')->get['code'], 'redirect_uri' => APP::Module('Routing')->root . 'users/login/vk']))), true);
 
             if (isset($vk_result['user_id'])) {
                 if ($user_id = APP::Module('DB')->Select(
-                        $this->conf['connection'], ['fetchColumn', 0], 
+                        $this->settings['module_users_db_connection'], ['fetchColumn', 0], 
                         ['user_id'], 'social_accounts', 
                         [
                             ['network', '=', 'vk', PDO::PARAM_STR], 
@@ -1290,11 +1284,11 @@ class Users {
                 } else {
                     if (isset($vk_result['email'])) {
                         if ($user_id = APP::Module('DB')->Select(
-                                $this->conf['connection'], ['fetchColumn', 0], 
+                                $this->settings['module_users_db_connection'], ['fetchColumn', 0], 
                                 ['id'], 'users', [['email', '=', $vk_result['email'], PDO::PARAM_STR]]
                         )) {
                             APP::Module('DB')->Insert(
-                                $this->conf['connection'], ' social_accounts',
+                                $this->settings['module_users_db_connection'], ' social_accounts',
                                 [
                                     'id' => 'NULL',
                                     'user_id' => [$user_id, PDO::PARAM_INT],
@@ -1306,12 +1300,12 @@ class Users {
                             
                             $this->user = $this->Auth($user_id, true, true);
                         } else {
-                            $password = $this->GeneratePassword((int) APP::Module('Registry')->Get('module_users_gen_pass_length'));
+                            $password = $this->GeneratePassword((int) $this->settings['module_users_gen_pass_length']);
                             $user_id = $this->Register($vk_result['email'], $password, 'user');
                             $this->user = $this->Auth($user_id, true, true);
                             
                             APP::Module('DB')->Insert(
-                                $this->conf['connection'], ' social_accounts',
+                                $this->settings['module_users_db_connection'], ' social_accounts',
                                 [
                                     'id' => 'NULL',
                                     'user_id' => [$user_id, PDO::PARAM_INT],
@@ -1322,7 +1316,7 @@ class Users {
                             );
                             
                             $letter = APP::Module('DB')->Select(
-                                APP::Module('Mail')->conf['connection'], 
+                                APP::Module('Mail')->settings['module_mail_db_connection'], 
                                 ['fetch', PDO::FETCH_ASSOC], 
                                 [
                                     'letters.subject', 
@@ -1333,7 +1327,7 @@ class Users {
                                     'senders.email'
                                 ], 
                                 'letters', 
-                                [['letters.id', '=', APP::Module('Registry')->Get('module_users_register_letter'), PDO::PARAM_INT]],
+                                [['letters.id', '=', $this->settings['module_users_register_letter'], PDO::PARAM_INT]],
                                 ['join/senders' => [['senders.id','=','letters.sender_id']]]
                             );
 
@@ -1384,24 +1378,19 @@ class Users {
     }
     
     public function LoginFB() {
-        if (!(int) APP::Module('Registry')->Get('module_users_login_service')) APP::Render('users/errors', 'include', 'auth_service');
+        if (!(int) $this->settings['module_users_login_service']) APP::Render('users/errors', 'include', 'auth_service');
         
         if (isset(APP::Module('Routing')->get['code'])) {
-            $fb_auth = APP::Module('Registry')->Get([
-                'module_users_social_auth_fb_id',
-                'module_users_social_auth_fb_key'
-            ]);
-
             $fb_result = null;
             
-            parse_str(file_get_contents('https://graph.facebook.com/oauth/access_token?' . urldecode(http_build_query(['client_id' => $fb_auth['module_users_social_auth_fb_id'], 'client_secret' => $fb_auth['module_users_social_auth_fb_key'], 'code' => APP::Module('Routing')->get['code'], 'redirect_uri' => APP::Module('Routing')->root . 'users/login/fb']))), $fb_result);
+            parse_str(file_get_contents('https://graph.facebook.com/oauth/access_token?' . urldecode(http_build_query(['client_id' => $this->settings['module_users_social_auth_fb_id'], 'client_secret' => $this->settings['module_users_social_auth_fb_key'], 'code' => APP::Module('Routing')->get['code'], 'redirect_uri' => APP::Module('Routing')->root . 'users/login/fb']))), $fb_result);
 
             if (count($fb_result) > 0 && isset($fb_result['access_token'])) {
                 $fb_user = json_decode(file_get_contents('https://graph.facebook.com/me?fields=email&' . urldecode(http_build_query(array('access_token' => $fb_result['access_token'])))), true);
                 
                 if (isset($fb_user['id'])) {
                     if ($user_id = APP::Module('DB')->Select(
-                        $this->conf['connection'], ['fetchColumn', 0], 
+                        $this->settings['module_users_db_connection'], ['fetchColumn', 0], 
                         ['user_id'], 'social_accounts', 
                         [
                             ['network', '=', 'fb', PDO::PARAM_STR], 
@@ -1412,11 +1401,11 @@ class Users {
                     } else {
                         if (isset($fb_user['email'])) {
                             if ($user_id = APP::Module('DB')->Select(
-                                $this->conf['connection'], ['fetchColumn', 0], 
+                                $this->settings['module_users_db_connection'], ['fetchColumn', 0], 
                                 ['id'], 'users', [['email', '=', $fb_user['email'], PDO::PARAM_STR]]
                             )) {
                                 APP::Module('DB')->Insert(
-                                    $this->conf['connection'], ' social_accounts',
+                                    $this->settings['module_users_db_connection'], ' social_accounts',
                                     [
                                         'id' => 'NULL',
                                         'user_id' => [$user_id, PDO::PARAM_INT],
@@ -1428,12 +1417,12 @@ class Users {
 
                                 $this->user = $this->Auth($user_id, true, true);
                             } else {
-                                $password = $this->GeneratePassword((int) APP::Module('Registry')->Get('module_users_gen_pass_length'));
+                                $password = $this->GeneratePassword((int) $this->settings['module_users_gen_pass_length']);
                                 $user_id = $this->Register($fb_user['email'], $password, 'user');
                                 $this->user = $this->Auth($user_id, true, true);
 
                                 APP::Module('DB')->Insert(
-                                    $this->conf['connection'], ' social_accounts',
+                                    $this->settings['module_users_db_connection'], ' social_accounts',
                                     [
                                         'id' => 'NULL',
                                         'user_id' => [$user_id, PDO::PARAM_INT],
@@ -1444,7 +1433,7 @@ class Users {
                                 );
 
                                 $letter = APP::Module('DB')->Select(
-                                    APP::Module('Mail')->conf['connection'], 
+                                    APP::Module('Mail')->settings['module_mail_db_connection'], 
                                     ['fetch', PDO::FETCH_ASSOC], 
                                     [
                                         'letters.subject', 
@@ -1455,7 +1444,7 @@ class Users {
                                         'senders.email'
                                     ], 
                                     'letters', 
-                                    [['letters.id', '=', APP::Module('Registry')->Get('module_users_register_letter'), PDO::PARAM_INT]],
+                                    [['letters.id', '=', $this->settings['module_users_register_letter'], PDO::PARAM_INT]],
                                     ['join/senders' => [['senders.id','=','letters.sender_id']]]
                                 );
 
@@ -1492,19 +1481,14 @@ class Users {
     }
     
     public function LoginGoogle() {
-        if (!(int) APP::Module('Registry')->Get('module_users_login_service')) APP::Render('users/errors', 'include', 'auth_service');
+        if (!(int) $this->settings['module_users_login_service']) APP::Render('users/errors', 'include', 'auth_service');
         
         if (isset(APP::Module('Routing')->get['code'])) {
-            $google_auth = APP::Module('Registry')->Get([
-                'module_users_social_auth_google_id',
-                'module_users_social_auth_google_key'
-            ]);
-
             $curl = curl_init();
             
             curl_setopt($curl, CURLOPT_URL, 'https://accounts.google.com/o/oauth2/token');
             curl_setopt($curl, CURLOPT_POST, 1);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, urldecode(http_build_query(['client_id' => $google_auth['module_users_social_auth_google_id'], 'client_secret' => $google_auth['module_users_social_auth_google_key'], 'code' => APP::Module('Routing')->get['code'], 'redirect_uri' => APP::Module('Routing')->root . 'users/login/google', 'grant_type' => 'authorization_code'])));
+            curl_setopt($curl, CURLOPT_POSTFIELDS, urldecode(http_build_query(['client_id' => $this->settings['module_users_social_auth_google_id'], 'client_secret' => $this->settings['module_users_social_auth_google_key'], 'code' => APP::Module('Routing')->get['code'], 'redirect_uri' => APP::Module('Routing')->root . 'users/login/google', 'grant_type' => 'authorization_code'])));
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
             
@@ -1517,7 +1501,7 @@ class Users {
 
                 if (isset($google_user['id'])) {
                     if ($user_id = APP::Module('DB')->Select(
-                        $this->conf['connection'], ['fetchColumn', 0], 
+                        $this->settings['module_users_db_connection'], ['fetchColumn', 0], 
                         ['user_id'], 'social_accounts', 
                         [
                             ['network', '=', 'google', PDO::PARAM_STR], 
@@ -1528,11 +1512,11 @@ class Users {
                     } else {
                         if (isset($google_user['email'])) {
                             if ($user_id = APP::Module('DB')->Select(
-                                $this->conf['connection'], ['fetchColumn', 0], 
+                                $this->settings['module_users_db_connection'], ['fetchColumn', 0], 
                                 ['id'], 'users', [['email', '=', $google_user['email'], PDO::PARAM_STR]]
                             )) {
                                 APP::Module('DB')->Insert(
-                                    $this->conf['connection'], ' social_accounts',
+                                    $this->settings['module_users_db_connection'], ' social_accounts',
                                     [
                                         'id' => 'NULL',
                                         'user_id' => [$user_id, PDO::PARAM_INT],
@@ -1544,12 +1528,12 @@ class Users {
 
                                 $this->user = $this->Auth($user_id, true, true);
                             } else {
-                                $password = $this->GeneratePassword((int) APP::Module('Registry')->Get('module_users_gen_pass_length'));
+                                $password = $this->GeneratePassword((int) $this->settings['module_users_gen_pass_length']);
                                 $user_id = $this->Register($google_user['email'], $password, 'user');
                                 $this->user = $this->Auth($user_id, true, true);
 
                                 APP::Module('DB')->Insert(
-                                    $this->conf['connection'], ' social_accounts',
+                                    $this->settings['module_users_db_connection'], ' social_accounts',
                                     [
                                         'id' => 'NULL',
                                         'user_id' => [$user_id, PDO::PARAM_INT],
@@ -1560,7 +1544,7 @@ class Users {
                                 );
 
                                 $letter = APP::Module('DB')->Select(
-                                    APP::Module('Mail')->conf['connection'], 
+                                    APP::Module('Mail')->settings['module_mail_db_connection'], 
                                     ['fetch', PDO::FETCH_ASSOC], 
                                     [
                                         'letters.subject', 
@@ -1571,7 +1555,7 @@ class Users {
                                         'senders.email'
                                     ], 
                                     'letters', 
-                                    [['letters.id', '=', APP::Module('Registry')->Get('module_users_register_letter'), PDO::PARAM_INT]],
+                                    [['letters.id', '=', $this->settings['module_users_register_letter'], PDO::PARAM_INT]],
                                     ['join/senders' => [['senders.id','=','letters.sender_id']]]
                                 );
 
@@ -1608,19 +1592,14 @@ class Users {
     }
     
     public function LoginYA() {  
-        if (!(int) APP::Module('Registry')->Get('module_users_login_service')) APP::Render('users/errors', 'include', 'auth_service');
+        if (!(int) $this->settings['module_users_login_service']) APP::Render('users/errors', 'include', 'auth_service');
         
         if (isset(APP::Module('Routing')->get['code'])) {
-            $ya_auth = APP::Module('Registry')->Get([
-                'module_users_social_auth_ya_id',
-                'module_users_social_auth_ya_key'
-            ]);
-
             $curl = curl_init();
             
             curl_setopt($curl, CURLOPT_URL, 'https://oauth.yandex.ru/token');
             curl_setopt($curl, CURLOPT_POST, 1);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, urldecode(http_build_query(['client_id' => $ya_auth['module_users_social_auth_ya_id'], 'client_secret' => $ya_auth['module_users_social_auth_ya_key'], 'code' => APP::Module('Routing')->get['code'], 'redirect_uri' => APP::Module('Routing')->root . 'users/login/ya', 'grant_type' => 'authorization_code'])));
+            curl_setopt($curl, CURLOPT_POSTFIELDS, urldecode(http_build_query(['client_id' => $this->settings['module_users_social_auth_ya_id'], 'client_secret' => $this->settings['module_users_social_auth_ya_key'], 'code' => APP::Module('Routing')->get['code'], 'redirect_uri' => APP::Module('Routing')->root . 'users/login/ya', 'grant_type' => 'authorization_code'])));
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
             
@@ -1633,7 +1612,7 @@ class Users {
 
                 if (isset($ya_user['id'])) {
                     if ($user_id = APP::Module('DB')->Select(
-                        $this->conf['connection'], ['fetchColumn', 0], 
+                        $this->settings['module_users_db_connection'], ['fetchColumn', 0], 
                         ['user_id'], 'social_accounts', 
                         [
                             ['network', '=', 'ya', PDO::PARAM_STR], 
@@ -1644,11 +1623,11 @@ class Users {
                     } else {
                         if (isset($ya_user['default_email'])) {
                             if ($user_id = APP::Module('DB')->Select(
-                                $this->conf['connection'], ['fetchColumn', 0], 
+                                $this->settings['module_users_db_connection'], ['fetchColumn', 0], 
                                 ['id'], 'users', [['email', '=', $ya_user['default_email'], PDO::PARAM_STR]]
                             )) {
                                 APP::Module('DB')->Insert(
-                                    $this->conf['connection'], ' social_accounts',
+                                    $this->settings['module_users_db_connection'], ' social_accounts',
                                     [
                                         'id' => 'NULL',
                                         'user_id' => [$user_id, PDO::PARAM_INT],
@@ -1660,12 +1639,12 @@ class Users {
 
                                 $this->user = $this->Auth($user_id, true, true);
                             } else {
-                                $password = $this->GeneratePassword((int) APP::Module('Registry')->Get('module_users_gen_pass_length'));
+                                $password = $this->GeneratePassword((int) $this->settings['module_users_gen_pass_length']);
                                 $user_id = $this->Register($ya_user['default_email'], $password, 'user');
                                 $this->user = $this->Auth($user_id, true, true);
 
                                 APP::Module('DB')->Insert(
-                                    $this->conf['connection'], ' social_accounts',
+                                    $this->settings['module_users_db_connection'], ' social_accounts',
                                     [
                                         'id' => 'NULL',
                                         'user_id' => [$user_id, PDO::PARAM_INT],
@@ -1676,7 +1655,7 @@ class Users {
                                 );
 
                                 $letter = APP::Module('DB')->Select(
-                                    APP::Module('Mail')->conf['connection'], 
+                                    APP::Module('Mail')->settings['module_mail_db_connection'], 
                                     ['fetch', PDO::FETCH_ASSOC], 
                                     [
                                         'letters.subject', 
@@ -1687,7 +1666,7 @@ class Users {
                                         'senders.email'
                                     ], 
                                     'letters', 
-                                    [['letters.id', '=', APP::Module('Registry')->Get('module_users_register_letter'), PDO::PARAM_INT]],
+                                    [['letters.id', '=', $this->settings['module_users_register_letter'], PDO::PARAM_INT]],
                                     ['join/senders' => [['senders.id','=','letters.sender_id']]]
                                 );
 

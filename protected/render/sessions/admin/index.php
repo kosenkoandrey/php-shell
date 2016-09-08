@@ -35,6 +35,16 @@
 
                             <div class="card-body card-padding">
                                 <div class="form-group">
+                                    <label for="module_sessions_db_connection" class="col-sm-2 control-label">Database connection</label>
+                                    <div class="col-sm-2">
+                                        <div class="fg-line">
+                                            <select id="module_sessions_db_connection" name="module_sessions_db_connection" class="selectpicker">
+                                                <? foreach (array_keys(APP::Module('DB')->conf['connections']) as $connection) { ?><option value="<?= $connection ?>"><?= $connection ?></option><? } ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
                                     <label for="module_sessions_cookie_domain" class="col-sm-2 control-label">Cookie domain</label>
                                     <div class="col-sm-3">
                                         <div class="fg-line">
@@ -98,24 +108,28 @@
         
         <script>
             $(document).ready(function() {
-                $('#module_sessions_cookie_domain').val('<?= $data['module_sessions_cookie_domain'] ?>');
-                $('#module_sessions_cookie_lifetime').val('<?= $data['module_sessions_cookie_lifetime'] ?>');
-                $('#module_sessions_gc_maxlifetime').val('<?= $data['module_sessions_gc_maxlifetime'] ?>');
-                $('#module_sessions_compress').val('<?= $data['module_sessions_compress'] ?>');
+                $('#module_sessions_db_connection').val('<?= APP::Module('Sessions')->settings['module_sessions_db_connection'] ?>');
+                $('#module_sessions_cookie_domain').val('<?= APP::Module('Sessions')->settings['module_sessions_cookie_domain'] ?>');
+                $('#module_sessions_cookie_lifetime').val('<?= APP::Module('Sessions')->settings['module_sessions_cookie_lifetime'] ?>');
+                $('#module_sessions_gc_maxlifetime').val('<?= APP::Module('Sessions')->settings['module_sessions_gc_maxlifetime'] ?>');
+                $('#module_sessions_compress').val('<?= APP::Module('Sessions')->settings['module_sessions_compress'] ?>');
 
                 $('#update-settings').submit(function(event) {
                     event.preventDefault();
 
+                    var module_sessions_db_connection = $(this).find('#module_sessions_db_connection');
                     var module_sessions_cookie_domain = $(this).find('#module_sessions_cookie_domain');
                     var module_sessions_cookie_lifetime = $(this).find('#module_sessions_cookie_lifetime');
                     var module_sessions_gc_maxlifetime = $(this).find('#module_sessions_gc_maxlifetime');
                     var module_sessions_compress = $(this).find('#module_sessions_compress');
                     
+                    module_sessions_db_connection.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
                     module_sessions_cookie_domain.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
                     module_sessions_cookie_lifetime.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
                     module_sessions_gc_maxlifetime.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
                     module_sessions_compress.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
                     
+                    if (module_sessions_db_connection.val() === '') { module_sessions_db_connection.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-2').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
                     if (module_sessions_cookie_domain.val() === '') { module_sessions_cookie_domain.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
                     if (module_sessions_cookie_lifetime.val() === '') { module_sessions_cookie_lifetime.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
                     if (module_sessions_gc_maxlifetime.val() === '') { module_sessions_gc_maxlifetime.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }

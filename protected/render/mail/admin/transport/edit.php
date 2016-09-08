@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>PHP-shell - SSH</title>
+        <title>PHP-shell - Mail</title>
 
         <!-- Vendor CSS -->
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
@@ -13,13 +13,14 @@
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/google-material-color/dist/palette.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/css/bootstrap-select.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.css" rel="stylesheet">
-        
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/chosen/chosen.min.css" rel="stylesheet">
+
         <? APP::Render('core/widgets/css') ?>
     </head>
     <body data-ma-header="teal">
         <? 
         APP::Render('admin/widgets/header', 'include', [
-            'SSH' => 'admin/ssh'
+            'Mail transport' => 'admin/mail/transport',
         ]);
         ?>
         <section id="main">
@@ -28,47 +29,52 @@
             <section id="content">
                 <div class="container">
                     <div class="card">
-                        <form id="add-connection" class="form-horizontal" role="form">
+                        <form id="edit-transport" class="form-horizontal" role="form">
+                            <input type="hidden" name="transport_id" value="<?= APP::Module('Routing')->get['transport_id_hash'] ?>">
+                            
                             <div class="card-header">
-                                <h2>Add connection</h2>
+                                <h2>Edit transport</h2>
                             </div>
 
                             <div class="card-body card-padding">
                                 <div class="form-group">
-                                    <label for="host" class="col-sm-2 control-label">Host</label>
+                                    <label for="transport_0" class="col-sm-2 control-label">Action</label>
                                     <div class="col-sm-3">
                                         <div class="fg-line">
-                                            <input type="text" class="form-control" name="host" id="host" value="127.0.0.1">
+                                            <input type="text" class="form-control" name="transport[0]" id="transport_0">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="port" class="col-sm-2 control-label">Port</label>
+                                    <label for="transport_1" class="col-sm-2 control-label">Module</label>
                                     <div class="col-sm-3">
                                         <div class="fg-line">
-                                            <input type="text" class="form-control" name="port" id="port" value="22">
+                                            <select id="transport_1" name="transport[1]">
+                                                <? foreach (APP::$modules as $key => $value) { ?><option value="<?= $key ?>"><?= $key ?></option><? } ?>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="user" class="col-sm-2 control-label">User</label>
+                                    <label for="transport_2" class="col-sm-2 control-label">Method</label>
                                     <div class="col-sm-3">
                                         <div class="fg-line">
-                                            <input type="text" class="form-control" name="user" id="user">
+                                            <input type="text" class="form-control" name="transport[2]" id="transport_2">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="password" class="col-sm-2 control-label">Password</label>
+                                    <label for="transport_3" class="col-sm-2 control-label">Settings URI</label>
                                     <div class="col-sm-3">
                                         <div class="fg-line">
-                                            <input type="password" class="form-control" name="password" id="password">
+                                            <input type="text" class="form-control" name="transport[3]" id="transport_3">
                                         </div>
                                     </div>
                                 </div>
+                                
                                 <div class="form-group">
                                     <div class="col-sm-offset-2 col-sm-5">
-                                        <button type="submit" class="btn palette-Teal bg waves-effect btn-lg">Add</button>
+                                        <button type="submit" class="btn palette-Teal bg waves-effect btn-lg">Save changes</button>
                                     </div>
                                 </div>
                             </div>
@@ -90,74 +96,73 @@
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/Waves/dist/waves.min.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.min.js"></script>
-        
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/chosen/chosen.jquery.min.js"></script>
+
         <? APP::Render('core/widgets/js') ?>
         
         <script>
             $(document).ready(function() {
-                $('#add-connection').submit(function(event) {
+                $('#transport_0').val('<?= $data[0] ?>');
+                $('#transport_1').val('<?= $data[1] ?>');
+                $('#transport_2').val('<?= $data[2] ?>');
+                $('#transport_3').val('<?= $data[3] ?>');
+                
+                $('#transport_1').chosen({
+                    width: '100%',
+                    allow_single_deselect: true
+                });
+                
+                $('#edit-transport').submit(function(event) {
                     event.preventDefault();
 
-                    var host = $(this).find('#host');
-                    var port = $(this).find('#port');
-                    var user = $(this).find('#user');
-                    var password = $(this).find('#password');
+                    var transport_0 = $(this).find('#transport_0');
+                    var transport_1 = $(this).find('#transport_1');
+                    var transport_2 = $(this).find('#transport_2');
+                    var transport_3 = $(this).find('#transport_3');
                     
-                    host.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
-                    port.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
-                    user.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
-                    password.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    transport_0.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    transport_1.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    transport_2.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    transport_3.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
 
-                    if (host.val() === '') { host.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
-                    if (port.val() === '') { port.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
-                    if (user.val() === '') { user.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
-                    if (password.val() === '') { password.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    if (transport_0.val() === '') { transport_0.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    if (transport_1.val() === '') { transport_1.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    if (transport_2.val() === '') { transport_2.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    if (transport_3.val() === '') { transport_3.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
  
                     $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
 
                     $.ajax({
                         type: 'post',
-                        url: '<?= APP::Module('Routing')->root ?>admin/ssh/api/add.json',
+                        url: '<?= APP::Module('Routing')->root ?>admin/mail/api/transport/update.json',
                         data: $(this).serialize(),
                         success: function(result) {
                             switch(result.status) {
                                 case 'success':
                                     swal({
                                         title: 'Done!',
-                                        text: 'Connection "' + user.val() + '@' + host.val() + ':' + port.val() + '" has been added',
+                                        text: 'Transport method "' + transport_0.val() + '" has been added',
                                         type: 'success',
                                         showCancelButton: false,
                                         confirmButtonText: 'Ok',
                                         closeOnConfirm: false
                                     }, function(){
-                                        window.location.href = '<?= APP::Module('Routing')->root ?>admin/ssh';
+                                        window.location.href = '<?= APP::Module('Routing')->root ?>admin/mail/transport';
                                     });
                                     break;
                                 case 'error': 
                                     $.each(result.errors, function(i, error) {
                                         switch(error) {
-                                            case 1: $('#host').closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); break;
-                                            case 2: $('#port').closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); break;
-                                            case 3: $('#user').closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); break;
-                                            case 4: $('#password').closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); break;
-                                            /*
-                                            case 5: 
-                                                swal({
-                                                    title: 'Error!',
-                                                    text: 'Connection failed',
-                                                    type: 'error',
-                                                    showCancelButton: false,
-                                                    confirmButtonText: 'Ok',
-                                                    closeOnConfirm: false
-                                                }); 
-                                                break;
-                                            */
+                                            case 1: $('#transport_0').closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); break;
+                                            case 2: $('#transport_1').closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); break;
+                                            case 3: $('#transport_2').closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); break;
+                                            case 4: $('#transport_3').closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); break;
                                         }
                                     });
                                     break;
                             }
 
-                            $('#add-connection').find('[type="submit"]').html('Add').attr('disabled', false);
+                            $('#edit-transport').find('[type="submit"]').html('Save changes').attr('disabled', false);
                         }
                     });
                   });

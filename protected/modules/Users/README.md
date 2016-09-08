@@ -40,7 +40,8 @@ User management system
         │   ├── oauth_clients.php
         │   ├── passwords.php
         │   ├── services.php
-        │   └── timeouts.php
+        │   ├── timeouts.php
+        │   └── settings.php
         ├── actions.php
         ├── activate.php
         ├── double_login.php
@@ -66,7 +67,7 @@ int APP::Module('Users')->Register(string $email, string $password[, string $rol
 array APP::Module('Users')->Auth(int $id[, bool $set_cookie = true[, bool $save_password = false]])
 
 // Generate password
-string APP::Module('Users')->GeneratePassword(int $number)
+string APP::Module('Users')->GeneratePassword(int $length[, bool $letters = true[, bool $numbers = false[, bool $other = false]]])
 ```
 
 ### Triggers
@@ -91,6 +92,7 @@ string APP::Module('Users')->GeneratePassword(int $number)
 - Update auth settings
 - Update passwords settings
 - Update timeouts settings 
+- Update other settings 
 
 ### WEB interfaces
 ```
@@ -113,6 +115,7 @@ string APP::Module('Users')->GeneratePassword(int $number)
 /admin/users/auth                                           // Setup auth
 /admin/users/passwords                                      // Setup passwords
 /admin/users/timeouts                                       // Setup timeouts
+/admin/users/settings                                       // Other settings
 /admin/users/roles                                          // Manage roles
 /admin/users/roles/add                                      // Add role
 /admin/users/roles/rules/<role_id_hash>/edit/<rule_id_hash> // Edit rule
@@ -142,4 +145,5 @@ string APP::Module('Users')->GeneratePassword(int $number)
 /admin/users/api/auth/update.json                           // [API] Update auth settings
 /admin/users/api/passwords/update.json                      // [API] Update passwords settings
 /admin/users/api/timeouts/update.json                       // [API] Update timeouts settings
+/admin/users/api/settings/update.json                       // [API] Update other settings
 ```

@@ -80,8 +80,8 @@
         <? APP::Render('core/widgets/js') ?>
         
         <script>
-            $('#module_users_check_rules').prop('checked', <?= (int) $data['module_users_check_rules'] ?>);
-            $('#module_users_auth_token').prop('checked', <?= (int) $data['module_users_auth_token'] ?>);
+            $('#module_users_check_rules').prop('checked', <?= (int) APP::Module('Users')->settings['module_users_check_rules'] ?>);
+            $('#module_users_auth_token').prop('checked', <?= (int) APP::Module('Users')->settings['module_users_auth_token'] ?>);
 
             $(document).ready(function() {
                 $('#update-auth').submit(function(event) {

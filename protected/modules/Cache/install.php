@@ -60,5 +60,9 @@ if ($error) {
 
 $data->extractTo(ROOT);
 
-APP::Module('Registry')->Add('module_cache_memcache_host', $_SESSION['core']['install']['cache']['connection']['host']);
-APP::Module('Registry')->Add('module_cache_memcache_port', $_SESSION['core']['install']['cache']['connection']['port']);
+$input = $_SESSION['core']['install']['cache'];
+
+APP::Module('Registry')->Add('module_cache_memcache_host', $input['connection']['host']);
+APP::Module('Registry')->Add('module_cache_memcache_port', $input['connection']['port']);
+
+APP::Module('Triggers')->Register('update_cache_settings', 'Cache', 'Update settings');
