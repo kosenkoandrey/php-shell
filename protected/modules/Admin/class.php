@@ -6,6 +6,7 @@ class Admin {
     }
 
     public function Manage() {
+        $this->Test();
         APP::Render('admin/index');
     }
     
@@ -90,5 +91,4 @@ class Admin {
         echo json_encode(APP::UninstallModule($module));
         exit;
     }
-
 }

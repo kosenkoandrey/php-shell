@@ -1,6 +1,6 @@
 <?
 return [
-    'location'          => ['https', 'domain.com', '/'],
+    'location'          => ['http', 'dev1.sendthis.ru', '/'],
     'encoding'          => 'UTF-8',
     'locale'            => 'en_US',
     'timezone'          => 'Etc/GMT-3',

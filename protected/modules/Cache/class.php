@@ -18,7 +18,6 @@ class Cache {
         return APP::Render('cache/admin/nav', 'content');
     }
 
-    
     public function Settings() {
         APP::Render('cache/admin/index', 'include', APP::Module('Registry')->Get(['module_cache_memcache_host', 'module_cache_memcache_port']));
     }
@@ -37,5 +36,4 @@ class Cache {
         ]);
         exit;
     }
-    
 }

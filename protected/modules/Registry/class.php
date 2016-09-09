@@ -71,7 +71,7 @@ class Registry {
     }
     
     public function Update($fields, $where) {
-        APP::Module('DB')->Update($this->conf['connection'], 'registry', $fields, $where);
+        return APP::Module('DB')->Update($this->conf['connection'], 'registry', $fields, $where);
     }
     
 }

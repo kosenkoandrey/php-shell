@@ -1186,10 +1186,10 @@ class Users {
         APP::Module('Registry')->Update(['value' => isset($_POST['module_users_change_password_service'])], [['item', '=', 'module_users_change_password_service', PDO::PARAM_STR]]);
         
         APP::Module('Triggers')->Exec('update_users_services_settings', [
-            'login_service' => $_POST['module_users_login_service'],
-            'register_service' => $_POST['module_users_register_service'],
-            'reset_password_service' => $_POST['module_users_reset_password_service'],
-            'change_password_service' => $_POST['module_users_change_password_service']
+            'login_service' => isset($_POST['module_users_login_service']),
+            'register_service' => isset($_POST['module_users_register_service']),
+            'reset_password_service' => isset($_POST['module_users_reset_password_service']),
+            'change_password_service' => isset($_POST['module_users_change_password_service'])
         ]);
         
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');

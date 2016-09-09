@@ -1,13 +1,12 @@
 <?
 return [
     'connections' => [
-        // default
         'auto' => [
             'type'      => 'mysql',
             'host'      => 'localhost',
-            'database'  => 'phpshell',
-            'username'  => 'root',
-            'password'  => '',
+            'database'  => 'phpshell_dev1',
+            'username'  => 'phpshell',
+            'password'  => 'UUY9mPCC5PBVQ7SJ',
             'charset'   => 'utf8'
         ]
     ],
