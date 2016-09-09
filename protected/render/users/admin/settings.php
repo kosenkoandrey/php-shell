@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>PHP-shell - Mail</title>
+        <title>PHP-shell - Users</title>
 
         <!-- Vendor CSS -->
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
@@ -19,7 +19,7 @@
     <body data-ma-header="teal">
         <? 
         APP::Render('admin/widgets/header', 'include', [
-            'Mail settings' => 'admin/mail/settings'
+            'Users' => 'admin/users'
         ]);
         ?>
         <section id="main">
@@ -35,28 +35,12 @@
 
                             <div class="card-body card-padding">
                                 <div class="form-group">
-                                    <label for="module_mail_db_connection" class="col-sm-2 control-label">Database connection</label>
+                                    <label for="module_users_db_connection" class="col-sm-2 control-label">Database connection</label>
                                     <div class="col-sm-2">
                                         <div class="fg-line">
-                                            <select id="module_mail_db_connection" name="module_mail_db_connection" class="selectpicker">
+                                            <select id="module_users_db_connection" name="module_users_db_connection" class="selectpicker">
                                                 <? foreach (array_keys(APP::Module('DB')->conf['connections']) as $connection) { ?><option value="<?= $connection ?>"><?= $connection ?></option><? } ?>
                                             </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="module_mail_x_mailer" class="col-sm-2 control-label">X-Mailer</label>
-                                    <div class="col-sm-2">
-                                        <div class="fg-line">
-                                            <input type="text" class="form-control" name="module_mail_x_mailer" id="module_mail_x_mailer">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="module_mail_charset" class="col-sm-2 control-label">Charset</label>
-                                    <div class="col-sm-2">
-                                        <div class="fg-line">
-                                            <input type="text" class="form-control" name="module_mail_charset" id="module_mail_charset">
                                         </div>
                                     </div>
                                 </div>
@@ -89,37 +73,27 @@
         
         <script>
             $(document).ready(function() {
-                $('#module_mail_db_connection').val('<?= APP::Module('Mail')->settings['module_mail_db_connection'] ?>');
-                $('#module_mail_x_mailer').val('<?= APP::Module('Mail')->settings['module_mail_x_mailer'] ?>');
-                $('#module_mail_charset').val('<?= APP::Module('Mail')->settings['module_mail_charset'] ?>');
+                $('#module_users_db_connection').val('<?= APP::Module('Users')->settings['module_users_db_connection'] ?>');
 
                 $('#update-settings').submit(function(event) {
                     event.preventDefault();
 
-                    var module_mail_db_connection = $(this).find('#module_mail_db_connection');
-                    var module_mail_x_mailer = $(this).find('#module_mail_x_mailer');
-                    var module_mail_charset = $(this).find('#module_mail_charset');
+                    var module_users_db_connection = $(this).find('#module_users_timeout_activation');
+                    module_users_db_connection.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    if (module_users_db_connection.val() === '') { module_users_db_connection.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-2').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
 
-                    module_mail_db_connection.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
-                    module_mail_x_mailer.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
-                    module_mail_charset.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
-                    
-                    if (module_mail_db_connection.val() === '') { module_mail_db_connection.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-2').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
-                    if (module_mail_x_mailer.val() === '') { module_mail_x_mailer.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-2').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
-                    if (module_mail_charset.val() === '') { module_mail_charset.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-2').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
-                    
                     $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
 
                     $.ajax({
                         type: 'post',
-                        url: '<?= APP::Module('Routing')->root ?>admin/mail/api/settings/update.json',
+                        url: '<?= APP::Module('Routing')->root ?>admin/users/api/settings/update.json',
                         data: $(this).serialize(),
                         success: function(result) {
                             switch(result.status) {
                                 case 'success':
                                     swal({
                                         title: 'Done!',
-                                        text: 'Mail settings has been updated',
+                                        text: 'Users settings has been updated',
                                         type: 'success',
                                         showCancelButton: false,
                                         confirmButtonText: 'Ok',

@@ -4,6 +4,7 @@ class APP {
     public static $conf = [];
     public static $modules = [];
     public static $handlers = [];
+    public static $console = false;
 
     public static function Init($conf, $argv) {
         define('RUNTIME', microtime(true));
@@ -13,16 +14,19 @@ class APP {
         date_default_timezone_set($conf['timezone']);
         error_reporting($conf['error_reporting']);
         
-        set_error_handler('APP::ErrorHandler', E_ALL & ~E_NOTICE);
+        set_error_handler('APP::ErrorHandler', E_ALL);
         set_exception_handler('APP::ExceptionHandler');
         register_shutdown_function('APP::ShutdownHandler');
 
         self::$conf = $conf;
+        self::$console = (bool) count($argv);
         
         if (!file_exists($conf['logs'])) {
             mkdir($conf['logs']);
         }
         
+        ob_start();
+
         if (($conf['install']) && (!count($argv))) {
             session_start();
             
@@ -37,35 +41,15 @@ class APP {
         foreach (glob(ROOT . '/protected/modules/*') as $path) self::LoadModule($path);
         foreach (self::$modules as $module) self::InitModule($module);
 
-        if (count($argv)) {
-            $args = [];
-            
-            for ($x = array_search('init.php', (array) $argv) + 1; $x < count($argv); $x ++) {
-                $args[] = $argv[$x];
-            }
-            
-            switch ($args[0]) {
-                case 'test':
-                    foreach (glob(ROOT . '/protected/modules/*') as $path) self::LoadModuleTest($path);
-                    
-                    $module = $args[1];
-                    $method = $args[2];
-                    
-                    unset($args[0], $args[1], $args[2]);
-                    break;
-                default:
-                    $module = $args[0];
-                    $method = $args[1];
-                    
-                    unset($args[0], $args[1]);
-                    break;
-            }
-            
-            call_user_func_array([self::Module($module), $method], $args);
-            exit;
+        if (self::$console) {
+            if ($argv[0] === 'init.php') call_user_func_array([self::Module($argv[1]), $argv[2]], json_decode($argv[3], true));
         } else {
             foreach (self::$handlers as $handler) self::Module($handler[0])->{$handler[1]}($handler[2]);
         }
+
+        $out = ob_get_contents();
+        ob_end_clean();
+        echo $out;
     }
     
     
@@ -284,14 +268,14 @@ class APP {
         $conf = $path . '/conf.php';
 
         if (!file_exists($class)) {
-            self::Error('core/error', 3, $name);
+            throw new Exception('Module class "' . $name . '" not found');
         }
 
         if (!array_key_exists($name, self::$modules)) {
             include_once $class;
 
             if (!class_exists($name)) {
-                self::Error('core/error', 4, $name);
+                throw new Exception('Invalid module "' . $name . '" class name');
             }
 
             $conf_data = array_replace_recursive(['init' => false], file_exists($conf) ? require_once $conf : []);
@@ -300,28 +284,6 @@ class APP {
             self::$modules[$name]->conf = $conf_data;
         }
         
-        return self::$modules[$name];
-    }
-    
-    public static function LoadModuleTest($path) {
-        $name = basename($path) . 'Test';
-        $class = $path . '/test.php';
-
-        if (!file_exists($class)) {
-            self::Error('core/error', 6, $name);
-        }
-        
-        if (!array_key_exists($name, self::$modules)) {
-            include_once $class;
-
-            if (!class_exists($name)) {
-                self::Error('core/error', 7, $name);
-            }
-
-            self::$modules[$name] = new $name();
-            self::$modules[$name]->conf = ['init' => false];
-        }
-
         return self::$modules[$name];
     }
     
@@ -366,7 +328,7 @@ class APP {
     public static function Render($src, $mode = 'include', $data = null, $ext = '.php') {
         if ($mode != 'eval') {
             $file = ROOT . '/protected/render/' . $src . '.php';
-            if (!file_exists($file)) self::Error('core/error', 5, $src);
+            if (!file_exists($file)) throw new Exception('Can\'t render file "' . $src . '"');
         }
 
         switch ($mode) {
@@ -387,7 +349,7 @@ class APP {
         }
     }
     
-    public static function Error($view, $code, $details = null) {
+    private static function Error($view, $code, $details = null) {
         if (self::$conf['logs']) {
             file_put_contents(
                 self::$conf['logs'] . '/php-errors-' . date('d-m-Y', time()) . '.log',

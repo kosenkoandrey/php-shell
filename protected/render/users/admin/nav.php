@@ -6,3 +6,4 @@
 <li><a href="<?= APP::Module('Routing')->root ?>admin/users/passwords">Passwords</a></li>
 <li><a href="<?= APP::Module('Routing')->root ?>admin/users/notifications">Notifications</a></li>
 <li><a href="<?= APP::Module('Routing')->root ?>admin/users/timeouts">Timeouts</a></li>
+<li><a href="<?= APP::Module('Routing')->root ?>admin/users/settings">Other</a></li>

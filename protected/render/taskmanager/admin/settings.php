@@ -105,11 +105,11 @@
         
         <script>
             $(document).ready(function() {
-                $('#module_taskmanager_db_connection').val('<?= $data['module_taskmanager_db_connection'] ?>');
-                $('#module_taskmanager_complete_lifetime').val('<?= $data['module_taskmanager_complete_lifetime'] ?>');
-                $('#module_taskmanager_max_execution_time').val('<?= $data['module_taskmanager_max_execution_time'] ?>');
-                $('#module_taskmanager_memory_limit').val('<?= $data['module_taskmanager_memory_limit'] ?>');
-                $('#module_taskmanager_tmp_dir').val('<?= $data['module_taskmanager_tmp_dir'] ?>');
+                $('#module_taskmanager_db_connection').val('<?= APP::Module('TaskManager')->settings['module_taskmanager_db_connection'] ?>');
+                $('#module_taskmanager_complete_lifetime').val('<?= APP::Module('TaskManager')->settings['module_taskmanager_complete_lifetime'] ?>');
+                $('#module_taskmanager_max_execution_time').val('<?= APP::Module('TaskManager')->settings['module_taskmanager_max_execution_time'] ?>');
+                $('#module_taskmanager_memory_limit').val('<?= APP::Module('TaskManager')->settings['module_taskmanager_memory_limit'] ?>');
+                $('#module_taskmanager_tmp_dir').val('<?= APP::Module('TaskManager')->settings['module_taskmanager_tmp_dir'] ?>');
 
                 $('#update-settings').submit(function(event) {
                     event.preventDefault();

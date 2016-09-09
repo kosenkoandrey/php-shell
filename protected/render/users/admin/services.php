@@ -98,10 +98,10 @@
         <? APP::Render('core/widgets/js') ?>
         
         <script>
-            $('#module_users_login_service').prop('checked', <?= (int) $data['module_users_login_service'] ?>);
-            $('#module_users_register_service').prop('checked', <?= (int) $data['module_users_register_service'] ?>);
-            $('#module_users_reset_password_service').prop('checked', <?= (int) $data['module_users_reset_password_service'] ?>);
-            $('#module_users_change_password_service').prop('checked', <?= (int) $data['module_users_change_password_service'] ?>);
+            $('#module_users_login_service').prop('checked', <?= (int) APP::Module('Users')->settings['module_users_login_service'] ?>);
+            $('#module_users_register_service').prop('checked', <?= (int) APP::Module('Users')->settings['module_users_register_service'] ?>);
+            $('#module_users_reset_password_service').prop('checked', <?= (int) APP::Module('Users')->settings['module_users_reset_password_service'] ?>);
+            $('#module_users_change_password_service').prop('checked', <?= (int) APP::Module('Users')->settings['module_users_change_password_service'] ?>);
 
             $(document).ready(function() {
                 $('#update-services').submit(function(event) {

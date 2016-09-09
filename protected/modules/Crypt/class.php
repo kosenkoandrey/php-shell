@@ -1,8 +1,14 @@
 <?
 class Crypt {
 
+    public $settings;
+    
     function __construct($conf) {
         foreach ($conf['routes'] as $route) APP::Module('Routing')->Add($route[0], $route[1], $route[2]);
+    }
+    
+    public function Init() {
+        $this->settings = APP::Module('Registry')->Get(['module_crypt_key']);
     }
     
     public function Admin() {
@@ -30,7 +36,7 @@ class Crypt {
 
         $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);
         $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-        $crypttext = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, APP::Module('Registry')->Get('module_crypt_key'), $value, MCRYPT_MODE_ECB, $iv);
+        $crypttext = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $this->settings['module_crypt_key'], $value, MCRYPT_MODE_ECB, $iv);
 
         return trim($this->SafeB64Encode($crypttext));
     }
@@ -40,14 +46,14 @@ class Crypt {
 
         $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);
         $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-        $decrypttext = mcrypt_decrypt(MCRYPT_RIJNDAEL_256, APP::Module('Registry')->Get('module_crypt_key'), $this->SafeB64Decode($value), MCRYPT_MODE_ECB, $iv);
+        $decrypttext = mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $this->settings['module_crypt_key'], $this->SafeB64Decode($value), MCRYPT_MODE_ECB, $iv);
 
         return trim($decrypttext);
     }
 
     
     public function Settings() {
-        APP::Render('crypt/admin/index', 'include', APP::Module('Registry')->Get('module_crypt_key'));
+        APP::Render('crypt/admin/index');
     }
     
     

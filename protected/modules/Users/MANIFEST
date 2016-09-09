@@ -24,6 +24,7 @@
 [file]protected/render/users/admin/passwords.php[/file]
 [file]protected/render/users/admin/services.php[/file]
 [file]protected/render/users/admin/timeouts.php[/file]
+[file]protected/render/users/admin/settings.php[/file]
 [file]protected/render/users/admin/roles/add.php[/file]
 [file]protected/render/users/admin/roles/index.php[/file]
 [file]protected/render/users/admin/roles/rules/add.php[/file]

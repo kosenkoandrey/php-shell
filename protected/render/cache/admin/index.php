@@ -78,8 +78,8 @@
         
         <script>
             $(document).ready(function() {
-                $('#module_cache_memcache_host').val('<?= $data['module_cache_memcache_host'] ?>');
-                $('#module_cache_memcache_port').val('<?= $data['module_cache_memcache_port'] ?>');
+                $('#module_cache_memcache_host').val('<?= APP::Module('Cache')->settings['module_cache_memcache_host'] ?>');
+                $('#module_cache_memcache_port').val('<?= APP::Module('Cache')->settings['module_cache_memcache_port'] ?>');
 
                 $('#update-settings').submit(function(event) {
                     event.preventDefault();

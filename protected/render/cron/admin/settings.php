@@ -70,7 +70,7 @@
         
         <script>
             $(document).ready(function() {
-                $('#module_cron_tmp_file').val('<?= $data ?>');
+                $('#module_cron_tmp_file').val('<?= APP::Module('Cron')->file ?>');
 
                 $('#update-settings').submit(function(event) {
                     event.preventDefault();

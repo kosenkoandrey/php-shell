@@ -94,10 +94,10 @@
         
         <script>
             $(document).ready(function() {
-                $('#module_users_change_password_letter').val('<?= $data['module_users_change_password_letter'] ?>');
-                $('#module_users_reset_password_letter').val('<?= $data['module_users_reset_password_letter'] ?>');
-                $('#module_users_register_letter').val('<?= $data['module_users_register_letter'] ?>');
-                $('#module_users_register_activation_letter').val('<?= $data['module_users_register_activation_letter'] ?>');
+                $('#module_users_change_password_letter').val('<?= APP::Module('Users')->settings['module_users_change_password_letter'] ?>');
+                $('#module_users_reset_password_letter').val('<?= APP::Module('Users')->settings['module_users_reset_password_letter'] ?>');
+                $('#module_users_register_letter').val('<?= APP::Module('Users')->settings['module_users_register_letter'] ?>');
+                $('#module_users_register_activation_letter').val('<?= APP::Module('Users')->settings['module_users_register_activation_letter'] ?>');
                 
                 $('#update-notifications').submit(function(event) {
                     event.preventDefault();

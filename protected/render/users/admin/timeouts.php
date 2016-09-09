@@ -87,9 +87,9 @@
         
         <script>
             $(document).ready(function() {
-                $('#module_users_timeout_activation').val('<?= $data['module_users_timeout_activation'] ?>');
-                $('#module_users_timeout_email').val('<?= $data['module_users_timeout_email'] ?>');
-                $('#module_users_timeout_token').val('<?= $data['module_users_timeout_token'] ?>');
+                $('#module_users_timeout_activation').val('<?= APP::Module('Users')->settings['module_users_timeout_activation'] ?>');
+                $('#module_users_timeout_email').val('<?= APP::Module('Users')->settings['module_users_timeout_email'] ?>');
+                $('#module_users_timeout_token').val('<?= APP::Module('Users')->settings['module_users_timeout_token'] ?>');
 
                 $('#update-timeouts').submit(function(event) {
                     event.preventDefault();

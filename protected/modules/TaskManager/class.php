@@ -36,7 +36,7 @@ class TaskManager {
     }
     
     public function Exec() {
-        $lock = fopen($this->settings['module_taskmanager_tmp_dir'] . '/module_taskmanager_lock_exec', 'w'); 
+        $lock = fopen($this->settings['module_taskmanager_tmp_dir'] . '/module_taskmanager_exec.lock', 'w'); 
         
         if (flock($lock, LOCK_EX|LOCK_NB)) { 
             set_time_limit($this->settings['module_taskmanager_max_execution_time']);
@@ -68,7 +68,7 @@ class TaskManager {
     }
     
     public function GC() {
-        $lock = fopen($this->settings['module_taskmanager_tmp_dir'] . '/module_taskmanager_lock_gc', 'w'); 
+        $lock = fopen($this->settings['module_taskmanager_tmp_dir'] . '/module_taskmanager_gc.lock', 'w'); 
         
         if (flock($lock, LOCK_EX|LOCK_NB)) { 
             APP::Module('DB')->Delete(
@@ -108,16 +108,7 @@ class TaskManager {
     }
     
     public function Settings() {
-        APP::Render(
-            'taskmanager/admin/settings', 'include', 
-            APP::Module('Registry')->Get([
-                'module_taskmanager_db_connection',
-                'module_taskmanager_complete_lifetime',
-                'module_taskmanager_max_execution_time',
-                'module_taskmanager_memory_limit',
-                'module_taskmanager_tmp_dir'
-            ])
-        );
+        APP::Render('taskmanager/admin/settings');
     }
     
     

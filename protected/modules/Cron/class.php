@@ -1,7 +1,7 @@
 <?
 class Cron {
 
-    private $file;
+    public $file;
 
     function __construct($conf) {
         foreach ($conf['routes'] as $route) APP::Module('Routing')->Add($route[0], $route[1], $route[2]);
@@ -122,7 +122,7 @@ class Cron {
     }
     
     public function Settings() {
-        APP::Render('cron/admin/settings', 'include', APP::Module('Registry')->Get('module_cron_tmp_file'));
+        APP::Render('cron/admin/settings');
     }
 
     

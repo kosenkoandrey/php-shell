@@ -8,12 +8,6 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
 --
 -- Database: `phpshell`
 --
@@ -85,109 +79,121 @@ CREATE TABLE `registry` (
 --
 
 INSERT INTO `registry` (`id`, `sub_id`, `item`, `value`, `up_date`) VALUES
-(1, 0, 'module_crypt_key', 'f4fb6e520dd5f38a30bb335cee8b39bc', NOW()),
+(1, 0, 'module_crypt_key', '1dff9846d67f9f93b2c730e2519b194d', NOW()),
 (2, 0, 'module_trigger_type', '["add_trigger", "Triggers", "Add trigger"]', NOW()),
 (3, 0, 'module_trigger_type', '["remove_trigger", "Triggers", "Remove trigger"]', NOW()),
 (4, 0, 'module_trigger_type', '["update_trigger", "Triggers", "Update trigger"]', NOW()),
-(5, 0, 'module_sessions_cookie_domain', 'domain.com', NOW()),
-(6, 0, 'module_sessions_cookie_lifetime', '0', NOW()),
-(7, 0, 'module_sessions_compress', '9', NOW()),
-(8, 0, 'module_sessions_gc_maxlifetime', '1440', NOW()),
-(9, 0, 'module_trigger_type', '["update_sessions_settings", "Sessions", "Update settings"]', NOW()),
-(10, 0, 'module_mail_charset', 'UTF-8', NOW()),
-(11, 0, 'module_mail_x_mailer', 'php-shell', NOW()),
-(12, 0, 'module_trigger_type', '["mail_add_letter", "Mail / Letters", "Add"]', NOW()),
-(13, 0, 'module_trigger_type', '["mail_remove_letter", "Mail / Letters", "Remove"]', NOW()),
-(14, 0, 'module_trigger_type', '["mail_update_letter", "Mail / Letters", "Update"]', NOW()),
-(15, 0, 'module_trigger_type', '["mail_add_letters_group", "Mail / Letters", "Add group"]', NOW()),
-(16, 0, 'module_trigger_type', '["mail_remove_letters_group", "Mail / Letters", "Remove group"]', NOW()),
-(17, 0, 'module_trigger_type', '["mail_update_letters_group", "Mail / Letters", "Update group"]', NOW()),
-(18, 0, 'module_trigger_type', '["mail_add_sender", "Mail / Senders", "Add"]', NOW()),
-(19, 0, 'module_trigger_type', '["mail_remove_sender", "Mail / Senders", "Remove"]', NOW()),
-(20, 0, 'module_trigger_type', '["mail_update_sender", "Mail / Senders", "Update"]', NOW()),
-(21, 0, 'module_trigger_type', '["mail_add_senders_group", "Mail / Senders", "Add group"]', NOW()),
-(22, 0, 'module_trigger_type', '["mail_remove_senders_group", "Mail / Senders", "Remove group"]', NOW()),
-(23, 0, 'module_trigger_type', '["mail_update_senders_group", "Mail / Senders", "Update group"]', NOW()),
-(24, 0, 'module_trigger_type', '["mail_update_settings", "Mail", "Update settings"]', NOW()),
-(25, 0, 'module_trigger_type', '["mail_send_letter", "Mail", "Send mail"]', NOW()),
-(26, 0, 'module_users_register_activation_letter', '1', NOW()),
-(27, 0, 'module_users_reset_password_letter', '2', NOW()),
-(28, 0, 'module_users_change_password_letter', '3', NOW()),
-(29, 0, 'module_users_register_letter', '4', NOW()),
-(30, 0, 'module_users_role', 'default', NOW()),
-(31, 0, 'module_users_role', 'new', NOW()),
-(32, 0, 'module_users_role', 'user', NOW()),
-(33, 0, 'module_users_role', 'admin', NOW()),
-(34, 30, 'module_users_rule', '["users\\\\/actions\\\\/change-password(.*)","users\\/actions\\/login"]', NOW()),
-(35, 30, 'module_users_rule', '["users\\\\/profile","users\\/actions\\/login"]', NOW()),
-(36, 30, 'module_users_rule', '["admin(.*)","users\\/actions\\/login"]', NOW()),
-(37, 31, 'module_users_rule', '["admin(.*)","users\\/actions\\/login"]', NOW()),
-(38, 32, 'module_users_rule', '["admin(.*)","users\\/actions\\/login"]', NOW()),
-(39, 0, 'module_users_auth_token', '1', NOW()),
-(40, 0, 'module_users_change_password_service', '1', NOW()),
-(41, 0, 'module_users_check_rules', '1', NOW()),
-(42, 0, 'module_users_gen_pass_length', '6', NOW()),
-(43, 0, 'module_users_login_service', '1', NOW()),
-(44, 0, 'module_users_min_pass_length', '3', NOW()),
-(45, 0, 'module_users_register_service', '1', NOW()),
-(46, 0, 'module_users_reset_password_service', '1', NOW()),
-(47, 0, 'module_users_social_auth_fb_id', '0', NOW()),
-(48, 0, 'module_users_social_auth_fb_key', '0', NOW()),
-(49, 0, 'module_users_social_auth_google_id', '0', NOW()),
-(50, 0, 'module_users_social_auth_google_key', '0', NOW()),
-(51, 0, 'module_users_social_auth_vk_id', '0', NOW()),
-(52, 0, 'module_users_social_auth_vk_key', '0', NOW()),
-(53, 0, 'module_users_social_auth_ya_id', '0', NOW()),
-(54, 0, 'module_users_social_auth_ya_key', '0', NOW()),
-(55, 0, 'module_users_timeout_activation', '3 days', NOW()),
-(56, 0, 'module_users_timeout_email', '1 year', NOW()),
-(57, 0, 'module_users_timeout_token', '1 year', NOW()),
-(58, 0, 'module_trigger_type', '["user_logout", "Users", "Logout"]', NOW()),
-(59, 0, 'module_trigger_type', '["user_activate", "Users", "Activate"]', NOW()),
-(60, 0, 'module_trigger_type', '["remove_user", "Users", "Remove"]', NOW()),
-(61, 0, 'module_trigger_type', '["add_user", "Users", "Add"]', NOW()),
-(62, 0, 'module_trigger_type', '["user_login", "Users", "Login"]', NOW()),
-(63, 0, 'module_trigger_type', '["user_double_login", "Users", "Double login"]', NOW()),
-(64, 0, 'module_trigger_type', '["register_user", "Users", "Register"]', NOW()),
-(65, 0, 'module_trigger_type', '["reset_user_password", "Users", "Reset password"]', NOW()),
-(66, 0, 'module_trigger_type', '["change_user_password", "Users", "Change password"]', NOW()),
-(67, 0, 'module_trigger_type', '["update_user", "Users", "Update"]', NOW()),
-(68, 0, 'module_trigger_type', '["add_user_role", "Users / Roles", "Add"]', NOW()),
-(69, 0, 'module_trigger_type', '["remove_user_role", "Users / Roles", "Remove"]', NOW()),
-(70, 0, 'module_trigger_type', '["add_user_rule", "Users / Rules", "Add"]', NOW()),
-(71, 0, 'module_trigger_type', '["remove_user_rule", "Users / Rules", "Remove"]', NOW()),
-(72, 0, 'module_trigger_type', '["update_user_rule", "Users / Rules", "Update"]', NOW()),
-(73, 0, 'module_trigger_type', '["update_users_oauth_settings", "Users / Settings", "Update OAuth"]', NOW()),
-(74, 0, 'module_trigger_type', '["update_users_notifications_settings", "Users / Settings", "Update notifications"]', NOW()),
-(75, 0, 'module_trigger_type', '["update_users_services_settings", "Users / Settings", "Update services"]', NOW()),
-(76, 0, 'module_trigger_type', '["update_users_auth_settings", "Users / Settings", "Update auth"]', NOW()),
-(77, 0, 'module_trigger_type', '["update_users_passwords_settings", "Users / Settings", "Update passwords"]', NOW()),
-(78, 0, 'module_trigger_type', '["update_users_timeouts_settings", "Users / Settings", "Update timeouts"]', NOW()),
-(79, 0, 'module_trigger_type', '["import_locale_module", "Admin", "Import locale module"]', NOW()),
-(80, 0, 'module_trigger_type', '["remove_imported_module", "Admin", "Remove imported module"]', NOW()),
-(81, 0, 'module_trigger_type', '["export_module", "Admin", "Export module"]', NOW()),
-(82, 0, 'module_trigger_type', '["uninstall_module", "Admin", "Uninstall module"]', NOW()),
-(83, 0, 'module_trigger_type', '["add_ssh_connection", "SSH", "Add connection"]', NOW()),
-(84, 0, 'module_trigger_type', '["remove_ssh_connection", "SSH", "Remove connection"]', NOW()),
-(85, 0, 'module_trigger_type', '["update_ssh_connection", "SSH", "Update connection"]', NOW()),
-(86, 0, 'module_cron_tmp_file', '/tmp/crontab', NOW()),
-(87, 0, 'module_trigger_type', '["add_cron_job", "Cron", "Add job"]', NOW()),
-(88, 0, 'module_trigger_type', '["update_cron_job", "Cron", "Update job"]', NOW()),
-(89, 0, 'module_trigger_type', '["remove_cron_job", "Cron", "Remove job"]', NOW()),
-(90, 0, 'module_trigger_type', '["update_cron_settings", "Cron", "Update settings"]', NOW()),
-(91, 0, 'module_trigger_type', '["remove_log_file", "Logs", "Remove log file"]', NOW()),
+(5, 0, 'module_sessions_db_connection', 'auto', NOW()),
+(6, 0, 'module_sessions_cookie_domain', 'domain.com', NOW()),
+(7, 0, 'module_sessions_cookie_lifetime', '0', NOW()),
+(8, 0, 'module_sessions_compress', '9', NOW()),
+(9, 0, 'module_sessions_gc_maxlifetime', '1440', NOW()),
+(10, 0, 'module_trigger_type', '["update_sessions_settings", "Sessions", "Update settings"]', NOW()),
+(11, 0, 'module_mail_db_connection', 'auto', NOW()),
+(12, 0, 'module_mail_charset', 'UTF-8', NOW()),
+(13, 0, 'module_mail_x_mailer', 'php-shell', NOW()),
+(14, 0, 'module_mail_transport', '["default","Mail","Transport","admin/mail/settings"]', NOW()),
+(15, 0, 'module_trigger_type', '["mail_add_letter", "Mail / Letters", "Add"]', NOW()),
+(16, 0, 'module_trigger_type', '["mail_remove_letter", "Mail / Letters", "Remove"]', NOW()),
+(17, 0, 'module_trigger_type', '["mail_update_letter", "Mail / Letters", "Update"]', NOW()),
+(18, 0, 'module_trigger_type', '["mail_add_letters_group", "Mail / Letters", "Add group"]', NOW()),
+(19, 0, 'module_trigger_type', '["mail_remove_letters_group", "Mail / Letters", "Remove group"]', NOW()),
+(20, 0, 'module_trigger_type', '["mail_update_letters_group", "Mail / Letters", "Update group"]', NOW()),
+(21, 0, 'module_trigger_type', '["mail_add_sender", "Mail / Senders", "Add"]', NOW()),
+(22, 0, 'module_trigger_type', '["mail_remove_sender", "Mail / Senders", "Remove"]', NOW()),
+(23, 0, 'module_trigger_type', '["mail_update_sender", "Mail / Senders", "Update"]', NOW()),
+(24, 0, 'module_trigger_type', '["mail_add_senders_group", "Mail / Senders", "Add group"]', NOW()),
+(25, 0, 'module_trigger_type', '["mail_remove_senders_group", "Mail / Senders", "Remove group"]', NOW()),
+(26, 0, 'module_trigger_type', '["mail_update_senders_group", "Mail / Senders", "Update group"]', NOW()),
+(27, 0, 'module_trigger_type', '["mail_add_transport", "Mail / Transport", "Add"]', NOW()),
+(28, 0, 'module_trigger_type', '["mail_remove_transport", "Mail / Senders", "Remove"]', NOW()),
+(29, 0, 'module_trigger_type', '["mail_update_transport", "Mail / Senders", "Update"]', NOW()),
+(30, 0, 'module_trigger_type', '["mail_update_settings", "Mail", "Update settings"]', NOW()),
+(31, 0, 'module_trigger_type', '["mail_send_letter", "Mail", "Send mail"]', NOW()),
+(32, 0, 'module_users_register_activation_letter', '1', NOW()),
+(33, 0, 'module_users_reset_password_letter', '2', NOW()),
+(34, 0, 'module_users_change_password_letter', '3', NOW()),
+(35, 0, 'module_users_register_letter', '4', NOW()),
+(36, 0, 'module_users_role', 'default', NOW()),
+(37, 0, 'module_users_role', 'new', NOW()),
+(38, 0, 'module_users_role', 'user', NOW()),
+(39, 0, 'module_users_role', 'admin', NOW()),
+(40, 36, 'module_users_rule', '["users\\\\/actions\\\\/change-password(.*)","users\\/actions\\/login"]', NOW()),
+(41, 36, 'module_users_rule', '["users\\\\/profile","users\\/actions\\/login"]', NOW()),
+(42, 36, 'module_users_rule', '["admin(.*)","users\\/actions\\/login"]', NOW()),
+(43, 37, 'module_users_rule', '["admin(.*)","users\\/actions\\/login"]', NOW()),
+(44, 38, 'module_users_rule', '["admin(.*)","users\\/actions\\/login"]', NOW()),
+(45, 0, 'module_users_db_connection', 'auto', NOW()),
+(46, 0, 'module_users_auth_token', '1', NOW()),
+(47, 0, 'module_users_change_password_service', '1', NOW()),
+(48, 0, 'module_users_check_rules', '1', NOW()),
+(49, 0, 'module_users_gen_pass_length', '6', NOW()),
+(50, 0, 'module_users_login_service', '1', NOW()),
+(51, 0, 'module_users_min_pass_length', '3', NOW()),
+(52, 0, 'module_users_register_service', '1', NOW()),
+(53, 0, 'module_users_reset_password_service', '1', NOW()),
+(54, 0, 'module_users_social_auth_fb_id', '0', NOW()),
+(55, 0, 'module_users_social_auth_fb_key', '0', NOW()),
+(56, 0, 'module_users_social_auth_google_id', '0', NOW()),
+(57, 0, 'module_users_social_auth_google_key', '0', NOW()),
+(58, 0, 'module_users_social_auth_vk_id', '0', NOW()),
+(59, 0, 'module_users_social_auth_vk_key', '0', NOW()),
+(60, 0, 'module_users_social_auth_ya_id', '0', NOW()),
+(61, 0, 'module_users_social_auth_ya_key', '0', NOW()),
+(62, 0, 'module_users_timeout_activation', '3 days', NOW()),
+(63, 0, 'module_users_timeout_email', '1 year', NOW()),
+(64, 0, 'module_users_timeout_token', '1 year', NOW()),
+(65, 0, 'module_trigger_type', '["user_logout", "Users", "Logout"]', NOW()),
+(66, 0, 'module_trigger_type', '["user_activate", "Users", "Activate"]', NOW()),
+(67, 0, 'module_trigger_type', '["remove_user", "Users", "Remove"]', NOW()),
+(68, 0, 'module_trigger_type', '["add_user", "Users", "Add"]', NOW()),
+(69, 0, 'module_trigger_type', '["user_login", "Users", "Login"]', NOW()),
+(70, 0, 'module_trigger_type', '["user_double_login", "Users", "Double login"]', NOW()),
+(71, 0, 'module_trigger_type', '["register_user", "Users", "Register"]', NOW()),
+(72, 0, 'module_trigger_type', '["reset_user_password", "Users", "Reset password"]', NOW()),
+(73, 0, 'module_trigger_type', '["change_user_password", "Users", "Change password"]', NOW()),
+(74, 0, 'module_trigger_type', '["update_user", "Users", "Update"]', NOW()),
+(75, 0, 'module_trigger_type', '["add_user_role", "Users / Roles", "Add"]', NOW()),
+(76, 0, 'module_trigger_type', '["remove_user_role", "Users / Roles", "Remove"]', NOW()),
+(77, 0, 'module_trigger_type', '["add_user_rule", "Users / Rules", "Add"]', NOW()),
+(78, 0, 'module_trigger_type', '["remove_user_rule", "Users / Rules", "Remove"]', NOW()),
+(79, 0, 'module_trigger_type', '["update_user_rule", "Users / Rules", "Update"]', NOW()),
+(80, 0, 'module_trigger_type', '["update_users_oauth_settings", "Users / Settings", "Update OAuth"]', NOW()),
+(81, 0, 'module_trigger_type', '["update_users_notifications_settings", "Users / Settings", "Update notifications"]', NOW()),
+(82, 0, 'module_trigger_type', '["update_users_services_settings", "Users / Settings", "Update services"]', NOW()),
+(83, 0, 'module_trigger_type', '["update_users_auth_settings", "Users / Settings", "Update auth"]', NOW()),
+(84, 0, 'module_trigger_type', '["update_users_passwords_settings", "Users / Settings", "Update passwords"]', NOW()),
+(85, 0, 'module_trigger_type', '["update_users_timeouts_settings", "Users / Settings", "Update timeouts"]', NOW()),
+(86, 0, 'module_trigger_type', '["update_users_other_settings", "Users / Settings", "Update other"]', NOW()),
+(87, 0, 'module_trigger_type', '["import_locale_module", "Admin", "Import locale module"]', NOW()),
+(88, 0, 'module_trigger_type', '["remove_imported_module", "Admin", "Remove imported module"]', NOW()),
+(89, 0, 'module_trigger_type', '["export_module", "Admin", "Export module"]', NOW()),
+(90, 0, 'module_trigger_type', '["uninstall_module", "Admin", "Uninstall module"]', NOW()),
+(91, 0, 'module_cache_memcache_host', '127.0.0.1', NOW()),
 (92, 0, 'module_cache_memcache_port', '11211', NOW()),
-(93, 0, 'module_cache_memcache_host', '127.0.0.1', NOW()),
-(94, 0, 'module_taskmanager_db_connection', 'auto', NOW()),
-(95, 0, 'module_taskmanager_complete_lifetime', '1 month', NOW()),
-(96, 0, 'module_taskmanager_max_execution_time', '7200', NOW()),
-(97, 0, 'module_taskmanager_memory_limit', '512M', NOW()),
-(98, 0, 'module_taskmanager_tmp_dir', '/tmp', NOW()),
-(99, 0, 'module_trigger_type', '["taskmanager_add", "Task Manager", "Add task"]', NOW()),
-(100, 0, 'module_trigger_type', '["taskmanager_update", "Task Manager", "Update task"]', NOW()),
-(101, 0, 'module_trigger_type', '["taskmanager_remove", "Task Manager", "Remove task"]', NOW()),
-(102, 0, 'module_trigger_type', '["taskmanager_exec", "Task Manager", "Exec task"]', NOW()),
-(103, 0, 'module_trigger_type', '["taskmanager_update_settings", "Task Manager", "Update settings"]', NOW());
+(93, 0, 'module_trigger_type', '["update_cache_settings", "Cache", "Update settings"]', NOW()),
+(94, 0, 'module_trigger_type', '["add_ssh_connection", "SSH", "Add connection"]', NOW()),
+(95, 0, 'module_trigger_type', '["remove_ssh_connection", "SSH", "Remove connection"]', NOW()),
+(96, 0, 'module_trigger_type', '["update_ssh_connection", "SSH", "Update connection"]', NOW()),
+(97, 0, 'module_cron_tmp_file', '/tmp/crontab', NOW()),
+(98, 0, 'module_trigger_type', '["add_cron_job", "Cron", "Add job"]', NOW()),
+(99, 0, 'module_trigger_type', '["update_cron_job", "Cron", "Update job"]', NOW()),
+(100, 0, 'module_trigger_type', '["remove_cron_job", "Cron", "Remove job"]', NOW()),
+(101, 0, 'module_trigger_type', '["update_cron_settings", "Cron", "Update settings"]', NOW()),
+(102, 0, 'module_trigger_type', '["remove_log_file", "Logs", "Remove log file"]', NOW()),
+(103, 0, 'module_ssh_connection', '["127.0.0.1","22","root",""]', NOW()),
+(104, 0, 'module_taskmanager_db_connection', 'auto', NOW()),
+(105, 0, 'module_taskmanager_complete_lifetime', '1 month', NOW()),
+(106, 0, 'module_taskmanager_max_execution_time', '72000', NOW()),
+(107, 0, 'module_taskmanager_memory_limit', '512M', NOW()),
+(108, 0, 'module_taskmanager_tmp_dir', '/tmp', NOW()),
+(109, 103, 'module_cron_job', '*/1 * * * * php /var/www/init.php TaskManager Exec []', NOW()),
+(110, 103, 'module_cron_job', '*/1 * * * * php /var/www/init.php TaskManager GC []', NOW()),
+(111, 0, 'module_trigger_type', '["taskmanager_add", "Task Manager", "Add task"]', NOW()),
+(112, 0, 'module_trigger_type', '["taskmanager_update", "Task Manager", "Update task"]', NOW()),
+(113, 0, 'module_trigger_type', '["taskmanager_remove", "Task Manager", "Remove task"]', NOW()),
+(114, 0, 'module_trigger_type', '["taskmanager_exec", "Task Manager", "Exec task"]', NOW()),
+(115, 0, 'module_trigger_type', '["taskmanager_update_settings", "Task Manager", "Update settings"]', NOW());
 
 -- --------------------------------------------------------
 
@@ -259,6 +265,24 @@ CREATE TABLE `social_accounts` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `task_manager`
+--
+
+CREATE TABLE `task_manager` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `token` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `module` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `method` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `args` text COLLATE utf8_unicode_ci NOT NULL,
+  `state` enum('wait','complete') COLLATE utf8_unicode_ci NOT NULL,
+  `cr_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `exec_date` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `complete_date` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -276,37 +300,11 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `email`, `password`, `role`, `reg_date`, `last_visit`) VALUES
-(1, 'admin@phpshell', '-U5CqS3GteC0Wg5Hw8bxAXwngZ7M1SRC3vFmRgD_osY', 'admin', NOW(), NOW());
-
---
--- Table structure for table `task_manager`
---
-
-CREATE TABLE `task_manager` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `token` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `module` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `method` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `args` text COLLATE utf8_unicode_ci NOT NULL,
-  `state` enum('wait','complete') COLLATE utf8_unicode_ci NOT NULL,
-  `cr_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `exec_date` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `complete_date` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+(1, 'admin@phpshell', 'uO3KTOglXwFF04jQBh8fsYmOoQA-qY88YxDH0lrqz4Y', 'admin', NOW(), NOW());
 
 --
 -- Indexes for dumped tables
 --
-
---
--- Indexes for table `task_manager`
---
-ALTER TABLE `task_manager`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `token` (`token`),
-  ADD KEY `state` (`state`),
-  ADD KEY `state_2` (`state`,`exec_date`),
-  ADD KEY `token_2` (`token`,`state`,`exec_date`);
 
 --
 -- Indexes for table `letters`
@@ -359,6 +357,16 @@ ALTER TABLE `social_accounts`
   ADD KEY `user_id` (`user_id`);
 
 --
+-- Indexes for table `task_manager`
+--
+ALTER TABLE `task_manager`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `token` (`token`),
+  ADD KEY `state` (`state`),
+  ADD KEY `state_2` (`state`,`exec_date`),
+  ADD KEY `token_2` (`token`,`state`,`exec_date`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -368,12 +376,6 @@ ALTER TABLE `users`
 --
 -- AUTO_INCREMENT for dumped tables
 --
-
---
--- AUTO_INCREMENT for table `task_manager`
---
-ALTER TABLE `task_manager`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `letters`
@@ -389,7 +391,7 @@ ALTER TABLE `letters_groups`
 -- AUTO_INCREMENT for table `registry`
 --
 ALTER TABLE `registry`
-  MODIFY `id` mediumint(9) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=92;
+  MODIFY `id` mediumint(9) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=116;
 --
 -- AUTO_INCREMENT for table `senders`
 --
@@ -406,6 +408,11 @@ ALTER TABLE `senders_groups`
 ALTER TABLE `social_accounts`
   MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 --
+-- AUTO_INCREMENT for table `task_manager`
+--
+ALTER TABLE `task_manager`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
@@ -419,7 +426,3 @@ ALTER TABLE `users`
 --
 ALTER TABLE `social_accounts`
   ADD CONSTRAINT `social_accounts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

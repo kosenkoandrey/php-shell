@@ -22,3 +22,6 @@
 [file]protected/render/mail/admin/senders/index.php[/file]
 [file]protected/render/mail/admin/senders/groups/add.php[/file]
 [file]protected/render/mail/admin/senders/groups/edit.php[/file]
+[file]protected/render/mail/admin/transport/add.php[/file]
+[file]protected/render/mail/admin/transport/edit.php[/file]
+[file]protected/render/mail/admin/transport/index.php[/file]
