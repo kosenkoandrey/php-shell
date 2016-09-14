@@ -6,7 +6,6 @@ class Admin {
     }
 
     public function Manage() {
-        $this->Test();
         APP::Render('admin/index');
     }
     
