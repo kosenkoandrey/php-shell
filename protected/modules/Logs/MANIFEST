@@ -12,3 +12,7 @@
 [file]protected/render/logs/admin/index.php[/file]
 [file]protected/render/logs/admin/nav.php[/file]
 [file]protected/render/logs/admin/view.php[/file]
+[file]protected/render/logs/admin/dashboard/css.php[/file]
+[file]protected/render/logs/admin/dashboard/html.php[/file]
+[file]protected/render/logs/admin/dashboard/index.php[/file]
+[file]protected/render/logs/admin/dashboard/js.php[/file]

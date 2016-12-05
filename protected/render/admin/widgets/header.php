@@ -1,8 +1,8 @@
 <header id="header" class="media">
     <div class="pull-left h-logo">
         <a href="<?= APP::Module('Routing')->root ?>admin" class="hidden-xs">
-            PULT
-            <small>GLAMURNENKO.RU</small>
+            PHP-shell   
+            <small>MICRO FRAMEWORK</small>
         </a>
     </div>
 
@@ -20,7 +20,7 @@
         </li>
         <li class="dropdown hm-profile">
             <a data-toggle="dropdown" href="">
-                <img src="<?= APP::$conf['location'][0] ?>://www.gravatar.com/avatar/<?= md5(APP::Module('Users')->user['email']) ?>?s=40&d=<?= urlencode(APP::Module('Routing')->root . 'public/ui/img/profile-pics/default.png') ?>&t=<?= time() ?>">
+                <img src="<?= APP::$conf['location'][0] ?>://www.gravatar.com/avatar/<?= md5(APP::Module('Users')->user['email']) ?>?s=40&d=<?= urlencode(APP::Module('Routing')->root . APP::Module('Users')->settings['module_users_profile_picture']) ?>&t=<?= time() ?>">
             </a>
 
             <ul class="dropdown-menu pull-right dm-icon">

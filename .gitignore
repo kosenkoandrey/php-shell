@@ -1,3 +1,7 @@
 /nbproject/
 /logs/
 /phpunit.phar
+/protected/modules/Test
+/protected/modules/SendThis/daemon/sendthis20
+/public/ui/node_modules
+/public/ui/vendors/bower_components

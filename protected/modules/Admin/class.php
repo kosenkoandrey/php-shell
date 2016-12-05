@@ -5,8 +5,32 @@ class Admin {
         foreach ($conf['routes'] as $route) APP::Module('Routing')->Add($route[0], $route[1], $route[2]);
     }
 
-    public function Manage() {
-        APP::Render('admin/index');
+    public function Overview() {
+        $cards = [];
+        
+        foreach (APP::$modules as $value) {
+            if (method_exists($value, 'Dashboard')) {
+                foreach ($value->Dashboard() as $dashboard) {
+                    if (count($dashboard[0]) == 1) {
+                        $cards[$dashboard[0][0]]['type'] = 'card';
+                        $cards[$dashboard[0][0]]['data'] = $dashboard[1];
+                    } else {
+                        $cards[$dashboard[0][0]]['type'] = 'tab';
+                        $cards[$dashboard[0][0]]['data'][$dashboard[0][1]] = $dashboard[1];
+                    }
+                }
+            }
+        }
+        
+        APP::Render('admin/index', 'include', compact('cards'));
+    }
+    
+    public function Application() {
+        APP::Render('admin/app');
+    }
+    
+    public function InstalledModules() {
+        APP::Render('admin/modules/index');
     }
     
     public function System() {

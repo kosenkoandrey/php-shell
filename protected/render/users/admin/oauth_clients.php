@@ -33,137 +33,135 @@
                                 <h2>OAuth clients</h2>
                             </div>
                             <div class="card-body card-padding">
-                                <form id="update-social-networks">
-                                    <ul class="tab-nav m-b-15" role="tablist" data-tab-color="teal">
-                                        <li class="active"><a href="#facebook" role="tab" data-toggle="tab">Facebook</a></li>
-                                        <li role="presentation"><a href="#vk" role="tab" data-toggle="tab">VK</a></li>
-                                        <li role="presentation"><a href="#google" role="tab" data-toggle="tab">Google</a></li>
-                                        <li role="presentation"><a href="#yandex" role="tab" data-toggle="tab">Yandex</a></li>
-                                    </ul>
+                                <ul class="tab-nav m-b-15" role="tablist" data-tab-color="teal">
+                                    <li class="active"><a href="#facebook" role="tab" data-toggle="tab">Facebook</a></li>
+                                    <li role="presentation"><a href="#vk" role="tab" data-toggle="tab">VK</a></li>
+                                    <li role="presentation"><a href="#google" role="tab" data-toggle="tab">Google</a></li>
+                                    <li role="presentation"><a href="#yandex" role="tab" data-toggle="tab">Yandex</a></li>
+                                </ul>
 
-                                    <div class="tab-content">
-                                        <div role="tabpanel" class="tab-pane active animated fadeIn in" id="facebook">
-                                            <div class="form-group">
-                                                <label for="module_users_social_auth_fb_id" class="col-sm-1 control-label">ID</label>
-                                                <div class="col-sm-3">
-                                                    <div class="fg-line">
-                                                        <input 
-                                                            type="text" 
-                                                            class="form-control" 
-                                                            name="module_users_social_auth_fb_id" 
-                                                            id="module_users_social_auth_fb_id" 
-                                                            value="<?= isset(APP::Module('Users')->settings['module_users_social_auth_fb_id']) ? APP::Module('Users')->settings['module_users_social_auth_fb_id'] : '' ?>"
-                                                        >
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="module_users_social_auth_fb_key" class="col-sm-1 control-label">Key</label>
-                                                <div class="col-sm-3">
-                                                    <div class="fg-line">
-                                                        <input 
-                                                            type="text" 
-                                                            class="form-control" 
-                                                            name="module_users_social_auth_fb_key" 
-                                                            id="module_users_social_auth_fb_key" 
-                                                            value="<?= isset(APP::Module('Users')->settings['module_users_social_auth_fb_key']) ? APP::Module('Users')->settings['module_users_social_auth_fb_key'] : '' ?>"
-                                                        >
-                                                    </div>
+                                <div class="tab-content">
+                                    <div role="tabpanel" class="tab-pane active animated fadeIn in" id="facebook">
+                                        <div class="form-group">
+                                            <label for="module_users_oauth_client_fb_id" class="col-sm-1 control-label">ID</label>
+                                            <div class="col-sm-3">
+                                                <div class="fg-line">
+                                                    <input 
+                                                        type="text" 
+                                                        class="form-control" 
+                                                        name="module_users_oauth_client_fb_id" 
+                                                        id="module_users_oauth_client_fb_id" 
+                                                        value="<?= isset(APP::Module('Users')->settings['module_users_oauth_client_fb_id']) ? APP::Module('Users')->settings['module_users_oauth_client_fb_id'] : '' ?>"
+                                                    >
                                                 </div>
                                             </div>
                                         </div>
-                                        <div role="tabpanel" class="tab-pane animated fadeIn" id="vk">
-                                            <div class="form-group">
-                                                <label for="module_users_social_auth_vk_id" class="col-sm-1 control-label">ID</label>
-                                                <div class="col-sm-3">
-                                                    <div class="fg-line">
-                                                        <input 
-                                                            type="text" 
-                                                            class="form-control" 
-                                                            name="module_users_social_auth_vk_id" 
-                                                            id="module_users_social_auth_vk_id" 
-                                                            value="<?= isset(APP::Module('Users')->settings['module_users_social_auth_vk_id']) ? APP::Module('Users')->settings['module_users_social_auth_vk_id'] : '' ?>"
-                                                        >
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="module_users_social_auth_vk_key" class="col-sm-1 control-label">Key</label>
-                                                <div class="col-sm-3">
-                                                    <div class="fg-line">
-                                                        <input 
-                                                            type="text" 
-                                                            class="form-control" 
-                                                            name="module_users_social_auth_vk_key" 
-                                                            id="module_users_social_auth_vk_key" 
-                                                            value="<?= isset(APP::Module('Users')->settings['module_users_social_auth_vk_key']) ? APP::Module('Users')->settings['module_users_social_auth_vk_key'] : '' ?>"
-                                                        >
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div role="tabpanel" class="tab-pane animated fadeIn" id="google">
-                                            <div class="form-group">
-                                                <label for="module_users_social_auth_google_id" class="col-sm-1 control-label">ID</label>
-                                                <div class="col-sm-3">
-                                                    <div class="fg-line">
-                                                        <input 
-                                                            type="text" 
-                                                            class="form-control" 
-                                                            name="module_users_social_auth_google_id" 
-                                                            id="module_users_social_auth_google_id" 
-                                                            value="<?= isset(APP::Module('Users')->settings['module_users_social_auth_google_id']) ? APP::Module('Users')->settings['module_users_social_auth_google_id'] : '' ?>"
-                                                        >
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="module_users_social_auth_google_key" class="col-sm-1 control-label">Key</label>
-                                                <div class="col-sm-3">
-                                                    <div class="fg-line">
-                                                        <input 
-                                                            type="text" 
-                                                            class="form-control" 
-                                                            name="module_users_social_auth_google_key" 
-                                                            id="module_users_social_auth_google_key" 
-                                                            value="<?= isset(APP::Module('Users')->settings['module_users_social_auth_google_key']) ? APP::Module('Users')->settings['module_users_social_auth_google_key'] : '' ?>"
-                                                        >
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div role="tabpanel" class="tab-pane animated fadeIn" id="yandex">
-                                            <div class="form-group">
-                                                <label for="module_users_social_auth_ya_id" class="col-sm-1 control-label">ID</label>
-                                                <div class="col-sm-3">
-                                                    <div class="fg-line">
-                                                        <input 
-                                                            type="text" 
-                                                            class="form-control" 
-                                                            name="module_users_social_auth_ya_id" 
-                                                            id="module_users_social_auth_ya_id" 
-                                                            value="<?= isset(APP::Module('Users')->settings['module_users_social_auth_ya_id']) ? APP::Module('Users')->settings['module_users_social_auth_ya_id'] : '' ?>"
-                                                        >
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="module_users_social_auth_ya_key" class="col-sm-1 control-label">Key</label>
-                                                <div class="col-sm-3">
-                                                    <div class="fg-line">
-                                                        <input 
-                                                            type="text" 
-                                                            class="form-control" 
-                                                            name="module_users_social_auth_ya_key" 
-                                                            id="module_users_social_auth_ya_key" 
-                                                            value="<?= isset(APP::Module('Users')->settings['module_users_social_auth_ya_key']) ? APP::Module('Users')->settings['module_users_social_auth_ya_key'] : '' ?>"
-                                                        >
-                                                    </div>
+                                        <div class="form-group">
+                                            <label for="module_users_oauth_client_fb_key" class="col-sm-1 control-label">Key</label>
+                                            <div class="col-sm-3">
+                                                <div class="fg-line">
+                                                    <input 
+                                                        type="text" 
+                                                        class="form-control" 
+                                                        name="module_users_oauth_client_fb_key" 
+                                                        id="module_users_oauth_client_fb_key" 
+                                                        value="<?= isset(APP::Module('Users')->settings['module_users_oauth_client_fb_key']) ? APP::Module('Users')->settings['module_users_oauth_client_fb_key'] : '' ?>"
+                                                    >
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </form>
+                                    <div role="tabpanel" class="tab-pane animated fadeIn" id="vk">
+                                        <div class="form-group">
+                                            <label for="module_users_oauth_client_vk_id" class="col-sm-1 control-label">ID</label>
+                                            <div class="col-sm-3">
+                                                <div class="fg-line">
+                                                    <input 
+                                                        type="text" 
+                                                        class="form-control" 
+                                                        name="module_users_oauth_client_vk_id" 
+                                                        id="module_users_oauth_client_vk_id" 
+                                                        value="<?= isset(APP::Module('Users')->settings['module_users_oauth_client_vk_id']) ? APP::Module('Users')->settings['module_users_oauth_client_vk_id'] : '' ?>"
+                                                    >
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="module_users_oauth_client_vk_key" class="col-sm-1 control-label">Key</label>
+                                            <div class="col-sm-3">
+                                                <div class="fg-line">
+                                                    <input 
+                                                        type="text" 
+                                                        class="form-control" 
+                                                        name="module_users_oauth_client_vk_key" 
+                                                        id="module_users_oauth_client_vk_key" 
+                                                        value="<?= isset(APP::Module('Users')->settings['module_users_oauth_client_vk_key']) ? APP::Module('Users')->settings['module_users_oauth_client_vk_key'] : '' ?>"
+                                                    >
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div role="tabpanel" class="tab-pane animated fadeIn" id="google">
+                                        <div class="form-group">
+                                            <label for="module_users_oauth_client_google_id" class="col-sm-1 control-label">ID</label>
+                                            <div class="col-sm-3">
+                                                <div class="fg-line">
+                                                    <input 
+                                                        type="text" 
+                                                        class="form-control" 
+                                                        name="module_users_oauth_client_google_id" 
+                                                        id="module_users_oauth_client_google_id" 
+                                                        value="<?= isset(APP::Module('Users')->settings['module_users_oauth_client_google_id']) ? APP::Module('Users')->settings['module_users_oauth_client_google_id'] : '' ?>"
+                                                    >
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="module_users_oauth_client_google_key" class="col-sm-1 control-label">Key</label>
+                                            <div class="col-sm-3">
+                                                <div class="fg-line">
+                                                    <input 
+                                                        type="text" 
+                                                        class="form-control" 
+                                                        name="module_users_oauth_client_google_key" 
+                                                        id="module_users_oauth_client_google_key" 
+                                                        value="<?= isset(APP::Module('Users')->settings['module_users_oauth_client_google_key']) ? APP::Module('Users')->settings['module_users_oauth_client_google_key'] : '' ?>"
+                                                    >
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div role="tabpanel" class="tab-pane animated fadeIn" id="yandex">
+                                        <div class="form-group">
+                                            <label for="module_users_oauth_client_ya_id" class="col-sm-1 control-label">ID</label>
+                                            <div class="col-sm-3">
+                                                <div class="fg-line">
+                                                    <input 
+                                                        type="text" 
+                                                        class="form-control" 
+                                                        name="module_users_oauth_client_ya_id" 
+                                                        id="module_users_oauth_client_ya_id" 
+                                                        value="<?= isset(APP::Module('Users')->settings['module_users_oauth_client_ya_id']) ? APP::Module('Users')->settings['module_users_oauth_client_ya_id'] : '' ?>"
+                                                    >
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="module_users_oauth_client_ya_key" class="col-sm-1 control-label">Key</label>
+                                            <div class="col-sm-3">
+                                                <div class="fg-line">
+                                                    <input 
+                                                        type="text" 
+                                                        class="form-control" 
+                                                        name="module_users_oauth_client_ya_key" 
+                                                        id="module_users_oauth_client_ya_key" 
+                                                        value="<?= isset(APP::Module('Users')->settings['module_users_oauth_client_ya_key']) ? APP::Module('Users')->settings['module_users_oauth_client_ya_key'] : '' ?>"
+                                                    >
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 
                                 <div class="form-group">
                                     <div class="col-sm-offset-1 col-sm-5">
@@ -208,7 +206,7 @@
                                 case 'success':
                                     swal({
                                         title: 'Done!',
-                                        text: 'Social networks settings has been updated',
+                                        text: 'OAuth clients settings has been updated',
                                         type: 'success',
                                         showCancelButton: false,
                                         confirmButtonText: 'Ok',

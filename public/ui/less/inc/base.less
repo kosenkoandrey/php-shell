@@ -56,7 +56,7 @@ pre {
     
     @media (min-width: @screen-mobile-min) {
         padding: 0 40px 30px @sidebar-left-width;
-        min-height: ~"calc(100vh - 159px)";
+        //min-height: ~"calc(100vh - 159px)";
     }
     
     @media (max-width: @screen-mobile-max) and (min-width: @screen-sm-min) {
@@ -65,5 +65,11 @@ pre {
     
     @media (max-width: @screen-xs-max)  {
         padding: 0 15px 30px;
+    }
+}
+
+#main.center {
+    @media (min-width: @screen-mobile-min) {
+        padding: 0 @sidebar-left-width 30px @sidebar-left-width;
     }
 }

@@ -45,6 +45,22 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
+                                    <label for="module_users_tmp_dir" class="col-sm-2 control-label">Temp dir</label>
+                                    <div class="col-sm-2">
+                                        <div class="fg-line">
+                                            <input type="text" class="form-control" name="module_users_tmp_dir" id="module_users_tmp_dir">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="module_users_profile_picture" class="col-sm-2 control-label">Profile picture</label>
+                                    <div class="col-sm-10">
+                                        <div class="fg-line">
+                                            <input type="text" class="form-control" name="module_users_profile_picture" id="module_users_profile_picture">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
                                     <div class="col-sm-offset-2 col-sm-2">
                                         <button type="submit" class="btn palette-Teal bg waves-effect btn-lg">Save changes</button>
                                     </div>
@@ -74,13 +90,23 @@
         <script>
             $(document).ready(function() {
                 $('#module_users_db_connection').val('<?= APP::Module('Users')->settings['module_users_db_connection'] ?>');
+                $('#module_users_tmp_dir').val('<?= APP::Module('Users')->settings['module_users_tmp_dir'] ?>');
+                $('#module_users_profile_picture').val('<?= APP::Module('Users')->settings['module_users_profile_picture'] ?>');
 
                 $('#update-settings').submit(function(event) {
                     event.preventDefault();
 
-                    var module_users_db_connection = $(this).find('#module_users_timeout_activation');
+                    var module_users_db_connection = $(this).find('#module_users_db_connection');
+                    var module_users_tmp_dir = $(this).find('#module_users_tmp_dir');
+                    var module_users_profile_picture = $(this).find('#module_users_profile_picture');
+                    
                     module_users_db_connection.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    module_users_tmp_dir.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    module_users_profile_picture.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    
                     if (module_users_db_connection.val() === '') { module_users_db_connection.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-2').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    if (module_users_tmp_dir.val() === '') { module_users_tmp_dir.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-2').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    if (module_users_profile_picture.val() === '') { module_users_profile_picture.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-10').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
 
                     $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
 
@@ -108,7 +134,7 @@
                             $('#update-settings').find('[type="submit"]').html('Save changes').attr('disabled', false);
                         }
                     });
-                  });
+                });
             });
         </script>
     </body>

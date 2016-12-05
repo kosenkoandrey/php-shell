@@ -2,8 +2,8 @@
  * Load Main Bootstrap LESS files
  */
 /*!
- * Bootstrap v3.3.6 (http://getbootstrap.com)
- * Copyright 2011-2015 Twitter, Inc.
+ * Bootstrap v3.3.7 (http://getbootstrap.com)
+ * Copyright 2011-2016 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
 /*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
@@ -1098,7 +1098,6 @@ a:focus {
   text-decoration: none;
 }
 a:focus {
-  outline: thin dotted;
   outline: 5px auto -webkit-focus-ring-color;
   outline-offset: -2px;
   outline: none !important;
@@ -2528,7 +2527,6 @@ select[size] {
 input[type="file"]:focus,
 input[type="radio"]:focus,
 input[type="checkbox"]:focus {
-  outline: thin dotted;
   outline: 5px auto -webkit-focus-ring-color;
   outline-offset: -2px;
   outline: none !important;
@@ -3022,7 +3020,6 @@ select[multiple].input-lg {
 .btn.focus,
 .btn:active.focus,
 .btn.active.focus {
-  outline: thin dotted;
   outline: 5px auto -webkit-focus-ring-color;
   outline-offset: -2px;
   outline: none !important;
@@ -7460,10 +7457,10 @@ button.close {
   border-left: 0;
 }
 /*!
- * Waves v0.7.4
+ * Waves v0.7.5
  * http://fian.my.id/Waves 
  * 
- * Copyright 2014 Alfiana E. Sibuea and other contributors 
+ * Copyright 2014-2016 Alfiana E. Sibuea and other contributors 
  * Released under the MIT license 
  * https://github.com/fians/Waves/blob/master/LICENSE 
  */
@@ -7594,10 +7591,6 @@ button.close {
 }
 .waves-block {
   display: block;
-}
-/* Firefox Bug: link not triggered */
-a.waves-effect .waves-ripple {
-  z-index: -1;
 }
 /**
  * google-material-color v1.2.6
@@ -8187,7 +8180,6 @@ pre {
 @media (min-width: 1280px) {
   #main {
     padding: 0 40px 30px 270px;
-    min-height: calc(100vh - 159px);
   }
 }
 @media (max-width: 1279px) and (min-width: 768px) {
@@ -8198,6 +8190,11 @@ pre {
 @media (max-width: 767px) {
   #main {
     padding: 0 15px 30px;
+  }
+}
+@media (min-width: 1280px) {
+  #main.center {
+    padding: 0 270px 30px 270px;
   }
 }
 .clist {
@@ -8225,7 +8222,7 @@ pre {
   -ms-user-select: none;
   user-select: none;
   position: relative;
-  padding: 40px 45px;
+  padding: 40px 45px 50px 45px;
   margin-bottom: 20px;
   z-index: 10;
 }
@@ -11323,7 +11320,7 @@ html:not(.ie9) .select.fg-line:before {
   text-decoration: underline;
 }
 #profile-main {
-  min-height: 500px;
+  min-height: 600px;
   position: relative;
 }
 #profile-main .pm-overview {
@@ -11373,7 +11370,7 @@ html:not(.ie9) .select.fg-line:before {
 }
 #profile-main .pmo-pic {
   position: relative;
-  margin: 20px;
+  margin: 15px 15px 0 15px;
 }
 @media (min-width: 768px) {
   #profile-main .pmo-pic img {
@@ -11472,12 +11469,12 @@ html:not(.ie9) .select.fg-line:before {
 }
 @media (min-width: 1200px) {
   #profile-main .pmb-block {
-    padding: 40px 42px 0;
+    padding: 25px 30px 0;
   }
 }
 @media (max-width: 1199px) {
   #profile-main .pmb-block {
-    padding: 30px 20px 0;
+    padding: 25px 30px 0;
   }
 }
 #profile-main .pmb-block:last-child {

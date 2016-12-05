@@ -3,6 +3,8 @@
 # php-shell
 Micro PHP Framework
 
+[https://php-shell.com](https://php-shell.com)
+
 ### Requirements
 
 You need at least `PHP 5.6` with extensions:
@@ -109,7 +111,12 @@ Run test of module `Example`
 │           ├── error.php
 │           ├── import.php
 │           └── install.php
-├── app.php                             # Core
-├── conf.php                            # Config
+├── phpshell.sql                        # Database dump
+├── php.ini                             # Custom PHP config
+├── app.php                             # Core class
+├── conf.php                            # Main config
 └── init.php                            # Init script
 ```
+
+### Credits
+Thanks to [Andrey Kosenko](https://github.com/kosenkoandrey) for great ideas and financial support of the project.

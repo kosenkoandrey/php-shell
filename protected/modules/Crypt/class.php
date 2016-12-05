@@ -70,5 +70,5 @@ class Crypt {
         ]);
         exit;
     }
-    
+
 }

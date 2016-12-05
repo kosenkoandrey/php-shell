@@ -10081,7 +10081,6 @@ pre {
 @media (min-width: 1280px) {
   #main {
     padding: 0 40px 30px 270px;
-    min-height: calc(100vh - 159px);
   }
 }
 
@@ -10094,6 +10093,12 @@ pre {
 @media (max-width: 767px) {
   #main {
     padding: 0 15px 30px;
+  }
+}
+
+@media (min-width: 1280px) {
+  #main.center {
+    padding: 0 270px 30px 270px;
   }
 }
 
@@ -10127,7 +10132,7 @@ pre {
   -ms-user-select: none;
   user-select: none;
   position: relative;
-  padding: 40px 45px;
+  padding: 40px 45px 50px 45px;
   margin-bottom: 20px;
   z-index: 10;
 }
@@ -13848,7 +13853,7 @@ html:not(.ie9) .select.fg-line:before {
 }
 
 #profile-main {
-  min-height: 500px;
+  min-height: 600px;
   position: relative;
 }
 
@@ -13907,7 +13912,7 @@ html:not(.ie9) .select.fg-line:before {
 
 #profile-main .pmo-pic {
   position: relative;
-  margin: 20px;
+  margin: 15px 15px 0 15px;
 }
 
 @media (min-width: 768px) {
@@ -14022,13 +14027,13 @@ html:not(.ie9) .select.fg-line:before {
 
 @media (min-width: 1200px) {
   #profile-main .pmb-block {
-    padding: 40px 42px 0;
+    padding: 25px 30px 0;
   }
 }
 
 @media (max-width: 1199px) {
   #profile-main .pmb-block {
-    padding: 30px 20px 0;
+    padding: 25px 30px 0;
   }
 }
 
@@ -15706,9 +15711,4 @@ body.o-hidden {
 [data-ma-header="purple-400"]:before,
 [data-ma-header="purple-400"] #header {
   background-color: #AB47BC;
-}
-
-[data-ma-header="purple-400"] .smm-alerts > li.active,
-[data-ma-header="purple-400"] .main-menu li.active > a {
-  color: #AB47BC;
 }

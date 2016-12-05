@@ -7,18 +7,22 @@ return [
         ['users\/login\/google(\?.*)?',                                         'Users', 'LoginGoogle'],                // Login via Google
         ['users\/login\/ya(\?.*)?',                                             'Users', 'LoginYA'],                    // Login via Yandex
         ['users\/login\/double\/(?P<return_hash>.*)',                           'Users', 'DoubleLoginForm'],            // Double login form
-        ['users\/activate\/(?P<user_id_hash>.*)',                               'Users', 'Activate'],                   // User activation
-        ['users\/profile(\?.*)?',                                               'Users', 'Profile'],                    // User profile
+        ['users\/activate\/(?P<user_id_hash>.*)\/(?P<params>.*)',               'Users', 'Activate'],                   // User activation
+        ['users\/profile',                                                      'Users', 'PrivateProfile'],             // Private user profile
+        ['users\/profile\/(?P<user_id_hash>.*)',                                'Users', 'PublicProfile'],              // Public user profile
         ['users\/logout(\?.*)?',                                                'Users', 'Logout'],                     // Logout
 
         ['users\/api\/login\.json(\?.*)?',                                      'Users', 'APILogin'],                   // [API] Login
         ['users\/api\/double\-login\.json(\?.*)?',                              'Users', 'APIDoubleLogin'],             // [API] Double login
         ['users\/api\/logout\.json(\?.*)?',                                     'Users', 'APILogout'],                  // [API] Logout
         ['users\/api\/register\.json(\?.*)?',                                   'Users', 'APIRegister'],                // [API] Register
+        ['users\/api\/subscribe\.json(\?.*)?',                                  'Users', 'APISubscribe'],               // [API] Subscribe
         ['users\/api\/reset\-password\.json(\?.*)?',                            'Users', 'APIResetPassword'],           // [API] Reset password
         ['users\/api\/change\-password\.json(\?.*)?',                           'Users', 'APIChangePassword'],          // [API] Change password
+        ['users\/api\/about\/update\.json(\?.*)?',                              'Users', 'APIUpdateAbout'],             // [API] Update about current user
         
         ['admin\/users(\?.*)?',                                                 'Users', 'ManageUsers'],                // Manage users
+        ['admin\/users\/profile\/(?P<user_id>[0-9]+)',                          'Users', 'AdminProfile'],               // Admin user profile
         ['admin\/users\/add(\?.*)?',                                            'Users', 'AddUser'],                    // Add user
         ['admin\/users\/edit\/(?P<user_id_hash>.*)',                            'Users', 'EditUser'],                   // Edit user
         ['admin\/users\/oauth\/clients(\?.*)?',                                 'Users', 'SetupOAuthClients'],          // Setup oauth clients
@@ -52,6 +56,7 @@ return [
         ['admin\/users\/api\/passwords\/update\.json(\?.*)?',                   'Users', 'APIUpdatePasswordsSettings'],     // [API] Update passwords settings
         ['admin\/users\/api\/timeouts\/update\.json(\?.*)?',                    'Users', 'APIUpdateTimeoutsSettings'],      // [API] Update timeouts settings
         ['admin\/users\/api\/settings\/update\.json(\?.*)?',                    'Users', 'APIUpdateOtherSettings'],         // [API] Update other settings
+        ['admin\/users\/api\/about\/update\.json(\?.*)?',                       'Users', 'APIAdminUpdateAbout'],            // [API] Update about any users
     ],
     'init' => true
 ];

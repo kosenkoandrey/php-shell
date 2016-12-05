@@ -52,8 +52,10 @@ class Triggers {
     
     public function Exec($id, $data) {
         foreach (isset($this->list[$id]) ? $this->list[$id]['rules'] : [] as $rule) {
-            APP::Module($rule[0])->{$rule[1]}($id, $data);
+            $data = APP::Module($rule[0])->{$rule[1]}($id, $data);
         }
+        
+        return $data;
     }
     
     

@@ -9,6 +9,10 @@ class Logs {
         return APP::Render('logs/admin/nav', 'content');
     }
     
+    public function Dashboard() {
+        return APP::Render('logs/admin/dashboard/index', 'return');
+    }
+    
 
     public function Manage() {
         APP::Render('logs/admin/index');
@@ -16,9 +20,25 @@ class Logs {
     
     public function View() {
         $file = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['filename_hash']);
-        APP::Render('logs/admin/view', 'include', [$file, file($file)]);
+        APP::Render('logs/admin/view', 'include', [$file, file($file, FILE_SKIP_EMPTY_LINES)]);
     }
     
+    
+    public function APIDashboard() { 
+        $out = [];
+        
+        for ($x = $_POST['date']['to']; $x >= $_POST['date']['from']; $x = $x - 86400) {
+            $file = APP::$conf['logs'] . '/php-errors-' . date('d-m-Y', $x) . '.log';
+            $out[] = [$x * 1000, file_exists($file) ? count(file($file)) : 0];
+        }
+        
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode($out);
+        exit;
+    }
     
     public function APIListLogs() {
         $logs = [];

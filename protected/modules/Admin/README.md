@@ -22,6 +22,7 @@ Tools for managing system components
 └── /render
     └── /admin
         ├── /modules
+        │   ├── index.php
         │   ├── import.php
         │   ├── network_import.php
         │   ├── uninstall.php
@@ -30,6 +31,7 @@ Tools for managing system components
         │   ├── footer.php
         │   ├── header.php
         │   └── sidebar.php
+        ├── app.php
         └── index.php
 ```
 

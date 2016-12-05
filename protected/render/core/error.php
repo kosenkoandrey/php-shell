@@ -2,8 +2,8 @@
 ob_end_clean();
 
 if (APP::$console) {
-    echo "An error has occured!\n";
-    echo "---------------------\n";
+    echo "An error has occured\n";
+    echo "--------------------\n";
 
     switch ($data[0]) {
         case 0: echo $data[1][1]; break;

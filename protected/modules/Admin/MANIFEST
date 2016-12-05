@@ -10,6 +10,8 @@
 [file]protected/modules/Admin/uninstall.php[/file]
 [file]protected/modules/Admin/test.php[/file]
 [file]protected/render/admin/index.php[/file]
+[file]protected/render/admin/app.php[/file]
+[file]protected/render/admin/modules/index.php[/file]
 [file]protected/render/admin/modules/import.php[/file]
 [file]protected/render/admin/modules/network_import.php[/file]
 [file]protected/render/admin/modules/uninstall.php[/file]

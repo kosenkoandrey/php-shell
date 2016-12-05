@@ -51,8 +51,7 @@
                             <table class="table table-hover table-vmiddle" id="transport-table">
                                 <thead>
                                     <tr>
-                                        <th data-column-id="id" data-visible="false">ID</th>
-                                        <th data-column-id="action">Action</th>
+                                        <th data-column-id="id" data-visible="false" data-type="numeric" data-order="desc">ID</th>
                                         <th data-column-id="module">Module</th>
                                         <th data-column-id="method">Method</th>
                                         <th data-column-id="actions" data-formatter="actions">Actions</th>
@@ -96,7 +95,6 @@
                         iconRefresh: 'zmdi-refresh',
                         iconUp: 'zmdi-chevron-up pull-left'
                     },
-                    sorting: false,
                     formatters: {
                         actions: function(column, row) {
                             return  '<a href="<?= APP::Module('Routing')->root ?>' + row.settings + '" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-settings"></span></a> ' +

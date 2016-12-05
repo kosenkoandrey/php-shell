@@ -9,6 +9,8 @@ User management system
 - [Registry](https://github.com/evildevel/php-shell/tree/master/protected/modules/Registry)
 - [Mail](https://github.com/evildevel/php-shell/tree/master/protected/modules/Mail)
 - [Triggers](https://github.com/evildevel/php-shell/tree/master/protected/modules/Triggers)
+- [Cron](https://github.com/evildevel/php-shell/tree/master/protected/modules/Cron)
+- [SSH](https://github.com/evildevel/php-shell/tree/master/protected/modules/SSH)
 
 ### Files
 ```
@@ -41,12 +43,15 @@ User management system
         │   ├── passwords.php
         │   ├── services.php
         │   ├── timeouts.php
-        │   └── settings.php
+        │   ├── settings.php
+        │   └── profile.php
+        ├── /profiles
+        │   ├── public.php
+        │   └── private.php
         ├── actions.php
         ├── activate.php
         ├── double_login.php
-        ├── errors.php
-        └── profile.php
+        └── errors.php
 ```
 
 ### Properties
@@ -78,6 +83,7 @@ string APP::Module('Users')->GeneratePassword(int $length[, bool $letters = true
 - Login
 - Double login
 - Register new user
+- Subscribe new user
 - Reset password
 - Change password
 - Update user
@@ -86,13 +92,14 @@ string APP::Module('Users')->GeneratePassword(int $length[, bool $letters = true
 - Add rule
 - Remove rule
 - Update rule
-- Update OAuth settings
+- Update OAuth clients settings
 - Update notifications settings
 - Update services settings
 - Update auth settings
 - Update passwords settings
 - Update timeouts settings 
 - Update other settings 
+- Update about user
 
 ### WEB interfaces
 ```
@@ -102,11 +109,14 @@ string APP::Module('Users')->GeneratePassword(int $length[, bool $letters = true
 /users/login/google                                         // Login via Google
 /users/login/ya                                             // Login via Yandex
 /users/login/double/<return_hash>                           // Double login form
-/users/activate/<user_id_hash>                              // User activation
-/users/profile                                              // User profile
+/users/activate/<user_id_hash>/<params>                     // User activation
+/users/profile                                              // Private user profile
+/users/profile/<user_id_hash>                               // Public user profile
+
 /users/logout                                               // Logout
 
 /admin/users                                                // Manage users
+/admin/users/profile/<user_id>                              // Admin user profile
 /admin/users/add                                            // Add user
 /admin/users/edit/<user_id_hash>                            // Edit user
 /admin/users/oauth/clients                                  // Setup OAuth clients
@@ -126,8 +136,10 @@ string APP::Module('Users')->GeneratePassword(int $length[, bool $letters = true
 /users/api/double-login.json                                // [API] Double login
 /users/api/logout.json                                      // [API] Logout
 /users/api/register.json                                    // [API] Register
+/users/api/subscribe.json                                   // [API] Subscribe
 /users/api/reset-password.json                              // [API] Reset password
 /users/api/change-password.json                             // [API] Change password
+/users/api/about/update.json                                // [API] Update about current user
 
 /admin/users/api/add.json                                   // [API] Add user
 /admin/users/api/remove.json                                // [API] Remove user
@@ -146,4 +158,5 @@ string APP::Module('Users')->GeneratePassword(int $length[, bool $letters = true
 /admin/users/api/passwords/update.json                      // [API] Update passwords settings
 /admin/users/api/timeouts/update.json                       // [API] Update timeouts settings
 /admin/users/api/settings/update.json                       // [API] Update other settings
+/admin/users/api/about/update.json                          // [API] Update about any users
 ```

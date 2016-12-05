@@ -106,7 +106,7 @@
                     },
                     formatters: {
                         actions: function(column, row) {
-                            return  '<a href="<?= APP::Module('Routing')->root ?>users/profile?user_token=' + row.auth_token + '" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-account"></span></a> ' + 
+                            return  '<a href="<?= APP::Module('Routing')->root ?>admin/users/profile/' + row.id + '" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-account"></span></a> ' + 
                                     '<a href="<?= APP::Module('Routing')->root ?>admin/users/edit/' + row.user_id_token + '" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-edit"></span></a> ' + 
                                     '<a href="javascript:void(0)" class="btn btn-sm btn-default btn-icon waves-effect waves-circle remove-user" data-user-id="' + row.id + '"><span class="zmdi zmdi-delete"></span></a>';
                         }

@@ -21,6 +21,11 @@ Manage log files
 └── /render
     └── /logs
         └── /admin
+            ├── /dashboard
+            │   ├── css.php
+            │   ├── html.php
+            │   ├── index.php
+            │   └── js.php
             ├── index.php
             ├── nav.php
             └── view.php

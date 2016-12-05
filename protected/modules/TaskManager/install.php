@@ -276,21 +276,41 @@ if ($error) {
 
 $data->extractTo(ROOT);
 
-$db = APP::Module('DB')->Open($_SESSION['core']['install']['taskmanager']['db_connection']);
-$ssh = $_SESSION['core']['install']['taskmanager']['ssh_connection'];
+APP::Module('DB')->Open($_SESSION['core']['install']['taskmanager']['db_connection'])->query("
+    SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
+    SET time_zone = '+00:00';
 
-$db->query('SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";');
-$db->query('SET time_zone = "+00:00";');
+    CREATE TABLE `task_manager` (
+      `id` bigint(20) UNSIGNED NOT NULL,
+      `token` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+      `module` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+      `method` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+      `args` text COLLATE utf8_unicode_ci NOT NULL,
+      `state` enum('wait','complete') COLLATE utf8_unicode_ci NOT NULL,
+      `cr_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      `exec_date` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+      `complete_date` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-$db->query('CREATE TABLE `task_manager` (`id` bigint(20) UNSIGNED NOT NULL,`token` varchar(50) COLLATE utf8_unicode_ci NOT NULL,`module` varchar(50) COLLATE utf8_unicode_ci NOT NULL,`method` varchar(50) COLLATE utf8_unicode_ci NOT NULL,`args` text COLLATE utf8_unicode_ci NOT NULL,`state` enum("wait","complete") COLLATE utf8_unicode_ci NOT NULL,`cr_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,`exec_date` timestamp NOT NULL DEFAULT "0000-00-00 00:00:00",`complete_date` timestamp NOT NULL DEFAULT "0000-00-00 00:00:00") ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;');
-$db->query('ALTER TABLE `task_manager` ADD PRIMARY KEY (`id`),ADD KEY `token` (`token`),ADD KEY `state` (`state`),ADD KEY `state_2` (`state`,`exec_date`),ADD KEY `token_2` (`token`,`state`,`exec_date`);');
-$db->query('ALTER TABLE `task_manager` MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;');
+
+    ALTER TABLE `task_manager`
+      ADD PRIMARY KEY (`id`),
+      ADD KEY `state_exec_date` (`state`,`exec_date`) USING BTREE,
+      ADD KEY `state_complete_date` (`state`,`complete_date`) USING BTREE;
+
+
+    ALTER TABLE `task_manager`
+      MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+");
 
 APP::Module('Registry')->Add('module_taskmanager_db_connection', $_SESSION['core']['install']['taskmanager']['db_connection']);
+APP::Module('Registry')->Add('module_taskmanager_ssh_connection', $_SESSION['core']['install']['taskmanager']['ssh_connection']);
 APP::Module('Registry')->Add('module_taskmanager_complete_lifetime', $_SESSION['core']['install']['taskmanager']['settings']['complete_lifetime']);
 APP::Module('Registry')->Add('module_taskmanager_max_execution_time', $_SESSION['core']['install']['taskmanager']['settings']['max_execution_time']);
 APP::Module('Registry')->Add('module_taskmanager_memory_limit', $_SESSION['core']['install']['taskmanager']['settings']['memory_limit']);
 APP::Module('Registry')->Add('module_taskmanager_tmp_dir', $_SESSION['core']['install']['taskmanager']['settings']['tmp_dir']);
+
+$ssh = $_SESSION['core']['install']['taskmanager']['ssh_connection'];
 
 APP::Module('Cron')->Add($ssh, ['*/1', '*', '*', '*', '*', 'php ' . ROOT . '/init.php TaskManager Exec []']);
 APP::Module('Cron')->Add($ssh, ['*/1', '*', '*', '*', '*', 'php ' . ROOT . '/init.php TaskManager GC []']);

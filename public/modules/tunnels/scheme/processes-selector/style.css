@@ -1,0 +1,50 @@
+#processes-manager {
+    position: fixed;
+    left: 50%;
+    width: 700px;
+    max-height: 250px;
+    margin-left: -350px;
+    z-index: 10000;
+    top: 30%;
+    background: #ffffff;
+    
+    -webkit-box-shadow: 0 5px 15px rgba(0,0,0,.5);
+    box-shadow: 0 5px 15px rgba(0,0,0,.5);
+}
+
+#processes-manager #processes-panel {
+    border-radius: 0px;
+}
+
+#processes-manager #processes-panel .panel-title {
+    padding: 8px;
+}
+
+#processes-manager #processes-panel > .panel-body {
+    overflow-y: scroll;
+    height: 250px;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+#processes-manager #processes-list {
+    margin-bottom: 0;
+}
+#processes-manager #processes-list .item-icon {
+    width: 25px;
+}
+#processes-manager #processes-list .item-icon > i {
+    margin-left: 6px;
+}
+#processes-manager #processes-list .item-group-name,
+#processes-manager #processes-list .item-process-name {
+    cursor: pointer;
+}
+#processes-manager #processes-list .item-actions {
+    width: 100px;
+}
+
+#processes-manager #processes-list > tbody > tr > td {
+    padding: 12px 9px;
+}

@@ -25,69 +25,80 @@
 
             <section id="content">
                 <div class="container">
-                    <div class="card">
-                        <div class="card-header">
-                            <h2>Application configuration</h2>
-                        </div>
-                        <div class="card-body">
-                            <table class="table">
-                                <tbody>
-                                    <?
-                                    foreach ([
-                                        'Base URL'      => '<a href="' . APP::$conf['location'][0] . '://' . APP::$conf['location'][1] . APP::$conf['location'][2] . '" target="_blank" class="btn palette-Teal bg btn-xs waves-effect"><i class="zmdi zmdi-open-in-new"></i> ' . APP::$conf['location'][0] . '://' . APP::$conf['location'][1] . APP::$conf['location'][2] . '</a>',
-                                        'Encoding'      => APP::$conf['encoding'],
-                                        'Locale'        => APP::$conf['locale'],
-                                        'Timezone'      => APP::$conf['timezone'],
-                                        'Memory limit'  => APP::$conf['memory_limit'],
-                                        'Debug mode'    => APP::$conf['debug'] ? 'On': 'Off',
-                                        'Logs'          => APP::$conf['logs']
-                                    ] as $key => $value) {
-                                        ?>
-                                        <tr>
-                                            <td width="20%"><?= $key ?></td>
-                                            <td width="80%"><?= $value ?></td>
-                                        </tr>
-                                        <?
-                                    }
+                    <?
+                    foreach ($data['cards'] as $key => $value) {
+                        ?>
+                        <div class="card">
+                            <?
+                            switch ($value['type']) {
+                                case 'card':
                                     ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header">
-                            <h2>Installed modules</h2>
+                                    <div class="card-header">
+                                        <h2><?= $key ?></h2>
+                                    </div>
+                                    <div class="card-body card-padding" id="card-<?= md5($key) ?>">
+                                        <?= $value['data'][0] ?>
+                                    </div>
+                                    <?
+                                    ob_start();
+                                    echo $value['data'][1];
+                                    APP::$insert['dashboard_css_card_' . md5($key)] = ['css', 'code', 'before', '</body>', ob_get_contents()];
+                                    ob_end_clean();
 
-                            <ul class="actions">
-                                <li class="dropdown">
-                                    <a href="" data-toggle="dropdown">
-                                        <i class="zmdi zmdi-more-vert"></i>
-                                    </a>
-                                    <ul class="dropdown-menu dropdown-menu-right">
-                                        <li><a href="<?= APP::Module('Routing')->root ?>admin/modules/import">Import local modules</a></li>
-                                        <li><a href="<?= APP::Module('Routing')->root ?>admin/modules/import/network">Import modules via network</a></li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="card-body">
-                            <table class="table table-hover">
-                                <tbody>
-                                    <?
-                                    foreach (glob(ROOT . '/protected/modules/*') as $module) {
-                                        ?>
-                                        <tr>
-                                            <td width="90%"><?= basename($module) ?></td>
-                                            <td width="5%"><a href="<?= APP::Module('Routing')->root ?>admin/modules/export/<?= APP::Module('Crypt')->Encode(basename($module)) ?>" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-download"></span></a></td>
-                                            <td width="5%"><a href="<?= APP::Module('Routing')->root ?>admin/modules/uninstall/<?= APP::Module('Crypt')->Encode(basename($module)) ?>" class="btn btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-delete"></span></a></td>
-                                        </tr>
-                                        <?
-                                    }
+                                    ob_start();
+                                    echo $value['data'][2];
+                                    APP::$insert['dashboard_js_card_' . md5($key)] = ['js', 'code', 'before', '</body>', ob_get_contents()];
+                                    ob_end_clean();
+                                    break;
+                                case 'tab':
+                                    $first_tab_hash = md5($key . key($value['data']));
                                     ?>
-                                </tbody>
-                            </table>
+                                    <ul class="tab-nav tab-nav-right" role="tablist" data-tab-color="teal" style="padding: 15px 30px 0 30px;">
+                                        <li class="pull-left"><h4><?= $key ?></h4></li>
+                                        <?
+                                        foreach ($value['data'] as $tab => $tab_data) {
+                                            ?>
+                                            <li id="tab-nav-<?= md5($key . $tab) ?>" role="presentation"><a href="#tab-<?= md5($key . $tab) ?>" role="tab" data-toggle="tab"><?= $tab ?></a></li>
+                                            <?
+                                        }
+                                        ?>
+                                    </ul>
+                                    <div class="card-body card-padding">
+                                        <div class="tab-content" style="padding: 0;">
+                                            <?
+                                            foreach ($value['data'] as $tab => $tab_data) {
+                                                ?>
+                                                <div role="tabpanel" class="tab-pane animated fadeIn" id="tab-<?= md5($key . $tab) ?>">
+                                                    <?= $tab_data[0] ?>
+                                                </div>
+                                                <?
+                                                ob_start();
+                                                echo $tab_data[1];
+                                                APP::$insert['dashboard_css_tab_' . md5($key . $tab)] = ['css', 'code', 'before', '</body>', ob_get_contents()];
+                                                ob_end_clean();
+                                                
+                                                ob_start();
+                                                echo $tab_data[2];
+                                                APP::$insert['dashboard_js_tab_' . md5($key . $tab)] = ['js', 'code', 'before', '</body>', ob_get_contents()];
+                                                ob_end_clean();
+                                            }
+                                            ?>
+                                        </div>
+                                    </div>
+                                    <?
+                                    ob_start();
+                                    ?>
+                                    <script>$('#tab-nav-<?= $first_tab_hash ?> > a').trigger('click');</script>
+                                    <?
+                                    APP::$insert['dashboard_js_tab_click_' . $first_tab_hash] = ['js', 'code', 'before', '</body>', ob_get_contents()];
+                                    ob_end_clean();
+                                    break;
+                            }
+                            ?>
                         </div>
-                    </div>
+                        <?
+                    }
+                    ?>
                 </div>
             </section>
 
@@ -105,4 +116,4 @@
 
         <? APP::Render('core/widgets/js') ?>
     </body>
-  </html>
+</html>

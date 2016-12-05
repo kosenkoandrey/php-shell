@@ -22,7 +22,7 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
         <div class="login" data-lbg="teal">
             <div class="l-block toggled" id="l-lockscreen">
                 <div class="lb-header palette-Teal bg">
-                    <img src="<?= APP::$conf['location'][0] ?>://www.gravatar.com/avatar/<?= md5($data['email']) ?>?s=40&d=<?= urlencode(APP::Module('Routing')->root . 'public/ui/img/profile-pics/default.png') ?>&t=<?= time() ?>" class="avatar-img">
+                    <img src="<?= APP::$conf['location'][0] ?>://www.gravatar.com/avatar/<?= md5($data['email']) ?>?s=40&d=<?= urlencode(APP::Module('Routing')->root . APP::Module('Users')->settings['module_users_profile_picture']) ?>&t=<?= time() ?>" class="avatar-img">
                     The operation requires a password
                 </div>
 

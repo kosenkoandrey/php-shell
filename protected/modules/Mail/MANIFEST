@@ -1,6 +1,6 @@
 [name]Mail[/name]
-[description]Simple E-Mail sending. Senders and letters management system.[/description]
-[dependencies]Routing Crypt Registry DB Triggers[/dependencies]
+[description]Powerful E-Mail sending. Senders and letters management system.[/description]
+[dependencies]Routing Crypt Registry DB Triggers SSH Cron[/dependencies]
 
 [file]protected/modules/Mail/MANIFEST[/file]
 [file]protected/modules/Mail/README.md[/file]
@@ -11,6 +11,9 @@
 [file]protected/modules/Mail/test.php[/file]
 [file]protected/render/mail/admin/nav.php[/file]
 [file]protected/render/mail/admin/settings.php[/file]
+[file]protected/render/mail/admin/copy.php[/file]
+[file]protected/render/mail/admin/log.php[/file]
+[file]protected/render/mail/admin/queue.php[/file]
 [file]protected/render/mail/admin/letters/add.php[/file]
 [file]protected/render/mail/admin/letters/edit.php[/file]
 [file]protected/render/mail/admin/letters/index.php[/file]

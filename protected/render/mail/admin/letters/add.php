@@ -41,10 +41,12 @@ foreach ($data['path'] as $key => $value) {
 
                             <div class="card-body card-padding">
                                 <div class="form-group">
-                                    <label for="sender_id" class="col-sm-2 control-label">Sender</label>
-                                    <div class="col-sm-3">
+                                    <label for="sender" class="col-sm-2 control-label">Sender</label>
+                                    <div class="col-sm-5">
                                         <div class="fg-line">
-                                            <input type="text" class="form-control" name="sender_id" id="sender_id">
+                                            <select id="sender" name="sender" class="selectpicker">
+                                                <? foreach ($data['senders'] as $value) { ?><option value="<?= $value['id'] ?>"><?= $value['name'] ?> &lt;<?= $value['email'] ?>&gt;</option><? } ?>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -60,7 +62,7 @@ foreach ($data['path'] as $key => $value) {
                                     <label for="html" class="col-sm-2 control-label">HTML-version</label>
                                     <div class="col-sm-10">
                                         <div class="fg-line">
-                                            <textarea name="html" id="html" class="form-control auto-size" placeholder="Write HTML version of the letter"></textarea>
+                                            <textarea name="html" id="html" class="form-control" placeholder="Write HTML version of the letter"></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -68,16 +70,28 @@ foreach ($data['path'] as $key => $value) {
                                     <label for="plaintext" class="col-sm-2 control-label">Plaintext-version</label>
                                     <div class="col-sm-10">
                                         <div class="fg-line">
-                                            <textarea name="plaintext" id="plaintext" class="form-control auto-size" placeholder="Write plaintext version of the letter"></textarea>
+                                            <textarea name="plaintext" id="plaintext" class="form-control" placeholder="Write plaintext version of the letter"></textarea>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="list_id" class="col-sm-2 control-label">List-ID header</label>
-                                    <div class="col-sm-10">
+                                    <label for="transport" class="col-sm-2 control-label">Transport</label>
+                                    <div class="col-sm-2">
                                         <div class="fg-line">
-                                            <input type="text" class="form-control" name="list_id" id="list_id">
+                                            <select id="transport" name="transport" class="selectpicker">
+                                                <? foreach ($data['transport'] as $value) { ?><option value="<?= $value['id'] ?>"><?= $value['module'] ?> / <?= $value['method'] ?></option><? } ?>
+                                            </select>
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="priority" class="col-sm-2 control-label">Priority</label>
+                                    <div class="col-sm-2">
+                                        <select id="priority" name="priority" class="selectpicker">
+                                            <option value="1">low</option>
+                                            <option value="50">medium</option>
+                                            <option value="100">maximum</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -117,17 +131,21 @@ foreach ($data['path'] as $key => $value) {
                 $('#add-letter').submit(function(event) {
                     event.preventDefault();
 
-                    var sender_id = $(this).find('#sender_id');
+                    var sender = $(this).find('#sender');
                     var subject = $(this).find('#subject');
                     var html = $(this).find('#html');
                     var plaintext = $(this).find('#plaintext');
+                    var transport = $(this).find('#transport');
+                    var priority = $(this).find('#priority');
  
-                    sender_id.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    sender.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
                     html.closest('.form-group').removeClass('has-error has-feedback');
                     plaintext.closest('.form-group').removeClass('has-error has-feedback');
                     subject.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    transport.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    priority.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
 
-                    if (sender_id.val() === '') { sender_id.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    if (sender.val() === '') { sender.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-5').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
                     if (subject.val() === '') { subject.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-10').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
                     if (html.val() === '') { 
                         html.closest('.form-group').addClass('has-error has-feedback'); 
@@ -153,6 +171,8 @@ foreach ($data['path'] as $key => $value) {
                         }); 
                         return false; 
                     }
+                    if (transport.val() === '') { transport.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-2').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    if (priority.val() === '') { priority.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-2').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
 
                     $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
 

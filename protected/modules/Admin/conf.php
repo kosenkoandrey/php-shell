@@ -1,7 +1,9 @@
 <?
 return [
     'routes' => [
-        ['admin(\?.*)?',                                           'Admin', 'Manage'],
+        ['admin(\?.*)?',                                           'Admin', 'Overview'],
+        ['admin\/app',                                             'Admin', 'Application'],
+        ['admin\/modules',                                         'Admin', 'InstalledModules'],
         ['admin\/modules\/export\/(?P<module_hash>.*)',            'Admin', 'ExportModule'],
         ['admin\/modules\/import',                                 'Admin', 'ImportModules'],
         ['admin\/modules\/import\/network',                        'Admin', 'NetworkImportModules'],

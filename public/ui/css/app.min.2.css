@@ -1,3 +1,8 @@
+[data-ma-header="purple-400"] .smm-alerts > li.active,
+[data-ma-header="purple-400"] .main-menu li.active > a {
+  color: #AB47BC;
+}
+
 [data-ma-header="red-400"]:before,
 [data-ma-header="red-400"] #header {
   background-color: #EF5350;

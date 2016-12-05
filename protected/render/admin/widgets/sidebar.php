@@ -110,6 +110,13 @@ foreach (APP::$modules as $key => $value) {
     </ul>
 
     <ul class="main-menu">
+        <li class="sub-menu">
+            <a href="" data-ma-action="submenu-toggle"><i class="zmdi zmdi-caret-right"></i> Application</a>
+            <ul>
+                <li><a href="<?= APP::Module('Routing')->root ?>admin/app">Configuration</a></li>
+                <li><a href="<?= APP::Module('Routing')->root ?>admin/modules">Modules</a></li>
+            </ul>
+        </li>
         <?
         foreach ($modules as $key => $value) {
             ?>

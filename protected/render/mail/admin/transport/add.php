@@ -36,36 +36,28 @@
 
                             <div class="card-body card-padding">
                                 <div class="form-group">
-                                    <label for="transport_0" class="col-sm-2 control-label">Action</label>
+                                    <label for="module" class="col-sm-2 control-label">Module</label>
                                     <div class="col-sm-3">
                                         <div class="fg-line">
-                                            <input type="text" class="form-control" name="transport[0]" id="transport_0">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="transport_1" class="col-sm-2 control-label">Module</label>
-                                    <div class="col-sm-3">
-                                        <div class="fg-line">
-                                            <select id="transport_1" name="transport[1]">
+                                            <select id="module" name="module">
                                                 <? foreach (APP::$modules as $key => $value) { ?><option value="<?= $key ?>"><?= $key ?></option><? } ?>
                                             </select>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="transport_2" class="col-sm-2 control-label">Method</label>
+                                    <label for="method" class="col-sm-2 control-label">Method</label>
                                     <div class="col-sm-3">
                                         <div class="fg-line">
-                                            <input type="text" class="form-control" name="transport[2]" id="transport_2">
+                                            <input type="text" class="form-control" name="method" id="method">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="transport_3" class="col-sm-2 control-label">Settings URI</label>
+                                    <label for="settings" class="col-sm-2 control-label">Settings URI</label>
                                     <div class="col-sm-3">
                                         <div class="fg-line">
-                                            <input type="text" class="form-control" name="transport[3]" id="transport_3">
+                                            <input type="text" class="form-control" name="settings" id="settings">
                                         </div>
                                     </div>
                                 </div>
@@ -100,7 +92,7 @@
         
         <script>
             $(document).ready(function() {
-                $('#transport_1').chosen({
+                $('#module').chosen({
                     width: '100%',
                     allow_single_deselect: true
                 });
@@ -108,21 +100,18 @@
                 $('#add-transport').submit(function(event) {
                     event.preventDefault();
 
-                    var transport_0 = $(this).find('#transport_0');
-                    var transport_1 = $(this).find('#transport_1');
-                    var transport_2 = $(this).find('#transport_2');
-                    var transport_3 = $(this).find('#transport_3');
+                    var module = $(this).find('#module');
+                    var method = $(this).find('#method');
+                    var settings = $(this).find('#settings');
                     
-                    transport_0.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
-                    transport_1.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
-                    transport_2.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
-                    transport_3.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    module.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    method.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    settings.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
 
-                    if (transport_0.val() === '') { transport_0.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
-                    if (transport_1.val() === '') { transport_1.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
-                    if (transport_2.val() === '') { transport_2.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
-                    if (transport_3.val() === '') { transport_3.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
- 
+                    if (module.val() === '') { module.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    if (method.val() === '') { method.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    if (settings.val() === '') { settings.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+
                     $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
 
                     $.ajax({
@@ -134,7 +123,7 @@
                                 case 'success':
                                     swal({
                                         title: 'Done!',
-                                        text: 'Transport method "' + transport_0.val() + '" has been added',
+                                        text: 'Transport "' + module.val() + '/' + method.val() + '" has been added',
                                         type: 'success',
                                         showCancelButton: false,
                                         confirmButtonText: 'Ok',
@@ -146,10 +135,9 @@
                                 case 'error': 
                                     $.each(result.errors, function(i, error) {
                                         switch(error) {
-                                            case 1: $('#transport_0').closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); break;
-                                            case 2: $('#transport_1').closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); break;
-                                            case 3: $('#transport_2').closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); break;
-                                            case 4: $('#transport_3').closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); break;
+                                            case 1: $('#module').closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); break;
+                                            case 2: $('#method').closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); break;
+                                            case 3: $('#settings').closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); break;
                                         }
                                     });
                                     break;

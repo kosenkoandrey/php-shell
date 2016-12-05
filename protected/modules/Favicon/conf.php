@@ -1,6 +1,11 @@
 <?
 return [
-    'init'      => true,
-    'route'     => 'favicon.ico',
-    'source'    => ROOT . '/protected/modules/Favicon/favicon.png'
+    'routes' => [
+        ['favicon\.ico',                            'Favicon', 'OutMain'],
+        ['(?P<brand>.*)\-icon\-(?P<size>.*)\.png',  'Favicon', 'OutBrand'],
+        ['apple\-icon\.png',                        'Favicon', 'OutApple'],
+        ['favicon\-(?P<size>.*)\.png',              'Favicon', 'OutFavicon'],
+        ['manifest\.json',                          'Favicon', 'OutManifest'],
+        ['browserconfig\.xml',                      'Favicon', 'OutBrowserconfig']
+    ]
 ];

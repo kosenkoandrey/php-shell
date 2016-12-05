@@ -4,6 +4,10 @@ class APP {
     public static $conf = [];
     public static $modules = [];
     public static $handlers = [];
+    public static $out = [];
+    public static $insert = [];
+    public static $css = [];
+    public static $js = [];
     public static $console = false;
 
     public static function Init($conf, $argv) {
@@ -25,7 +29,7 @@ class APP {
             mkdir($conf['logs']);
         }
         
-        ob_start();
+        ob_start(['self', 'Out']);
 
         if (($conf['install']) && (!count($argv))) {
             session_start();
@@ -42,14 +46,12 @@ class APP {
         foreach (self::$modules as $module) self::InitModule($module);
 
         if (self::$console) {
-            if ($argv[0] === 'init.php') call_user_func_array([self::Module($argv[1]), $argv[2]], json_decode($argv[3], true));
+            if (strripos($argv[0], 'init.php') !== false) call_user_func_array([self::Module($argv[1]), $argv[2]], json_decode($argv[3], true));
         } else {
             foreach (self::$handlers as $handler) self::Module($handler[0])->{$handler[1]}($handler[2]);
         }
 
-        $out = ob_get_contents();
-        ob_end_clean();
-        echo $out;
+        ob_end_flush();
     }
     
     
@@ -353,13 +355,63 @@ class APP {
         if (self::$conf['logs']) {
             file_put_contents(
                 self::$conf['logs'] . '/php-errors-' . date('d-m-Y', time()) . '.log',
-                json_encode([date('H:i:s', time()), $code, $details]) . "\n",
-                FILE_APPEND
+                json_encode([date('H:i:s', time()), $code, $details], JSON_PARTIAL_OUTPUT_ON_ERROR) . "\n",
+                FILE_APPEND | LOCK_EX
             );
         }
         
         self::Render($view, 'include', [$code, $details]);
         die();
+    }
+    
+    private static function Out($buffer) {
+        foreach (self::$out as $value) {
+            switch ($value[0]) {
+                case 'module': $buffer = self::Module($value[1])->{$value[2]}($buffer); break;
+                case 'function': $buffer = $value[1]($buffer, isset($value[2]) ? $value[2] : false); break;
+            }
+        }
+        
+        foreach (self::$insert as $value) {
+            $string = false;
+            
+            switch ($value[0]) {
+                case 'js': 
+                    switch ($value[1]) {
+                        case 'file': 
+                            if (array_search($value[4], self::$js) === false) {
+                                self::$js[] = $value[4];
+                                $string = '<script src="' . $value[4] . '"></script>';
+                            } else {
+                                continue;
+                            }
+                            break;
+                        case 'code': $string = $value[4]; break;
+                    }
+                    break;
+                case 'css': 
+                    switch ($value[1]) {
+                        case 'file': 
+                            if (array_search($value[4], self::$css) === false) {
+                                self::$css[] = $value[4];
+                                $string = '<link href="' . $value[4] . '" rel="stylesheet">';
+                            } else {
+                                continue;
+                            }
+                            break;
+                        case 'code': $string = $value[4]; break;
+                    }
+                    break;
+                case 'html': $string = $value[4]; break;
+            }
+            
+            switch ($value[2]) {
+                case 'before': $buffer = str_replace($value[3], $string . $value[3], $buffer); break;
+                case 'after': $buffer = str_replace($value[3], $value[3] . $string, $buffer); break;
+            }
+        }
+        
+        return $buffer;
     }
     
 }
