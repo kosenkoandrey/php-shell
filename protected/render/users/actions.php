@@ -12,7 +12,7 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
         <!-- Vendor CSS -->
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/material-design-iconic-font/dist/css/material-design-iconic-font.min.css" rel="stylesheet">
-        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" rel="stylesheet">        
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/google-material-color/dist/palette.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.css" rel="stylesheet">
 
@@ -25,7 +25,7 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
             <a data-block="#l-forgot-password" data-bg="purple" class="palette-Teal text d-block actions"></a>
             <a data-block="#l-change-password" data-bg="blue" class="palette-Teal text d-block actions"></a>
         </div>
-        
+
         <div class="login" data-lbg="teal">
             <!-- Login -->
             <div class="l-block" id="l-login">
@@ -46,14 +46,14 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                             <? if (!empty(APP::Module('Users')->settings['module_users_oauth_client_fb_id'])) { ?><a class="m-b-25 m-r-5 m-t-5 btn btn-default btn-icon waves-effect waves-circle waves-float" href="https://www.facebook.com/dialog/oauth?<?= urldecode(http_build_query(['client_id' => APP::Module('Users')->settings['module_users_oauth_client_fb_id'], 'redirect_uri'  => APP::Module('Routing')->root . 'users/login/fb', 'response_type' => 'code', 'scope' => 'email', 'state' => APP::Module('Crypt')->SafeB64Encode('{"return": "' . APP::Module('Crypt')->Encode($return) . '"}')])) ?>"><i class="zmdi zmdi-facebook"></i></a><? } ?>
                             <? if (!empty(APP::Module('Users')->settings['module_users_oauth_client_google_id'])) { ?><a class="m-b-25 m-r-5 m-t-5 btn btn-default btn-icon waves-effect waves-circle waves-float" href="https://accounts.google.com/o/oauth2/auth?<?= urldecode(http_build_query(['client_id' => APP::Module('Users')->settings['module_users_oauth_client_google_id'], 'redirect_uri'  => APP::Module('Routing')->root . 'users/login/google', 'response_type' => 'code', 'scope' => urlencode('https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile'), 'state' => APP::Module('Crypt')->SafeB64Encode('{"return": "' . APP::Module('Crypt')->Encode($return) . '"}')])) ?>"><i class="zmdi zmdi-google-plus-box"></i></a><? } ?>
                             <? if (!empty(APP::Module('Users')->settings['module_users_oauth_client_ya_id'])) { ?><a class="m-b-25 m-r-5 m-t-5 btn btn-default btn-icon waves-effect waves-circle waves-float" href="https://oauth.yandex.ru/authorize?<?= urldecode(http_build_query(['client_id' => APP::Module('Users')->settings['module_users_oauth_client_ya_id'], 'redirect_uri'  => APP::Module('Routing')->root . 'users/login/ya', 'response_type' => 'code', 'display' => 'popup', 'state' => APP::Module('Crypt')->SafeB64Encode('{"return": "' . APP::Module('Crypt')->Encode($return) . '"}')])) ?>"><i class="zmdi zmdi-twitter"></i></a><? } ?>
-                            
+
                             <div class="form-group fg-float">
                                 <div class="fg-line">
                                     <input type="email" name="email" id="email" class="input-sm form-control fg-input">
                                     <label class="fg-label">Email Address</label>
                                 </div>
                             </div>
-                            
+
                             <div class="form-group fg-float">
                                 <div class="fg-line">
                                     <input type="password" name="password" id="password" class="input-sm form-control fg-input">
@@ -68,7 +68,7 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                                     Remember me
                                 </label>
                             </div>
- 
+
                             <button type="submit" class="btn palette-Teal bg">Sign in</button>
                         </form>
                         <?
@@ -76,7 +76,7 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                         ?><div class="alert alert-danger" role="alert"><i class="zmdi zmdi-close-circle zmdi-hc-fw"></i><b>Sign in turned off</b></div><?
                     }
                     ?>
-                        
+
                     <div class="m-t-20">
                         <a data-block="#l-register" data-bg="blue" class="palette-Teal text d-block m-b-5" href="">Create an account</a>
                         <a data-block="#l-forgot-password" data-bg="purple" href="" class="palette-Teal text">Forgot password?</a>
@@ -100,28 +100,28 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                             <? if (!empty(APP::Module('Users')->settings['module_users_oauth_client_fb_id'])) { ?><a class="m-b-25 m-r-5 m-t-5 btn btn-default btn-icon waves-effect waves-circle waves-float" href="https://www.facebook.com/dialog/oauth?<?= urldecode(http_build_query(['client_id' => APP::Module('Users')->settings['module_users_oauth_client_fb_id'], 'redirect_uri'  => APP::Module('Routing')->root . 'users/login/fb', 'response_type' => 'code', 'scope' => 'email', 'state' => APP::Module('Crypt')->SafeB64Encode('{"return": "' . APP::Module('Crypt')->Encode($return) . '"}')])) ?>"><i class="zmdi zmdi-facebook"></i></a><? } ?>
                             <? if (!empty(APP::Module('Users')->settings['module_users_oauth_client_google_id'])) { ?><a class="m-b-25 m-r-5 m-t-5 btn btn-default btn-icon waves-effect waves-circle waves-float" href="https://accounts.google.com/o/oauth2/auth?<?= urldecode(http_build_query(['client_id' => APP::Module('Users')->settings['module_users_oauth_client_google_id'], 'redirect_uri'  => APP::Module('Routing')->root . 'users/login/google', 'response_type' => 'code', 'scope' => urlencode('https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile'), 'state' => APP::Module('Crypt')->SafeB64Encode('{"return": "' . APP::Module('Crypt')->Encode($return) . '"}')])) ?>"><i class="zmdi zmdi-google-plus-box"></i></a><? } ?>
                             <? if (!empty(APP::Module('Users')->settings['module_users_oauth_client_ya_id'])) { ?><a class="m-b-25 m-r-5 m-t-5 btn btn-default btn-icon waves-effect waves-circle waves-float" href="https://oauth.yandex.ru/authorize?<?= urldecode(http_build_query(['client_id' => APP::Module('Users')->settings['module_users_oauth_client_ya_id'], 'redirect_uri'  => APP::Module('Routing')->root . 'users/login/ya', 'response_type' => 'code', 'display' => 'popup', 'state' => APP::Module('Crypt')->SafeB64Encode('{"return": "' . APP::Module('Crypt')->Encode($return) . '"}')])) ?>"><i class="zmdi zmdi-twitter"></i></a><? } ?>
-                            
+
                             <div class="form-group fg-float">
                                 <div class="fg-line">
                                     <input type="email" name="email" id="email" class="input-sm form-control fg-input">
                                     <label class="fg-label">Email Address</label>
                                 </div>
                             </div>
-                            
+
                             <div class="form-group fg-float">
                                 <div class="fg-line">
                                     <input type="password" name="password" id="password" class="input-sm form-control fg-input">
                                     <label class="fg-label">Password</label>
                                 </div>
                             </div>
-                            
+
                             <div class="form-group fg-float">
                                 <div class="fg-line">
                                     <input type="password" name="re-password" id="re-password" class="input-sm form-control fg-input">
                                     <label class="fg-label">Retype password</label>
                                 </div>
                             </div>
- 
+
                             <button type="submit" class="btn palette-Blue bg">Create Account</button>
                         </form>
                         <?
@@ -172,7 +172,7 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                     </div>
                 </div>
             </div>
-            
+
             <!-- Change Password -->
             <?
             if (isset(APP::Module('Users')->user['email'])) {
@@ -224,9 +224,9 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/Waves/dist/waves.min.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.min.js"></script>
-        
+
         <? APP::Render('core/widgets/js') ?>
-        
+
         <script>
             $(document).ready(function() {
                 if ($('.login')[0]) {
@@ -246,9 +246,9 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
 
                     });
                 }
-                
+
                 $('.l-block [data-block="#l-<?= APP::Module('Routing')->get['action'] ?>"]').trigger('click');
-                
+
                 $('#login').submit(function(event) {
                     event.preventDefault();
 
@@ -277,24 +277,24 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                         }
                     });
                 });
-                
+
                 $('#register').submit(function(event) {
                     event.preventDefault();
-                    
+
                     var email = $(this).find('#email');
                     var password = $(this).find('#password');
                     var re_password = $(this).find('#re-password');
-                    
+
                     email.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
                     password.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
                     re_password.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
-                    
+
                     if (email.val() === '') { email.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
                     if (password.val() === '') { password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
                     if (password.val() !== re_password.val()) { re_password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Passwords do not match</small>'); return false; }
-                    
+
                     $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
-                    
+
                     $.ajax({
                         type: 'post',
                         url: '<?= APP::Module('Routing')->root ?>users/api/register.json',
@@ -313,7 +313,7 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                                         window.location.href = '<?= $return ?>';
                                     });
                                     break;
-                                case 'error': 
+                                case 'error':
                                     $.each(result.errors, function(i, error) {
                                         switch(error) {
                                             case 1: email.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Invalid email</small>'); break;
@@ -331,17 +331,17 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                         }
                     });
                   });
-                  
+
                 $('#reset-password').submit(function(event) {
                     event.preventDefault();
-                    
+
                     var email = $(this).find('#email');
                     email.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
 
                     if (email.val() === '') { email.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
 
                     $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
-                    
+
                     $.ajax({
                         type: 'post',
                         url: '<?= APP::Module('Routing')->root ?>users/api/reset-password.json',
@@ -356,7 +356,7 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                                         showConfirmButton: false
                                     });
                                     break;
-                                case 'error': 
+                                case 'error':
                                     $.each(result.errors, function(i, error) {
                                         switch(error) {
                                             case 1: email.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Invalid email</small>'); break;
@@ -371,21 +371,21 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                         }
                     });
                   });
-                  
+
                 $('#change-password').submit(function(event) {
                     event.preventDefault();
-                    
+
                     var password = $(this).find('#password');
                     var re_password = $(this).find('#re-password');
-                    
+
                     password.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
                     re_password.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
-                    
+
                     if (password.val() === '') { password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
                     if (password.val() !== re_password.val()) { re_password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Passwords do not match</small>'); return false; }
-                    
+
                     $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
-                    
+
                     $.ajax({
                         type: 'post',
                         url: '<?= APP::Module('Routing')->root ?>users/api/change-password.json',
@@ -404,7 +404,7 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                                         window.location.href = '<?= $return ?>';
                                     });
                                     break;
-                                case 'error': 
+                                case 'error':
                                     $.each(result.errors, function(i, error) {
                                         switch(error) {
                                             case 1: alert('You must be logged'); break;

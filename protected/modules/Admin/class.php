@@ -7,7 +7,7 @@ class Admin {
 
     public function Overview() {
         $cards = [];
-        
+
         foreach (APP::$modules as $value) {
             if (method_exists($value, 'Dashboard')) {
                 foreach ($value->Dashboard() as $dashboard) {
