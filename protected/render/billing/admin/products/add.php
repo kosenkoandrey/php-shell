@@ -9,7 +9,7 @@
         <!-- Vendor CSS -->
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/material-design-iconic-font/dist/css/material-design-iconic-font.min.css" rel="stylesheet">
-        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" rel="stylesheet">        
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/google-material-color/dist/palette.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/css/bootstrap-select.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.css" rel="stylesheet">
@@ -17,7 +17,7 @@
         <? APP::Render('core/widgets/css') ?>
     </head>
     <body data-ma-header="teal">
-        <? 
+        <?
         APP::Render('admin/widgets/header', 'include', [
             'Products' => 'admin/billing/products'
         ]);
@@ -65,6 +65,14 @@
                                         </div>
                                     </div>
                                 </div>
+																																<div class="form-group">
+                                    <label for="members_access" class="col-sm-2 control-label">Access file</label>
+                                    <div class="col-sm-3">
+                                        <div class="fg-line">
+                                            <input type="text" class="form-control" name="members_access" id="members_access">
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="form-group">
                                     <div class="col-sm-offset-2 col-sm-5">
                                         <button type="submit" class="btn palette-Teal bg waves-effect btn-lg">Add</button>
@@ -92,7 +100,7 @@
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/autosize/dist/autosize.min.js"></script>
 
         <? APP::Render('core/widgets/js') ?>
-        
+
         <script>
             $(document).ready(function() {
                 $('#add-product').submit(function(event) {
@@ -102,16 +110,19 @@
                     var access_link = $(this).find('#access_link');
                     var name = $(this).find('#name');
                     var amount = $(this).find('#amount');
+																				var members_access = $(this).find('#members_access');
 
                     descr_link.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
                     access_link.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
                     name.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
                     amount.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+																				//members_access.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
 
                     if (descr_link.val() === '') { descr_link.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
                     if (access_link.val() === '') { access_link.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
                     if (name.val() === '') { name.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
                     if (amount.val() === '') { amount.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+																				//if (members_access.val() === '') { members_access.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
 
                     $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
 
@@ -133,7 +144,7 @@
                                         window.location.href = '<?= APP::Module('Routing')->root ?>admin/billing/products';
                                     });
                                     break;
-                                case 'error': 
+                                case 'error':
                                     $.each(result.errors, function(i, error) {});
                                     break;
                             }
