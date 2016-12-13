@@ -1,8 +1,8 @@
 <header id="header" class="media">
     <div class="pull-left h-logo">
         <a href="<?= APP::Module('Routing')->root ?>admin" class="hidden-xs">
-            PHP-shell   
-            <small>MICRO FRAMEWORK</small>
+            PULT   
+            <small>GLAMURNENKO.RU</small>
         </a>
     </div>
 
