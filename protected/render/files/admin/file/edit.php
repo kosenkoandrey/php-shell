@@ -4,6 +4,7 @@ $nav = [];
 foreach ($data['path'] as $key => $value) {
     $nav[$key ? $value : 'Files'] = 'admin/files/file/' . APP::Module('Crypt')->Encode($key);
 }
+$extension = explode('/', $data['file']['type']);
 ?>
 <!DOCTYPE html>
 <!--[if IE 9 ]><html class="ie9"><![endif]-->
@@ -111,7 +112,7 @@ foreach ($data['path'] as $key => $value) {
         <script>
             $(document).ready(function() {
                 $('#title').val('<?= $data['file']['title'] ?>');
-                $('.fileinput-filename').html('<?= $data['file']['id'].'.'.$data['file']['type'] ?>');
+                $('.fileinput-filename').html('<?= $data['file']['id'].'.'.$extension[1] ?>');
 
                 autosize($('#html'));
 

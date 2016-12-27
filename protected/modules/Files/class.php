@@ -128,9 +128,9 @@ class	Files	{
 								}
 
 								foreach	(APP::Module('DB')->Select(
-												$this->settings['module_files_db_connection'],	['fetchAll',	PDO::FETCH_ASSOC],	['id',	'title'],	'files',	[['group_id',	'=',	$group_sub_id,	PDO::PARAM_INT]]
+												$this->settings['module_files_db_connection'],	['fetchAll',	PDO::FETCH_ASSOC],	['id',	'title', 'type'],	'files',	[['group_id',	'=',	$group_sub_id,	PDO::PARAM_INT]]
 								)	as	$value)	{
-												$list[]	=	['file',	$value['id'],	$value['title']];
+												$list[]	=	['file',	$value['id'],	$value['title'], $value['type']];
 								}
 
 								APP::Render('files/admin/file/index',	'include',	[
@@ -232,7 +232,7 @@ class	Files	{
 																'id'							=>	'NULL',
 																'group_id'	=>	[$group_id,	PDO::PARAM_INT],
 																'title'				=>	[$_POST['title'],	PDO::PARAM_STR],
-																'type'					=>	[$pathinfo['extension'],	PDO::PARAM_STR],
+																'type'					=>	[$_FILES['file']['type'],	PDO::PARAM_STR],
 																'cr_date'		=>	'NOW()'
 																)
 												);
@@ -248,7 +248,7 @@ class	Files	{
 																				'id'							=>	$out['file_id'],
 																				'group_id'	=>	$group_id,
 																				'title'				=>	$_POST['title'],
-																				'type'					=>	$pathinfo['extension'],
+																				'type'					=>	$_FILES['file']['type'],
 																]);
 												}
 								}
@@ -267,11 +267,9 @@ class	Files	{
 												'errors'	=>	[]
 								];
 
-								$file	=	APP::Module('DB')->Select(
+								if	(!$file = APP::Module('DB')->Select(
 												$this->settings['module_files_db_connection'],	['fetch',	PDO::FETCH_ASSOC],	['id',	'type'],	'files',	[['id',	'=',	$_POST['id'],	PDO::PARAM_INT]]
-								);
-
-								if	(!$file)	{
+								))	{
 												$out['status']			=	'error';
 												$out['errors'][]	=	1;
 								}
@@ -281,8 +279,10 @@ class	Files	{
 																$this->settings['module_files_db_connection'],	'files',	[['id',	'=',	$_POST['id'],	PDO::PARAM_INT]]
 												);
 
-												if	(file_exists($this->settings['module_files_path']	.	$file['id']	.	'.'	.	$file['type']))	{
-																unlink($this->settings['module_files_path']	.	$file['id']	.	'.'	.	$file['type']);
+												$extension = explode('/', $file['type']);
+
+												if	(file_exists($this->settings['module_files_path']	.	$file['id']	.	'.'	. $extension[1]))	{
+																unlink($this->settings['module_files_path']	.	$file['id']	.	'.'	.	$extension[1]);
 												}
 
 												APP::Module('Triggers')->Exec('files_remove',	[
@@ -317,23 +317,24 @@ class	Files	{
 								if	($out['status']	==	'success')	{
 												if	(isset($_FILES['file'])	&&	$_FILES['file']['size'])	{
 																$pathinfo	=	pathinfo($_FILES['file']['tmp_name']	.	'/'	.	$_FILES['file']['name']);
+																$extension = explode('/', $file['type']);
 
-																if	(file_exists($this->settings['module_files_path']	.	$file['id']	.	'.'	.	$file['type']))	{
-																				unlink($this->settings['module_files_path']	.	$file['id']	.	'.'	.	$file['type']);
+																if	(file_exists($this->settings['module_files_path']	.	$file['id']	.	'.'	.	$extension[1]))	{
+																				unlink($this->settings['module_files_path']	.	$file['id']	.	'.'	.	$extension[1]);
 																}
 
 																if	($this->FileUpload($_FILES['file'],	$this->settings['module_files_path']	.	$file_id	.	'.'	.	$pathinfo['extension']))	{
 																				APP::Module('DB')->Update(
 																								$this->settings['module_files_db_connection'],	'files',	[
 																								'title'	=>	$_POST['title'],
-																								'type'		=>	$pathinfo['extension']
+																								'type'		=>	$_FILES['file']['type'],
 																								],	[['id',	'=',	$file_id,	PDO::PARAM_INT]]
 																				);
 
 																				APP::Module('Triggers')->Exec('files_update',	[
 																								'id'				=>	$file_id,
 																								'title'	=>	$_POST['title'],
-																								'type'		=>	$pathinfo['extension']
+																								'type'		=>	$_FILES['file']['type'],
 																				]);
 																}	else	{
 																				$out['status']			=	'error';

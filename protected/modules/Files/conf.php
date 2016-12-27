@@ -22,5 +22,12 @@ return [
 
 
         ['admin\/files\/api\/settings\/update\.json(\?.*)?',          'Files', 'APIUpdateSettings'],     // [API] Update files settings
-    ]
+    ],
+				'fileCss' => [
+								'video/mp4' => 'zmdi-movie-alt',
+								'application/pdf' => 'zmdi-file',
+								'image/png' => 'zmdi-image',
+								'image/jpeg' => 'zmdi-image',
+								'image/jpg' => 'zmdi-image',
+				]
 ];

@@ -66,13 +66,41 @@
                                     </div>
                                 </div>
 																																<div class="form-group">
-                                    <label for="members_access" class="col-sm-2 control-label">Access file</label>
+                                    <label for="members_access" class="col-sm-2 control-label">Access members</label>
                                     <div class="col-sm-3">
                                         <div class="fg-line">
                                             <input type="text" class="form-control" name="members_access" id="members_access">
                                         </div>
                                     </div>
                                 </div>
+																																<div class="form-group">
+                                    <label for="related_products" class="col-sm-2 control-label">Related products</label>
+                                    <div class="col-sm-3">
+                                        <div class="fg-line">
+                                            <input type="text" class="form-control" name="related_products" id="related_products">
+                                        </div>
+                                    </div>
+                                </div>
+																																<div class="form-group">
+																																				<label class="col-md-2 control-label">Дополнительные продукты</label>
+																																				<div class="col-md-5">
+																																								<div id="product-plus-products">
+																																												<div class="row" id="product_plus_time" style="display:none;">
+																																																<div class="col-md-6 mar-btm">
+																																																				<div class="input-group">
+																																																								<span class="input-group-addon">через</span>
+																																																								<input id="inv-prod-plus-product-time" name="product[time]" type="text" value="0" class="inv-prod-plus-product-time form-control">
+																																																				</div>
+																																																</div>
+																																																<div class="col-md-6 mar-btm">
+																																																				<select id="inv-plus-product-type" name="product[type]" class="form-control"><option value="now">сразу</option><option value="hours">час</option><option value="day">день</option><option value="week">неделю</option><option value="month">месяц</option></select>
+																																																</div>
+																																												</div>
+
+																																								</div>
+																																								<button id="product-plus-products-add" type="button" class="btn btn-default btn-labeled fa fa-plus">Добавить продукт</button>
+																																				</div>
+																																</div>
                                 <div class="form-group">
                                     <div class="col-sm-offset-2 col-sm-5">
                                         <button type="submit" class="btn palette-Teal bg waves-effect btn-lg">Add</button>
@@ -103,6 +131,50 @@
 
         <script>
             $(document).ready(function() {
+																var counters = {
+																				'plus_products': 0
+																};
+																var products = <?= json_encode($data['products']) ?>;
+
+																// product-plus-products
+																$('#product-plus-products-add').click(function() {
+																				var counter_products = ++counters.plus_products;
+
+																				$('#product-plus-products').append([
+																								'<div class="row">',
+																												'<div class="col-md-6 mar-btm">',
+																																'<select class="form-control selectpicker" id="product-plus-products-' + counter_products + '" name="plus_products[' + counter_products + '][id]" data-placeholder="product"></select>',
+																												'</div>',
+																												'<div class="col-md-5 mar-btm">',
+																																'<input class="form-control" id="product-plus-products-time-' + counter_products + '" name="plus_products[' + counter_products + '][time]" data-placeholder="time" type="text">',
+																												'</div>',
+																												'<div class="col-md-1 mar-btm">',
+																																'<button type="button" class="remove-product-plus-products btn btn-danger btn-xs bg waves-effect waves-circle waves-float zmdi zmdi-close"></button>',
+																												'</div>',
+																								'</div>'
+																				].join(''));
+
+																				$('#product-plus-products-' + counter_products).append('<option value="0">Select product</option>');
+
+																				var product = new String();
+
+																				$.each(products, function() {
+																								product += '<option value="' + this.id + '">' + this.name + '</option>';
+																				});
+
+																				$('#product-plus-products-' + counter_products)
+																				.append(product);
+																				$('#product-plus-products-' + counter_products).selectpicker('render');
+																});
+
+																// remove-product-plus-products
+																$(document).on('click', '.remove-product-plus-products', function () {
+																				$(this).closest('.row').remove();
+																				if($('#product-plus-products .row').length <= 1) {
+																								$('#product_plus_time').hide();
+																				}
+																});
+
                 $('#add-product').submit(function(event) {
                     event.preventDefault();
 

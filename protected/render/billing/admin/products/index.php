@@ -13,7 +13,7 @@ $filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Deco
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/css/bootstrap-select.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/material-design-iconic-font/dist/css/material-design-iconic-font.min.css" rel="stylesheet">
-        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" rel="stylesheet">        
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/google-material-color/dist/palette.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bootgrid/jquery.bootgrid.min.css" rel="stylesheet">
@@ -24,11 +24,11 @@ $filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Deco
                 display: none;
             }
         </style>
-        
+
         <? APP::Render('core/widgets/css') ?>
     </head>
     <body data-ma-header="teal">
-        <? 
+        <?
         APP::Render('admin/widgets/header', 'include', [
             'Products' => 'admin/billing/products'
         ]);
@@ -48,7 +48,6 @@ $filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Deco
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-right">
                                         <li><a href="<?= APP::Module('Routing')->root ?>admin/billing/products/add">Add product</a></li>
-                                        <li><a href="<?= APP::Module('Routing')->root ?>admin/billing/settings">Settings</a></li>
                                     </ul>
                                 </li>
                             </ul>
@@ -57,7 +56,7 @@ $filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Deco
                             <input type="hidden" name="search" value="<?= $filters ?>" id="search">
                             <div class="btn-group">
                                 <button type="button" id="render-table" class="btn btn-default"><i class="zmdi zmdi-check"></i> Apply</button>
-                            
+
                                 <div class="btn-group">
                                     <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">
                                         Actions <span class="caret"></span>
@@ -101,19 +100,19 @@ $filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Deco
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bootgrid/jquery.bootgrid.updated.min.js"></script>
 
-        <script src="<?= APP::Module('Routing')->root ?>public/modules/billing/products/rules.js"></script> 
-        
+        <script src="<?= APP::Module('Routing')->root ?>public/modules/billing/products/rules.js"></script>
+
         <? APP::Render('core/widgets/js') ?>
-        
+
         <script>
             $(document).ready(function() {
                 $('#search').RefRulesEditor({
                     'debug': true
                 });
-                
+
                 $(document).on('click', '#search_results_actions a', function () {
                     var action = $(this).data('action');
-                    
+
                     swal({
                         title: 'Are you sure?',
                         text: 'You will not be able to recover this action',
@@ -129,18 +128,18 @@ $filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Deco
                             $.post('<?= APP::Module('Routing')->root ?>admin/billing/products/api/action.json', {
                                 action: action,
                                 rules: $('#search').val()
-                            }, function() { 
+                            }, function() {
                                 products_table.bootgrid('reload', true);
                                 swal('Complete!', 'Action has been completed', 'success');
                             });
                         }
                     });
                 });
-                
+
                 $(document).on('click', '#render-table', function () {
                     $('#products-table').bootgrid('reload');
                 });
-                
+
                 var products_table = $("#products-table").bootgrid({
                     requestHandler: function (request) {
                         var model = {
@@ -175,7 +174,7 @@ $filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Deco
                     },
                     formatters: {
                         actions: function(column, row) {
-                            return  '<a href="<?= APP::Module('Routing')->root ?>admin/billing/products/edit/' + row.product_id_token + '" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-edit"></span></a> ' + 
+                            return  '<a href="<?= APP::Module('Routing')->root ?>admin/billing/products/edit/' + row.product_id_token + '" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-edit"></span></a> ' +
                                     '<a href="javascript:void(0)" class="btn btn-sm btn-default btn-icon waves-effect waves-circle remove-cost" data-product-id="' + row.id + '"><span class="zmdi zmdi-delete"></span></a>';
                         }
                     }
@@ -197,7 +196,7 @@ $filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Deco
                             if (isConfirm) {
                                 $.post('<?= APP::Module('Routing')->root ?>admin/billing/products/api/remove.json', {
                                     id: product_id
-                                }, function() { 
+                                }, function() {
                                     products_table.bootgrid('reload', true);
                                     swal('Deleted!', 'Product has been deleted', 'success');
                                 });

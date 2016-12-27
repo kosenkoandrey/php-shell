@@ -5,7 +5,7 @@ $nav_cnt = 0;
 foreach ($data['path'] as $key => $value) {
     ++ $nav_cnt;
     $title = $key ? $value : 'Files';
-    
+
     if (count($data['path']) !== $nav_cnt) {
         $nav[$title] = 'admin/files/file/' . APP::Module('Crypt')->Encode($key);
     } else {
@@ -24,7 +24,7 @@ foreach ($data['path'] as $key => $value) {
         <!-- Vendor CSS -->
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/material-design-iconic-font/dist/css/material-design-iconic-font.min.css" rel="stylesheet">
-        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" rel="stylesheet">        
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/google-material-color/dist/palette.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bootgrid/jquery.bootgrid.min.css" rel="stylesheet">
@@ -77,7 +77,7 @@ foreach ($data['path'] as $key => $value) {
                                                 case 'file':
                                                     ?>
                                                     <tr>
-                                                        <td style="font-size: 16px;"><span style="display: inline-block" class="avatar-char palette-Orange-400 bg m-r-5"><i class="zmdi zmdi-file"></i></span> <a style="color: #4C4C4C" href="<?= APP::Module('Routing')->root ?>admin/files/file/<?= $data['group_sub_id'] ? APP::Module('Crypt')->Encode($data['group_sub_id']) : 0 ?>/preview/<?= APP::Module('Crypt')->Encode($item[1]) ?>" target="_blank"><?= $item[2] ?></a></td>
+                                                        <td style="font-size: 16px;"><span style="display: inline-block" class="avatar-char palette-Purple-400 bg m-r-5"><i class="zmdi <?= isset(APP::Module('Files')->conf['fileCss'][$item[3]]) ? APP::Module('Files')->conf['fileCss'][$item[3]] :'zmdi-file'; ?>"></i></span> <a style="color: #4C4C4C" href="<?= APP::Module('Routing')->root ?>admin/files/file/<?= $data['group_sub_id'] ? APP::Module('Crypt')->Encode($data['group_sub_id']) : 0 ?>/preview/<?= APP::Module('Crypt')->Encode($item[1]) ?>" target="_blank"><?= $item[2] ?></a></td>
                                                         <td>
                                                             <a href="<?= APP::Module('Routing')->root ?>admin/files/file/<?= $data['group_sub_id'] ? APP::Module('Crypt')->Encode($data['group_sub_id']) : 0 ?>/edit/<?= APP::Module('Crypt')->Encode($item[1]) ?>" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-edit"></span></a>
                                                             <a href="javascript:void(0)" data-file-id="<?= $item[1] ?>" class="btn btn-sm btn-default btn-icon waves-effect waves-circle remove-file"><span class="zmdi zmdi-delete"></span></a>
@@ -119,7 +119,7 @@ foreach ($data['path'] as $key => $value) {
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bootgrid/jquery.bootgrid.updated.min.js"></script>
 
         <? APP::Render('core/widgets/js') ?>
-        
+
         <script>
         $('body').on('click', '.remove-file', function() {
             var file_id = $(this).data('file-id');
@@ -138,7 +138,7 @@ foreach ($data['path'] as $key => $value) {
                 if (isConfirm) {
                     $.post('<?= APP::Module('Routing')->root ?>admin/files/api/file/remove.json', {
                         id: file_id
-                    }, function() { 
+                    }, function() {
                         swal({
                             title: 'Done!',
                             text: 'File #' + file_id + ' has been removed',
@@ -153,7 +153,7 @@ foreach ($data['path'] as $key => $value) {
                 }
             });
         });
-        
+
         $('body').on('click', '.remove-file-group', function() {
             var file_group_id = $(this).data('file-group-id');
 
@@ -171,7 +171,7 @@ foreach ($data['path'] as $key => $value) {
                 if (isConfirm) {
                     $.post('<?= APP::Module('Routing')->root ?>admin/files/api/file/groups/remove.json', {
                         id: file_group_id
-                    }, function() { 
+                    }, function() {
                         swal({
                             title: 'Done!',
                             text: 'Group #' + file_group_id + ' has been removed',
@@ -180,7 +180,7 @@ foreach ($data['path'] as $key => $value) {
                             confirmButtonText: 'Ok',
                             closeOnConfirm: false
                         }, function(){
-                            window.location.href = '<?= APP::Module('Routing')->root ?>admin/files/file/<?= $data['group_sub_id'] ? APP::Module('Crypt')->Encode($data['group_sub_id']) : 0 ?>'; 
+                            window.location.href = '<?= APP::Module('Routing')->root ?>admin/files/file/<?= $data['group_sub_id'] ? APP::Module('Crypt')->Encode($data['group_sub_id']) : 0 ?>';
                         });
                     });
                 }

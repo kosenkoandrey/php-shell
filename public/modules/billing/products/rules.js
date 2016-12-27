@@ -49,6 +49,19 @@
 
                         if (param_value) {
                             switch(method) {
+                                case 'id': 
+                                    switch(id) {
+                                        case 'logic': 
+                                            if (settings.logic === undefined) settings.logic = new Object();
+                                            settings.logic = param_value; 
+                                            break;
+                                        case 'value': 
+                                            if (settings.value === undefined) settings.value = new Object();
+                                            settings.value = param_value; 
+                                            break;
+                                        default: settings[id] = param_value;
+                                    }
+                                    break;
                                 case 'name': 
                                     switch(id) {
                                         case 'logic': 
@@ -144,6 +157,7 @@
         },
         getRulesListByLogic: function(logic) {
             return [
+                '<li><a class="add_trigger_rule" data-logic="' + logic + '" data-method="id" href="javascript:void(0)">ID</a></li>',
                 '<li><a class="add_trigger_rule" data-logic="' + logic + '" data-method="name" href="javascript:void(0)">Name</a></li>',
                 '<li><a class="add_trigger_rule" data-logic="' + logic + '" data-method="amount" href="javascript:void(0)">Amount</a></li>'
             ].join('');
@@ -253,6 +267,33 @@
             $('.remove_rule_item').on('click', methods.remove_trigger_rule);
 
             switch(rule.method) {
+                case 'id':
+                    $('.trigger_settings', $trigger_rule_item).append([
+                        '<table>',
+                            '<tr>ID</tr>',
+                            '<tr>',
+                                '<td style="width: 125px">',
+                                    '<select class="selectpicker" data-id="logic">',
+                                        '<option value="=">equal</option>',
+                                        '<option value="!=">not equal</option>',
+                                        '<option value="IN">in</option>',
+                                    '</select>',
+                                '</td>',
+                                '<td style="width: 125px">',
+                                    '<input data-id="value" class="form-control m-l-5" type="text">',
+                                '</td>',
+                            '</tr>',
+                        '</table>'
+                    ].join(''));
+
+                    if (rule.settings.logic !== undefined) $('.trigger_settings select[data-id="logic"]', $trigger_rule_item).val(rule.settings.logic);
+                    $('.trigger_settings select[data-id="logic"]', $trigger_rule_item).on('change', function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))});
+
+                    if (rule.settings.value !== undefined) $('.trigger_settings input[data-id="value"]', $trigger_rule_item).val(rule.settings.value);
+                    $('.trigger_settings input[data-id="value"]', $trigger_rule_item).on('input propertychange paste', function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))});
+                    
+                    break;
+                
                 case 'name':
                     $('.trigger_settings', $trigger_rule_item).append([
                         '<table>',

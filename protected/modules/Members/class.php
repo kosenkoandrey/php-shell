@@ -70,7 +70,7 @@ class Members {
         return $this->GetPagesGroups($out, $out[0]);
     }
 
-    private function GetPagesSubGroupsId($group_id){
+    public function GetPagesSubGroupsId($group_id){
         $out = [];
 
         $out[] = APP::Module('DB')->Select(
