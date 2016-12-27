@@ -1703,10 +1703,13 @@ class Users {
                                 ]
                             );
 
+                            /*
                             APP::Module('Mail')->Send($vk_result['email'], $this->settings['module_users_register_letter'], [
                                 'email' => $vk_result['email'],
                                 'password' => $password
                             ]);
+                             * 
+                             */
                         }
                     } else {
                         APP::Render('users/errors', 'include', 'auth_vk_email');
@@ -1795,10 +1798,13 @@ class Users {
                                     ]
                                 );
 
+                                /*
                                 APP::Module('Mail')->Send($fb_user['email'], $this->settings['module_users_register_letter'], [
                                     'email' => $fb_user['email'],
                                     'password' => $password
                                 ]);
+                                 * 
+                                 */
                             }
                         } else {
                             APP::Render('users/errors', 'include', 'auth_fb_email');
