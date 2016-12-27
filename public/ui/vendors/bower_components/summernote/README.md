@@ -1,17 +1,18 @@
 # Summernote
 
-Super simple WYSIWYG Editor using Bootstrap (3.0 and 2.x).
+Super simple WYSIWYG Editor.
 
-[![Build Status](https://secure.travis-ci.org/summernote/summernote.png)](http://travis-ci.org/summernote/summernote)
+[![Build Status](https://secure.travis-ci.org/summernote/summernote.svg)](http://travis-ci.org/summernote/summernote)
 [![npm version](https://badge.fury.io/js/summernote.svg)](http://badge.fury.io/js/summernote)
 [![Dependency Status](https://gemnasium.com/summernote/summernote.svg)](https://gemnasium.com/summernote/summernote)
+[![Coverage Status](https://coveralls.io/repos/summernote/summernote/badge.svg?branch=develop&service=github)](https://coveralls.io/github/summernote/summernote?branch=develop)
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/summernoteis.svg)](https://saucelabs.com/u/summernoteis)
 
 ### Summernote
 Summernote is a JavaScript library that helps you create WYSIWYG editors online.
 
-Home Page: http://summernote.org
+Home page: <http://summernote.org>
 
 ### Why Summernote?
 
@@ -23,15 +24,14 @@ Summernote has a few special features:
 * Interactive WYSIWYG editing
 * Handy integration with server
 
-#### Inspired by
-* Gmail's WYSIWYG editor (http://www.gmail.com)
-* Redactor (http://imperavi.com/redactor/)
-
 ### Installation and dependencies
 
-Summernote uses opensource libraries: [jQuery](http://jquery.com/), [Bootstrap](http://getbootstrap.com), [Font Awesome](https://github.com/FortAwesome/Font-Awesome).
+Summernote uses opensource libraries: [jQuery](http://jquery.com/), [Bootstrap](http://getbootstrap.com).
 
 For [Meteor](http://github.com/meteor/meteor), just run `meteor add summernote:summernote`. More info in the [Meteor README](meteor/README.md).
+
+Also there's an adaptation for React: [react-summernote](https://github.com/Vnkitaev/react-summernote)
+
 
 For other/no frameworks:
 
@@ -40,18 +40,17 @@ For other/no frameworks:
 Include the following code in the `<head>` tag of your HTML:
 
 ```html
-<!-- include libraries(jQuery, bootstrap, fontawesome) -->
-<script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script> 
-<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" />
-<script type="text/javascript" src="//netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" />
+<!-- include libraries(jQuery, bootstrap) -->
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script> 
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css" />
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
 <!-- include summernote css/js-->
 <link href="summernote.css" rel="stylesheet">
-<script src="summernote.min.js"></script>
+<script src="summernote.js"></script>
 ```
 
-#### 2. target elements
+#### 2. target a element
 
 Then place a `div` tag somewhere in the `body` tag. This element will be replaced with the summernote editor.
 
@@ -69,57 +68,21 @@ $(document).ready(function() {
 });
 ```
 
+For more examples, please visit to [homepage](http://summernote.org/examples).
+
 ### API
 
 `code` - get the HTML source code underlying the text in the editor:
 
 ```javascript
-var sHTML = $('#summernote').code();
+var html = $('#summernote').summernote('code');
 ```
 
-`Destroy` summernote:
-
-```javascript
-$('#summernote').destroy();
-```
+For more detail about API, please refer to [document](http://summernote.org/getting-started/#basic-api).
 
 #### Warning - code injection
 
 The code view allows the user to enter script contents. Make sure to filter/[sanitize the HTML on the server](https://github.com/search?l=JavaScript&q=sanitize+html). Otherwise, an attacker can inject arbitrary JavaScript code into clients.
-
-### Supported platforms
-
-Any modern browser: Safari, Chrome, Firefox, Opera, Internet Explorer 9+.
-
-### Upcoming Features
-* Responsive toolbar
-* Table: Handles (sizing, selection) and popover
-* IE8 Support
-* Clipboard (you can paste images already)
-* Media object selection
-
-
-### Developer information
-
-#### structure of summernote.js
-
-```
-summernote.js - Renderer.js (Generate markup) - Locale.js (Locale object)
-              ㄴEventHandler.js - Toolbar.js (Toolbar module)
-                                ㄴPopover.js (Popover module)
-                                ㄴHandle.js  (Handle module)
-                                ㄴDialog.js  (Dialog module)
-                                ㄴEditor.js  (Abstract editor module) - Style.js (Style Getter and Setter)
-                                                                      ㄴHistory.js (Store on jQuery.data)
------------------------------Core Script-----------------------------
-  agent.js  (agent information)
-  async.js  (aysnc utility)
-  key.js    (keycode object)
-  dom.js    (dom functions)
-  list.js   (list functions)
-  range.js  (W3CRange extention)
----------------------------------------------------------------------
-```
 
 #### document structure
 
@@ -153,10 +116,24 @@ grunt dist
 At this point, you should now have a `build/` directory populated with everything you need to use summernote.
 
 #### test summernote
-run tests with PhantomJS
+run tests with Karma and PhantomJS
 ```bash
 grunt test
 ```
+If you want run tests on other browser,
+change the values for `broswers` properties in `Gruntfile.js`.
+
+```
+karma: {
+  all: {
+    browsers: ['PhantomJS'],
+    reporters: ['progress']
+  }
+}
+
+```
+You can use `Chrome`, `ChromeCanary`, `Firefox`, `Opera`, `Safari`, `PhantomJS` and `IE` beside `PhantomJS`.
+Once you run `grunt test`, it will watch all javascript file. Therefore karma run tests every time you chage code.
 
 #### start local server for developing summernote.
 run local server with connect and watch.

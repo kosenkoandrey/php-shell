@@ -1,0 +1,152 @@
+// Used Fonts
+@import "http://fonts.googleapis.com/css?family=Open+Sans:400,600,300,700";
+@import "http://fonts.googleapis.com/css?family=Pacifico";
+@import "http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css";
+* {
+	@include prefix(box-sizing, border-box);
+}
+
+// Global
+body {
+	background: #e9faf7;
+	color: #555;
+	height: 100%;
+	line-height: 20px;
+	margin: 0; padding: 0;
+	position: relative;
+
+	font:{
+		size: 13px;
+		family: $basefont;
+		weight: 400;
+	}
+}
+
+// Main Styles
+.container {
+	padding: 10px;
+	max-width:	800px;
+	margin: 0 auto;
+}
+
+.topbar {
+	padding: 0;
+	background: #fff;
+	border-bottom: 3px solid #ddedea;
+	text-align: center;
+
+	> .container {
+		padding: 0;
+		margin: 0 auto;
+	}
+
+	.top-items {
+		padding: 10px 20px;
+		color: $yes-pink;
+		display: inline-block;
+		position: relative;
+		text-align: center;
+		z-index: 30;
+		@include prefix(transition, all .3s ease);
+
+		.fa {
+			font-size: 15px;
+		}
+
+		&:after {
+			content: '';
+			background: $yes-pink;
+			width: 100%;
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			height: 0;
+			z-index: -1;
+			color: #fff;
+			@include prefix(transition, all .3s ease);
+		}
+
+		&:hover {
+			color: #fff;
+
+			&:after {
+				height: 100%;
+			}
+		}
+
+	}
+}
+
+header {
+	text-align: center;
+
+	.logo {
+		cursor: default;
+		margin: 60px auto;
+		display: block;
+
+		font: {
+			family: 'Pacifico', cursive;
+			size: 75px;
+		}
+		color: $yes-pink;
+		text-shadow: 3px 5px 0 #dfe3e8;
+		@include prefix(transition, all .4s ease);
+
+		&:hover {
+			color: darken($yes-pink, 5%);
+			text-shadow: 4px 8px 0 #dfe3e8;
+		}
+	}
+}
+
+// Deafult Buttons
+.btn-group {
+	margin: 30px 0;
+}
+
+.btn {
+	cursor: pointer;
+	background: #fff;
+	color: #fff;
+	text-decoration: none;
+	padding: 15px 0px;
+	display: inline-block;
+	text-align: center;
+	text-transform: uppercase;
+	margin-right: 3%;
+	width: 22%;
+	@include prefix(box-shadow, 0 3px 0 rgba(0,0,0,0.1));
+	@include prefix(border-radius, 3px);
+
+	&.error { background: $red; }
+	&.info { background: $blue; }
+	&.success { background: $green; }
+	&.default { background: $yes-pink; }
+
+	&:last-child {
+		margin-right: 0;
+	}
+}
+
+// Footer
+footer {
+	background: #fff;
+	padding: 15px 0;
+	margin-top: 30px;
+	text-align: center;
+	color: #909090;
+	font-weight: 300;
+	clear: both;
+
+	span, .fa-heart {
+		color: $yes-pink;
+		font-weight: 400;
+		@include prefix(transition, all .3s ease);
+	}
+
+	.fa-heart:hover {
+		font-size: 20px;
+	}
+
+}

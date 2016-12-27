@@ -1,0 +1,71 @@
+@import "variables";
+// ALERTS
+.notify {
+	position: fixed;
+	padding: 20px;
+	color: #fff;
+
+	// Position of Notifications
+	&[data-position="bottom"] {
+		right: 0;
+		left: 0;
+		bottom: 0;
+	}
+
+	&[data-position="top"] {
+		right: 0;
+		left: 0;
+		top:0;
+	}
+
+	&[data-position="right"] {
+		right: 0;
+		bottom: 0;
+		top: 0;
+		max-width: 300px;
+	}
+
+	&[data-position="left"] {
+		left: 0;
+		top: 0;
+		bottom: 0;
+		max-width: 300px;
+	}
+
+	// Type of Notifications
+	&[data-notify='success'] {
+		background: $green;
+	}
+
+	&[data-notify='info'] {
+		background: $blue;
+	}
+
+	&[data-notify='error'] {
+		background: $red;
+	}
+
+	&[data-notify='default'] {
+		background: $yes-pink;
+	}
+
+	.notify-close {
+		cursor: pointer;
+		position: absolute;
+		right:0;
+		top:0;
+		color: #fff;
+		padding: 10px 15px;
+		font-size: 20px;
+		text-decoration: none;
+	}
+
+	h1 {
+		margin: 5px 0 10px 0;
+		text-transform: uppercase;
+		font-weight: 300;
+		color: #fff;
+	}
+
+
+}

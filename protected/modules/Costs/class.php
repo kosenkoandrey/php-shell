@@ -169,7 +169,7 @@ class Costs {
             }
 
             foreach ($out as $key => $value) {
-                $out[$key]['utm_content_desc'] = $banners[$value['utm_content']];
+                $out[$key]['utm_content_desc'] = isset($banners[$value['utm_content']]) ? $banners[$value['utm_content']] : '';
             }
         }
 

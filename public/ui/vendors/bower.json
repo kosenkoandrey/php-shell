@@ -39,7 +39,6 @@
     "material-shadows": "~2.0.1",
     "nouislider": "leongersen/noUiSlider#~7.0.10",
     "simpleWeather": "~3.1.0",
-    "summernote": "~0.6.16",
     "sweetalert": "~1.0.1",
     "typeahead.js": "~0.11.1",
     "Waves": "waves#~0.7.4",
@@ -47,6 +46,7 @@
     "moment": "~2.10.6",
     "chosen": "~1.4.2",
     "google-material-color": "~1.2.6",
-    "salvattore": "~1.0.9"
+    "salvattore": "~1.0.9",
+    "summernote": "^0.8.2"
   }
 }
