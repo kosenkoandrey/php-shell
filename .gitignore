@@ -1,8 +1,10 @@
 /nbproject/
 /logs/
 /phpunit.phar
+/conf.php
 /protected/modules/Test
+/protected/modules/DB/conf.php
+/protected/modules/SendThis/daemon/config.json
 /protected/modules/SendThis/daemon/sendthis20
 /public/ui/node_modules
 /public/ui/vendors/bower_components
-sftp-config.json
