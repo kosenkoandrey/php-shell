@@ -5,3 +5,4 @@
 /protected/modules/SendThis/daemon/sendthis20
 /public/ui/node_modules
 /public/ui/vendors/bower_components
+sftp-config.json
