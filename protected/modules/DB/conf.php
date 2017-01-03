@@ -10,5 +10,6 @@ return [
            'charset'   => 'utf8'
        ]
     ],
+    
     'init' => true
 ];
