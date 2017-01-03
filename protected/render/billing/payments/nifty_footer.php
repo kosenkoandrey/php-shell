@@ -1,21 +1,21 @@
-																<div class="row">
-																				<div class="col-xs-6">
-																								<p>
-																												<b>По всем вопросам обращайтесь в службу поддержки</b>
-																												<br>
-																												<a href="http://www.glamurnenko.ru/blog/contacts/" target="_blank">http://www.glamurnenko.ru/blog/contacts/</a>
-																												<br>
-																												Тел.: +7(499)350-23-35
-																								</p>
-																								<p>&#0169; <?= date('Y') ?> Glamurnenko.ru</p>
-																				</div>
-																				<div class="col-xs-6 text-right">
-																								<a href="https://www.sslshopper.com/ssl-checker.html#hostname=pult.glamurnenko.ru" target="_blank"><img src="https://www.shopgadgetsandgizmos.com/images/ssl_badge.gif"></a>
-																				</div>
-																</div>
-												</div>
-								</div>
-				</div>
+<div class="row">
+    <div class="col-xs-6">
+        <p>
+            <b>По всем вопросам обращайтесь в службу поддержки</b>
+            <br>
+            <a href="http://www.glamurnenko.ru/blog/contacts/" target="_blank">http://www.glamurnenko.ru/blog/contacts/</a>
+            <br>
+            Тел.: +7(499)350-23-35
+        </p>
+        <p>&#0169; <?= date('Y') ?> Glamurnenko.ru</p>
+    </div>
+    <div class="col-xs-6 text-right">
+        <a href="https://www.sslshopper.com/ssl-checker.html#hostname=pult.glamurnenko.ru" target="_blank"><img src="https://www.shopgadgetsandgizmos.com/images/ssl_badge.gif"></a>
+    </div>
+</div>
+</div>
+</div>
+</div>
 </div>
 
 <button id="scroll-top" class="btn"><i class="fa fa-chevron-up"></i></button>

@@ -83,37 +83,36 @@
                                         </div>
                                     </div>
                                 </div>
-																																<div class="form-group">
-																																				<label class="col-md-2 control-label">Дополнительные продукты</label>
-																																				<div class="col-md-5">
-																																								<div id="product-plus-products">
-																																												<?
-																																												if (count($data['product']['plus_products'])) { ?>
-																																												<?php foreach ($data['product']['plus_products'] as $key => $product) {
-																																																				?>
-																																																				<div class="row">
-																																																								<div class="col-md-6 mar-btm">
-																																																												<select class="form-control selectpicker" id="product-plus-products-<?= $key ?>" name="plus_products[<?= $key ?>][id]" data-placeholder="select product">
-																																																																<? foreach ((array) $data['products'] as $product_id => $product_data) { ?>
-																																																																				<option value="<?= $product_id ?>" <? if ($product['id'] == $product_id) { echo 'selected'; } ?>><?= $product_data['name'] ?></option>
-																																																																<?	} ?>
-																																																												</select>
-																																																								</div>
-																																																								<div class="col-md-5 mar-btm">
-																																																												<input class="form-control" value="<?= $product['time'] ?>" id="product-plus-products-time-<?= $key ?>" name="plus_products[<?= $key ?>][time]" data-placeholder="time" type="text">
-																																																								</div>
-																																																								<div class="col-md-1 mar-btm">
-																																																												<button type="button" class="remove-product-plus-products btn btn-danger btn-xs bg waves-effect waves-circle waves-float zmdi zmdi-close"></button>
-																																																								</div>
-																																																				</div>
-																																																				<?
-																																																}
-																																												}
-																																												?>
-																																								</div>
-																																								<button id="product-plus-products-add" type="button" class="btn btn-default btn-labeled fa fa-plus">Добавить продукт</button>
-																																				</div>
-																																</div>
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label">Дополнительные продукты</label>
+                                    <div class="col-md-5">
+                                        <div id="product-plus-products">
+                                            <? if (count($data['product']['plus_products'])) { ?>
+                                                <?php foreach ($data['product']['plus_products'] as $key => $product) {
+                                                    ?>
+                                                    <div class="row">
+                                                        <div class="col-md-6 mar-btm">
+                                                            <select class="form-control selectpicker" id="product-plus-products-<?= $key ?>" name="plus_products[<?= $key ?>][id]" data-placeholder="select product">
+                                                                <? foreach ((array) $data['products'] as $product_id => $product_data) { ?>
+                                                                    <option value="<?= $product_id ?>" <? if ($product['id'] == $product_id) {echo 'selected'; } ?>><?= $product_data['name'] ?></option>
+                                                                <? } ?>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-5 mar-btm">
+                                                            <input class="form-control" value="<?= $product['time'] ?>" id="product-plus-products-time-<?= $key ?>" name="plus_products[<?= $key ?>][time]" data-placeholder="time" type="text">
+                                                        </div>
+                                                        <div class="col-md-1 mar-btm">
+                                                            <button type="button" class="remove-product-plus-products btn btn-danger btn-xs bg waves-effect waves-circle waves-float zmdi zmdi-close"></button>
+                                                        </div>
+                                                    </div>
+                                                    <?
+                                                }
+                                            }
+                                            ?>
+                                        </div>
+                                        <button id="product-plus-products-add" type="button" class="btn btn-default btn-labeled fa fa-plus">Добавить продукт</button>
+                                    </div>
+                                </div>
                                 <div class="form-group">
                                     <div class="col-sm-offset-2 col-sm-5">
                                         <button type="submit" class="btn palette-Teal bg waves-effect btn-lg">Save changes</button>
@@ -145,55 +144,55 @@
         <script>
             $(document).ready(function() {
 
-																var products = <?= json_encode($data['products']) ?>;
-																// product-plus-products
-																$('#product-plus-products-add').click(function() {
-																				var counters = {
-																								'plus_products': <?= count($data['product']['plus_products']) ?>
-																				};
-																				var counter_products = ++counters.plus_products;
+                var products = <?= json_encode($data['products']) ?>;
+                var counters = {
+                    'plus_products': <?= count($data['product']['plus_products']) ?>
+                };
+                // product-plus-products
+                $('#product-plus-products-add').click(function() {
+                    var counter_products = ++counters.plus_products;
 
-																				$('#product-plus-products').append([
-																								'<div class="row">',
-																												'<div class="col-md-6 mar-btm">',
-																																'<select class="form-control selectpicker" id="product-plus-products-' + counter_products + '" name="plus_products[' + counter_products + '][id]" data-placeholder="product"></select>',
-																												'</div>',
-																												'<div class="col-md-5 mar-btm">',
-																																'<input class="form-control" id="product-plus-products-time-' + counter_products + '" name="plus_products[' + counter_products + '][time]" data-placeholder="time" type="text">',
-																												'</div>',
-																												'<div class="col-md-1 mar-btm">',
-																																'<button type="button" class="remove-product-plus-products btn btn-danger btn-xs bg waves-effect waves-circle waves-float zmdi zmdi-close"></button>',
-																												'</div>',
-																								'</div>'
-																				].join(''));
+                    $('#product-plus-products').append([
+                        '<div class="row">',
+                            '<div class="col-md-6 mar-btm">',
+                                '<select class="form-control selectpicker" id="product-plus-products-' + counter_products + '" name="plus_products[' + counter_products + '][id]" data-placeholder="product"></select>',
+                            '</div>',
+                            '<div class="col-md-5 mar-btm">',
+                                '<input class="form-control" id="product-plus-products-time-' + counter_products + '" name="plus_products[' + counter_products + '][time]" data-placeholder="time" type="text">',
+                            '</div>',
+                            '<div class="col-md-1 mar-btm">',
+                                '<button type="button" class="remove-product-plus-products btn btn-danger btn-xs bg waves-effect waves-circle waves-float zmdi zmdi-close"></button>',
+                            '</div>',
+                        '</div>'
+                    ].join(''));
 
-																				$('#product-plus-products-' + counter_products).append('<option value="0">Select product</option>');
+                    $('#product-plus-products-' + counter_products).append('<option value="0">Select product</option>');
 
-																				var product = new String();
+                    var product = new String();
 
-																				$.each(products, function() {
-																								product += '<option value="' + this.id + '">' + this.name + '</option>';
-																				});
+                    $.each(products, function() {
+                        product += '<option value="' + this.id + '">' + this.name + '</option>';
+                    });
 
-																				$('#product-plus-products-' + counter_products)
-																				.append(product);
-																				$('#product-plus-products-' + counter_products).selectpicker('render');
-																});
+                    $('#product-plus-products-' + counter_products)
+                    .append(product);
+                    $('#product-plus-products-' + counter_products).selectpicker('render');
+                });
 
-																// remove-product-plus-products
-																$(document).on('click', '.remove-product-plus-products', function () {
-																				$(this).closest('.row').remove();
-																				if($('#product-plus-products .row').length <= 1) {
-																								$('#product_plus_time').hide();
-																				}
-																});
+                // remove-product-plus-products
+                $(document).on('click', '.remove-product-plus-products', function () {
+                    $(this).closest('.row').remove();
+                    if($('#product-plus-products .row').length <= 1) {
+                        $('#product_plus_time').hide();
+                    }
+                });
 
-																$('#access_link').val('<?= $data['product']['access_link'] ?>');
+		$('#access_link').val('<?= $data['product']['access_link'] ?>');
                 $('#descr_link').val('<?= $data['product']['descr_link'] ?>');
                 $('#name').val('<?= $data['product']['name'] ?>');
                 $('#amount').val('<?= $data['product']['amount'] ?>');
-																$('#members_access').val('<?= $data['product']['members_access'] ?>');
-																$('#related_products').val('<?= $data['product']['related_products'] ?>');
+		$('#members_access').val('<?= $data['product']['members_access'] ?>');
+		$('#related_products').val('<?= $data['product']['related_products'] ?>');
 
                 $('#update-product').submit(function(event) {
                     event.preventDefault();
@@ -202,7 +201,7 @@
                     var access_link = $(this).find('#access_link');
                     var name = $(this).find('#name');
                     var amount = $(this).find('#amount');
-																				var members_access = $(this).find('#members_access');
+                    var members_access = $(this).find('#members_access');
 
                     descr_link.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
                     access_link.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
