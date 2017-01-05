@@ -13,7 +13,8 @@ class Billing {
     public function Init() {
         $this->settings = APP::Module('Registry')->Get([
             'module_billing_db_connection',
-            'module_users_db_connection'
+            'module_users_db_connection',
+            'module_members_db_connection'
         ]);
 
         $this->products_search  = new ProductsSearch();
@@ -128,6 +129,16 @@ class Billing {
         ];
 
         if ($out['status'] == 'success') {
+            $plus_products = [];
+            foreach ($_POST['plus_products'] as $product){
+                if((int)$product['id']){
+                    $plus_products[] = [
+                        'id'    => $product['id'],
+                        'time'  => $product['time']
+                    ];
+                }
+            }
+            
             $out['product_id'] = APP::Module('DB')->Insert(
                 $this->settings['module_billing_db_connection'], 'billing_products', [
                     'id'               => 'NULL',
@@ -135,7 +146,7 @@ class Billing {
                     'amount'           => [$_POST['amount'], PDO::PARAM_INT],
                     'members_access'   => [$_POST['members_access'], PDO::PARAM_STR],
                     'related_products' => [$_POST['related_products'], PDO::PARAM_STR],
-                    'plus_products'    => [json_encode($_POST['plus_products']), PDO::PARAM_STR],
+                    'plus_products'    => [json_encode($plus_products), PDO::PARAM_STR],
                     'access_link'      => [$_POST['access_link'], PDO::PARAM_STR],
                     'descr_link'       => [$_POST['descr_link'], PDO::PARAM_STR],
                     'up_date'          => 'NOW()'
@@ -252,30 +263,88 @@ class Billing {
         exit;
     }
 
-    public function AddMemberAccess($user_id, $products) {
+    public function AddMemberAccess($invoice_id, $user_id) {
         $out['access_id'] = [];
 
         foreach (APP::Module('DB')->Select(
-            APP::Module('Billing')->settings['module_billing_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], ['members_access'], 'billing_products', [['id', 'IN', $products, PDO::PARAM_STR]]
+            APP::Module('Billing')->settings['module_billing_db_connection'],
+            ['fetchAll', PDO::FETCH_ASSOC],
+            ['billing_products.members_access'],
+            'billing_products',
+            [['billing_invoices_products.invoice_id', '=', $invoice_id, PDO::PARAM_STR]],
+            [
+                'left join/billing_invoices_products' => [
+                    ['billing_invoices_products.product_id', '=', 'billing_products.id']
+                ]
+            ]
         ) as $product) {
             $items = explode(',', $product['members_access']);
 
             foreach ($items as $item) {
-                $out['access_id'][] = APP::Module('DB')->Insert(
-                    $this->settings['module_members_db_connection'], 'members_access', Array(
-                        'id'      => 'NULL',
-                        'user_id' => [$user_id, PDO::PARAM_INT],
-                        'item'    => [substr($item, 0, 1), PDO::PARAM_STR],
-                        'item_id' => [substr($item, 1), PDO::PARAM_INT],
-                        'cr_date' => 'NOW()'
-                    )
-                );
+                
+                switch (substr($item, 0, 1)){
+                    case 'p':
+                        $table = 'members_pages';
+                        break;
+                    case 'g':
+                        $table = 'members_pages_groups';
+                        break;
+                }
+                
+                if(APP::Module('DB')->Select(
+                    APP::Module('Billing')->settings['module_members_db_connection'],
+                    ['fetch', PDO::FETCH_COLUMN],
+                    ['count(id)'],
+                    $table,
+                    [['id', '=', substr($item, 1), PDO::PARAM_INT]]
+                )){
+                    if(!APP::Module('DB')->Select(
+                        APP::Module('Billing')->settings['module_members_db_connection'],
+                        ['fetch', PDO::FETCH_COLUMN],
+                        ['count(id)'],
+                        'members_access',
+                        [
+                            ['user_id', '=', $user_id, PDO::PARAM_INT],
+                            ['item', '=', substr($item, 0, 1), PDO::PARAM_STR],
+                            ['item_id', '=', substr($item, 1), PDO::PARAM_STR]
+                        ]
+                    )){  
+                        $out['access_id'][] = APP::Module('DB')->Insert(
+                            $this->settings['module_members_db_connection'], 'members_access', [
+                                'id'      => 'NULL',
+                                'user_id' => [$user_id, PDO::PARAM_INT],
+                                'item'    => [substr($item, 0, 1), PDO::PARAM_STR],
+                                'item_id' => [substr($item, 1), PDO::PARAM_INT],
+                                'cr_date' => 'NOW()'
+                            ]
+                        );
+                        
+                        APP::Module('DB')->Insert(
+                            $this->settings['module_billing_db_connection'], 'billing_invoices_tag', [
+                                'id'          => 'NULL',
+                                'invoice_id'  => [$invoice_id, PDO::PARAM_INT],
+                                'action'      => ['invoice_open_access', PDO::PARAM_STR],
+                                'action_data' => [json_encode(['item' => substr($item, 0, 1), 'item_id' => substr($item, 1)]), PDO::PARAM_STR],
+                                'cr_date'     => 'NOW()'
+                            ]
+                        );
+                    }
+                }else{
+                    APP::Module('DB')->Insert(
+                        $this->settings['module_billing_db_connection'], 'billing_invoices_tag', [
+                            'id'          => 'NULL',
+                            'invoice_id'  => [$invoice_id, PDO::PARAM_INT],
+                            'action'      => ['invoice_fail_open_access', PDO::PARAM_STR],
+                            'action_data' => [json_encode(['item' => substr($item, 0, 1), 'item_id' => substr($item, 1)]), PDO::PARAM_STR],
+                            'cr_date'     => 'NOW()'
+                        ]
+                    );
+                }
             }
         }
 
         APP::Module('Triggers')->Exec('add_members_access', [
-            'user_id'  => $user_id,
-            'products' => $products
+            'user_id'  => $user_id
         ]);
 
         return $out;
@@ -302,15 +371,34 @@ class Billing {
         return $out;
     }
 
-    public function AddPlusProducts($data) {
-        APP::Module('DB')->Insert(
-            $this->settings['module_members_db_connection'], 'billing_invoices_products', Array(
-                'id'         => 'NULL',
-                'invoice_id' => [$invoice_id, PDO::PARAM_INT],
-                'product_id' => [$product[0], PDO::PARAM_INT],
-                'price'      => [$product[1], PDO::PARAM_INT]
-            )
+    public function AddPlusProducts($invoice_id, $product_id) {
+        $invoice = APP::Module('DB')->Select(
+            $this->settings['module_billing_db_connection'], ['fetch', PDO::FETCH_ASSOC], ['UNIX_TIMESTAMP(cr_date)'], 'billing_invoices', [['id', '=', $invoice_id]]
         );
+        
+        if($invoice){
+            APP::Module('DB')->Insert(
+                $this->settings['module_members_db_connection'], 'billing_invoices_plus_products', [
+                    'id'         => 'NULL',
+                    'invoice_id' => [$invoice_id, PDO::PARAM_INT],
+                    'product_id' => [$product_id, PDO::PARAM_INT],
+                    'cr_date'    => 'NOW()'
+                ]
+            );
+
+            APP::Module('DB')->Insert(
+                $this->settings['module_billing_db_connection'], 'billing_invoices_tag', [
+                    'id'          => 'NULL',
+                    'invoice_id'  => [$invoice_id, PDO::PARAM_INT],
+                    'action'      => ['add_plus_product', PDO::PARAM_STR],
+                    'action_data' => [json_encode(['product_id' => $product_id, 'long_time'=> time() - $invoice['cr_date']]), PDO::PARAM_STR],
+                    'cr_date'     => 'NOW()'
+                ]
+            );
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public function ManageInvoices() {
@@ -379,19 +467,19 @@ class Billing {
         $products_id = [];
         foreach ($products as $product) {
             $amount      += $product[1];
-            $products_id = $product[0];
+            $products_id[] = $product[0];
         }
 
         $invoice_id = APP::Module('DB')->Insert(
-                $this->settings['module_billing_db_connection'], 'billing_invoices', Array(
-                    'id'      => 'NULL',
-                    'user_id' => [$user_id, PDO::PARAM_INT],
-                    'amount'  => [$amount, PDO::PARAM_INT],
-                    'state'   => [$state, PDO::PARAM_STR],
-                    'author'  => [$author, PDO::PARAM_INT],
-                    'up_date' => 'NOW()',
-                    'cr_date' => 'NOW()'
-                )
+            $this->settings['module_billing_db_connection'], 'billing_invoices', Array(
+                'id'      => 'NULL',
+                'user_id' => [$user_id, PDO::PARAM_INT],
+                'amount'  => [$amount, PDO::PARAM_INT],
+                'state'   => [$state, PDO::PARAM_STR],
+                'author'  => [$author, PDO::PARAM_INT],
+                'up_date' => 'NOW()',
+                'cr_date' => 'NOW()'
+            )
         );
 
         foreach ($products as $product) {
@@ -400,23 +488,10 @@ class Billing {
                     'id'         => 'NULL',
                     'invoice_id' => [$invoice_id, PDO::PARAM_INT],
                     'product_id' => [$product[0], PDO::PARAM_INT],
-                    'price'      => [$product[1], PDO::PARAM_INT]
+                    'price'      => [$product[1], PDO::PARAM_INT],
+                    'cr_date'    => 'NOW()'
                 )
             );
-        }
-
-        //Добавление дополнительных продуктов
-        foreach (APP::Module('DB')->Select(
-            APP::Module('Billing')->settings['module_billing_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], ['billing_products.id', 'billing_products.plus_products'], 'billing_products', [['billing_products.id', 'IN', $products_id, PDO::PARAM_STR]]
-        ) as $product) {
-            $plus_products = json_decode($product['plus_products'], true);
-            if (count($plus_products)) {
-                foreach ($plus_products as $item) {
-                    APP::Module('TaskManager')->Add(
-                        'Billing', 'AddPlusProducts', date('Y-m-d H:i:s', strtotime($item['time'])), json_encode([$invoice_id, $item['id'], 0]), 'plus_products', 'wait'
-                    );
-                }
-            }
         }
 
         $data = [
@@ -437,6 +512,27 @@ class Billing {
                 'cr_date'     => 'NOW()'
             )
         );
+        
+        switch ($state){
+            case 'success' :
+                //open access members
+                $this->AddMemberAccess($invoice_id, $user_id);
+                
+                //add plus products
+                foreach (APP::Module('DB')->Select(
+                    APP::Module('Billing')->settings['module_billing_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], ['billing_products.id', 'billing_products.plus_products'], 'billing_products', [['billing_products.id', 'IN', $products_id, PDO::PARAM_STR]]
+                ) as $product) {
+                    $plus_products = json_decode($product['plus_products'], true);
+                    if (count($plus_products)) {
+                        foreach ($plus_products as $item) {
+                            APP::Module('TaskManager')->Add(
+                                'Billing', 'AddPlusProducts', date('Y-m-d H:i:s', strtotime($item['time'])), json_encode([$invoice_id, $item['id']]), 'plus_products', 'wait'
+                            );
+                        }
+                    }
+                } 
+                break;
+        }
 
         APP::Module('Triggers')->Exec('create_invoice', $data);
 
@@ -478,13 +574,6 @@ class Billing {
         )) {
             $out['status']   = 'error';
             $out['errors'][] = 1;
-        }
-
-        if (!APP::Module('DB')->Select(
-            $this->settings['module_users_db_connection'], ['fetchColumn', 0], ['COUNT(id)'], 'users', [['id', '=', APP::Module('Users')->user['id'], PDO::PARAM_INT]]
-        )) {
-            $out['status']   = 'error';
-            $out['errors'][] = 2;
         }
 
         if ($out['status'] == 'success') {

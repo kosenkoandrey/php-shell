@@ -11,7 +11,7 @@ return [
         ['users\/profile',                                                      'Users', 'PrivateProfile'],             // Private user profile
         ['users\/profile\/(?P<user_id_hash>.*)',                                'Users', 'PublicProfile'],              // Public user profile
         ['users\/logout(\?.*)?',                                                'Users', 'Logout'],                     // Logout
-
+        
         ['users\/api\/login\.json(\?.*)?',                                      'Users', 'APILogin'],                   // [API] Login
         ['users\/api\/double\-login\.json(\?.*)?',                              'Users', 'APIDoubleLogin'],             // [API] Double login
         ['users\/api\/logout\.json(\?.*)?',                                     'Users', 'APILogout'],                  // [API] Logout
@@ -38,6 +38,7 @@ return [
         ['admin\/users\/roles\/rules\/(?P<role_id_hash>.*)\/add(\?.*)?',        'Users', 'AddRule'],                    // Add rule
         ['admin\/users\/roles\/rules\/(?P<role_id_hash>.*)(\?.*)?',             'Users', 'ManageRules'],                // Manage rules of role
         
+        ['admin\/users\/api\/dashboard\.json(\?.*)?',                           'Users', 'APIDashboard'],
         ['admin\/users\/api\/list\.json(\?.*)?',                                'Users', 'APIListUsers'],                   // [API] List users
         ['admin\/users\/api\/add\.json(\?.*)?',                                 'Users', 'APIAddUser'],                     // [API] Add user
         ['admin\/users\/api\/remove\.json(\?.*)?',                              'Users', 'APIRemoveUser'],                  // [API] Remove user

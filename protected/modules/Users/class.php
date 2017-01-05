@@ -108,7 +108,110 @@ class Users {
         return APP::Render('users/admin/nav', 'content');
     }
 
+    public function Dashboard() {
+        return APP::Render('users/admin/dashboard/index', 'return');
+    }
+    
+    public function APIDashboard() {
+        $range = [];
 
+        for ($x = $_POST['date']['to']; $x >= $_POST['date']['from']; $x = $x - 86400) {
+            $range[date('d-m-Y', $x)] = [
+                'total'       => 0,
+                'active'      => 0,
+                'wait'        => 0,
+                'unsubscribe' => 0,
+                'dropped'     => 0
+            ];
+        }
+
+        foreach (APP::Module('DB')->Select(
+            $this->settings['module_users_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], ['users_about.value as state', 'UNIX_TIMESTAMP(reg_date) AS cr_date'], 'users', [
+            ['users_about.item', '=', 'state', PDO::PARAM_STR],
+            ['users.reg_date', 'BETWEEN', '"' . date('Y-m-d', $_POST['date']['from']) . ' 00:00:00" AND "' . date('Y-m-d', $_POST['date']['to']) . ' 23:59:59"', PDO::PARAM_STR]
+            ], [
+                'left join/users_about' => [
+                    ['users_about.user', '=', 'users.id']
+                ]
+            ], false, false, ['users.id', 'desc']
+        ) as $user) {
+            $date_index = date('d-m-Y', $user['cr_date']);
+
+            if (!isset($range[$date_index])) {
+                $range[$date_index] = [
+                    'total'       => 0,
+                    'active'      => 0,
+                    'wait'        => 0,
+                    'unsubscribe' => 0,
+                    'dropped'     => 0
+                ];
+            }
+
+            ++$range[$date_index]['total'];
+
+            if ($user['state'] == 'active')
+                ++$range[$date_index]['active'];
+            if ($user['state'] == 'wait')
+                ++$range[$date_index]['wait'];
+            if ($user['state'] == 'unsubscribe')
+                ++$range[$date_index]['unsubscribe'];
+            if ($user['state'] == 'dropped')
+                ++$range[$date_index]['dropped'];
+        }
+
+        $range_values = [];
+        $out          = [];
+
+        foreach ($range as $date_index => $counters) {
+            $date_values = explode('-', $date_index);
+
+            $range_values[] = [
+                'dt'          => $date_index,
+                'total'       => (int) $counters['total'],
+                'active'      => Array((int) $counters['active'], APP::Module('Crypt')->Encode('{"logic":"intersect","rules":[{"method":"user_state","settings":{"value":"active"}},{"method":"user_cr_date","settings":{"from":"' . $date_values[2] . '.' . $date_values[1] . '.' . $date_values[0] . '","to":"' . $date_values[2] . '.' . $date_values[1] . '.' . $date_values[0] . '"}}]}')),
+                'wait'        => Array((int) $counters['wait'], APP::Module('Crypt')->Encode('{"logic":"intersect","rules":[{"method":"user_state","settings":{"value":"wait"}},{"method":"user_cr_date","settings":{"from":"' . $date_values[2] . '.' . $date_values[1] . '.' . $date_values[0] . '","to":"' . $date_values[2] . '.' . $date_values[1] . '.' . $date_values[0] . '"}}]}')),
+                'unsubscribe' => Array((int) $counters['unsubscribe'], APP::Module('Crypt')->Encode('{"logic":"intersect","rules":[{"method":"user_state","settings":{"value":"unsubscribe"}},{"method":"user_cr_date","settings":{"from":"' . $date_values[2] . '.' . $date_values[1] . '.' . $date_values[0] . '","to":"' . $date_values[2] . '.' . $date_values[1] . '.' . $date_values[0] . '"}}]}')),
+                'dropped'     => Array((int) $counters['dropped'], APP::Module('Crypt')->Encode('{"logic":"intersect","rules":[{"method":"user_state","settings":{"value":"dropped"}},{"method":"user_cr_date","settings":{"from":"' . $date_values[2] . '.' . $date_values[1] . '.' . $date_values[0] . '","to":"' . $date_values[2] . '.' . $date_values[1] . '.' . $date_values[0] . '"}}]}')),
+            ];
+
+            $out['wait'][$date_index]        = [strtotime($date_index) * 1000, $counters['wait']];
+            $out['unsubscribe'][$date_index] = [strtotime($date_index) * 1000, $counters['unsubscribe']];
+            $out['dropped'][$date_index]     = [strtotime($date_index) * 1000, $counters['dropped']];
+        }
+
+        $date_from_values = explode('-', date('Y-m-d', $_POST['date']['from']));
+        $date_to_values   = explode('-', date('Y-m-d', $_POST['date']['to']));
+
+        $out = [
+            'total'  => [
+                'value' => (int) APP::Module('DB')->Select(
+                    $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], ['count(id)'], 'users', [
+                        ['reg_date', 'BETWEEN', '"' . date('Y-m-d', $_POST['date']['from']) . ' 00:00:00" AND "' . date('Y-m-d', $_POST['date']['to']) . ' 23:59:59"', PDO::PARAM_STR]
+                    ]
+                ),
+                'hash'  => [
+                    'active'      => APP::Module('Crypt')->Encode('{"logic":"intersect","rules":[{"method":"user_state","settings":{"value":"active"}},{"method":"user_cr_date","settings":{"from":"' . $date_from_values[2] . '.' . $date_from_values[1] . '.' . $date_from_values[0] . '","to":"' . $date_to_values[2] . '.' . $date_to_values[1] . '.' . $date_to_values[0] . '"}}]}'),
+                    'wait'        => APP::Module('Crypt')->Encode('{"logic":"intersect","rules":[{"method":"user_state","settings":{"value":"wait"}},{"method":"user_cr_date","settings":{"from":"' . $date_from_values[2] . '.' . $date_from_values[1] . '.' . $date_from_values[0] . '","to":"' . $date_to_values[2] . '.' . $date_to_values[1] . '.' . $date_to_values[0] . '"}}]}'),
+                    'unsubscribe' => APP::Module('Crypt')->Encode('{"logic":"intersect","rules":[{"method":"user_state","settings":{"value":"unsubscribe"}},{"method":"user_cr_date","settings":{"from":"' . $date_from_values[2] . '.' . $date_from_values[1] . '.' . $date_from_values[0] . '","to":"' . $date_to_values[2] . '.' . $date_to_values[1] . '.' . $date_to_values[0] . '"}}]}'),
+                    'dropped'     => APP::Module('Crypt')->Encode('{"logic":"intersect","rules":[{"method":"user_state","settings":{"value":"dropped"}},{"method":"user_cr_date","settings":{"from":"' . $date_from_values[2] . '.' . $date_from_values[1] . '.' . $date_from_values[0] . '","to":"' . $date_to_values[2] . '.' . $date_to_values[1] . '.' . $date_to_values[0] . '"}}]}'),
+                ]
+            ],
+            'values' => $range_values,
+            'range'  => [
+                'wait'        => array_values($out['wait']),
+                'unsubscribe' => array_values($out['unsubscribe']),
+                'dropped'     => array_values($out['dropped'])
+            ]
+        ];
+
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+
+        echo json_encode($out);
+        exit;
+    }
+    
     public function Login($email, $password) {
         return (int) APP::Module('DB')->Select(
             $this->settings['module_users_db_connection'], ['fetchColumn', 0], ['id'], 'users',
