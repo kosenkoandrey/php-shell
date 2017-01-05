@@ -179,13 +179,13 @@ class Costs {
                 ['COUNT(id)'], 'costs',
                 [
                     ['cost_date', '=', $date, PDO::PARAM_STR],
-                    ['utm_source', '=', $value['utm_source'], PDO::PARAM_STR],
-                    ['utm_medium', '=', $value['utm_medium'], PDO::PARAM_STR],
-                    ['utm_campaign', '=', $value['utm_campaign'], PDO::PARAM_STR],
-                    ['utm_term', '=', $value['utm_term'], PDO::PARAM_STR],
-                    ['utm_content', '=', $value['utm_content'], PDO::PARAM_STR],
-                    ['utm_compaing_desc', '=', $value['utm_compaing_desc'], PDO::PARAM_STR],
-                    ['utm_content_desc', '=', $value['utm_content_desc'], PDO::PARAM_STR]
+                    ['utm_source', '=', '"' . $value['utm_source'] . '"', PDO::PARAM_STR],
+                    ['utm_medium', '=', '"' . $value['utm_medium'] . '"', PDO::PARAM_STR],
+                    ['utm_campaign', '=', '"' . $value['utm_campaign'] . '"', PDO::PARAM_STR],
+                    ['utm_term', '=', '"' . $value['utm_term'] . '"', PDO::PARAM_STR],
+                    ['utm_content', '=', '"' . $value['utm_content'] . '"', PDO::PARAM_STR],
+                    ['utm_compaing_desc', '=', '"' . $value['utm_compaing_desc'] . '"', PDO::PARAM_STR],
+                    ['utm_content_desc', '=', '"' . $value['utm_content_desc'] . '"', PDO::PARAM_STR]
                 ]
             )) {
                 APP::Module('DB')->Insert(
@@ -209,7 +209,13 @@ class Costs {
             }
         }
         
-        APP::Module('Triggers')->Exec('download_yandex_costs', $out);
+        APP::Module('Triggers')->Exec(
+            'download_yandex_costs', 
+            [
+                'out' => $out, 
+                'date' => $date
+            ]
+        );
         
         if (isset(APP::Module('Routing')->get['debug'])) {
             echo 'TOTAL AMT: ' . $total_amt;
@@ -514,6 +520,45 @@ class Costs {
             'errors' => []
         ]);
         exit;
+    }
+    
+    
+    public function BackwardCompatibilityYandexCosts($id, $data) {
+        foreach ($data['out'] as $key => $value) {
+            if (!APP::Module('DB')->Select(
+                'pult_ref', ['fetch', PDO::FETCH_COLUMN], 
+                ['COUNT(id)'], 'cost',
+                [
+                    ['cost_date', '=', $data['date'], PDO::PARAM_STR],
+                    ['utm_source', '=', '"' . $value['utm_source'] . '"', PDO::PARAM_STR],
+                    ['utm_medium', '=', '"' . $value['utm_medium'] . '"', PDO::PARAM_STR],
+                    ['utm_campaign', '=', '"' . $value['utm_campaign'] . '"', PDO::PARAM_STR],
+                    ['utm_term', '=', '"' . $value['utm_term'] . '"', PDO::PARAM_STR],
+                    ['utm_content', '=', '"' . $value['utm_content'] . '"', PDO::PARAM_STR],
+                    ['utm_compaing_desc', '=', '"' . $value['utm_compaing_desc'] . '"', PDO::PARAM_STR],
+                    ['utm_content_desc', '=', '"' . $value['utm_content_desc'] . '"', PDO::PARAM_STR]
+                ]
+            )) {
+                APP::Module('DB')->Insert(
+                    'pult_ref', 'cost',
+                    Array(
+                        'id' => 'NULL',
+                        'user_id' => '"0"',
+                        'comment' => '"auto"',
+                        'cost' => [$value['amount'], PDO::PARAM_STR],
+                        'cost_date' => [$data['date'], PDO::PARAM_STR],
+                        'cr_date' => 'NOW()',
+                        'utm_source' => [$value['utm_source'], PDO::PARAM_STR],
+                        'utm_medium' => [$value['utm_medium'], PDO::PARAM_STR],
+                        'utm_campaign' => [$value['utm_campaign'], PDO::PARAM_STR],
+                        'utm_term' => [$value['utm_term'], PDO::PARAM_STR],
+                        'utm_content' => [$value['utm_content'], PDO::PARAM_STR],
+                        'utm_compaing_desc' => [$value['utm_compaing_desc'], PDO::PARAM_STR],
+                        'utm_content_desc' => [$value['utm_content_desc'], PDO::PARAM_STR],
+                    )
+                );
+            }
+        }
     }
     
 }

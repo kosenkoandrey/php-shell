@@ -1,6 +1,7 @@
 <?
 return [
     'routes' => [
+        ['members\/page\/(?P<page_id_hash>.*)',                                          'Members', 'ViewPage'],       // View page
         ['admin\/members\/pages\/(?P<group_sub_id_hash>.*)\/preview\/(?P<page_id_hash>.*)',        'Members', 'PreviewPage'],       // Preview page
         ['admin\/members\/pages\/(?P<group_sub_id_hash>.*)\/groups\/add',                            'Members', 'AddPagesGroup'],     // Add pages group
         ['admin\/members\/pages\/(?P<group_sub_id_hash>.*)\/groups\/(?P<group_id_hash>.*)\/edit',    'Members', 'EditPagesGroup'],    // Edit pages group

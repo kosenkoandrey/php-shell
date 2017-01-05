@@ -148,6 +148,21 @@ class Members {
             'list' => $list
         ]);
     }
+    
+    public function ViewPage() {
+        $page_id = (int) APP::Module('Crypt')->Decode(APP::Module('Routing')->get['page_id_hash']);
+
+        APP::Render(
+            'members/admin/page/view', 'include',
+            [
+                'page' => APP::Module('DB')->Select(
+                    $this->settings['module_members_db_connection'], ['fetch', PDO::FETCH_COLUMN],
+                    ['content'], 'members_pages',
+                    [['id', '=', $page_id, PDO::PARAM_INT]]
+                )
+            ]
+        );
+    }
 
     public function PreviewPage() {
         $group_sub_id = (int) isset(APP::Module('Routing')->get['group_sub_id_hash']) ? APP::Module('Crypt')->Decode(APP::Module('Routing')->get['group_sub_id_hash']) : 0;

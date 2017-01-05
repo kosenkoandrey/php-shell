@@ -1,16 +1,14 @@
 <?
 return [
     'connections' => [
-        /*
-        'auto' => [
+        'pult_ref' => [
             'type'      => 'mysql',
-            'host'      => 'localhost',
-            'database'  => 'phpshell',
-            'username'  => 'root',
-            'password'  => '',
+            'host'      => '46.165.220.102',
+            'database'  => 'admin_pult_ref',
+            'username'  => 'pult_sendthis',
+            'password'  => 'DvRAUh4KGC9Jf8Fc',
             'charset'   => 'utf8'
-        ]
-         */
+        ],
         'auto' => [
             'type'      => 'mysql',
             'host'      => 'localhost',

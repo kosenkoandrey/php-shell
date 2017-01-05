@@ -35,25 +35,26 @@
                             </div>
 																												<div class="panel-body">
 																																<div class="form-group">
-																																				<label for="invoice-usr-id" class="col-sm-2 control-label">Дата создания</label>
+																																				<label for="invoice-usr-id" class="col-sm-2 control-label">Create date</label>
 																																				<div class="col-sm-3">
 																																								<p class="form-control-static"><?= date('d.m.Y H:i:s', $data['invoice']['main']['cr_date']) ?></p>
 																																				</div>
 																																</div>
 																																<div class="form-group">
-																																				<label for="invoice-usr-id" class="col-sm-2 control-label">Пользователь</label>
+																																				<label for="invoice-usr-id" class="col-sm-2 control-label">User</label>
 																																				<div class="col-sm-3">
 																																								<input type="text" name="invoice[user_id]" id="user_id" class="form-control" value="<?= $data['invoice']['main']['user_id'] ?>"/>
 																																				</div>
 																																</div>
 																																<div class="form-group">
-																																				<label for="invoice-state" class="col-md-2 control-label">Состояние</label>
+																																				<label for="invoice-state" class="col-md-2 control-label">State</label>
 																																				<div class="col-md-3">
 																																								<select id="invoice-state" name="invoice[state]" class="selectpicker form-control" data-width="100%">
 																																												<?
 																																												$invoice_states = Array(
-																																																'new' => 'не оплачен',
-																																																'processed' => 'в работе'
+																																																'new' => 'not paid',
+																																																'processed' => 'processed',
+                                                                                                                                                                                                                                                                                                                                                                                                'success' => 'paid'
 																																												);
 
 																																												foreach ($invoice_states as $invoice_state_id => $invoice_state_name) {
@@ -64,7 +65,7 @@
 																																				</div>
 																																</div>
 																																<div class="form-group">
-																																				<label class="col-md-2 control-label">Продукты</label>
+																																				<label class="col-md-2 control-label">Products</label>
 																																				<div class="col-md-6">
 																																								<div id="invoice-products">
 																																												<?
@@ -83,7 +84,7 @@
 																																																				<div class="col-md-4 mar-btm">
 																																																								<div class="input-group">
 																																																												<input id="inv-prod-price-<?= $invoice_product_index + 1 ?>" name="invoice[products][<?= $invoice_product_index + 1 ?>][]" type="number" class="inv-prod-price form-control" value="<?= $invoice_product['price'] ?>">
-																																																												<span class="input-group-addon">руб.</span>
+																																																												<span class="input-group-addon">RUR</span>
 																																																								</div>
 																																																				</div>
 																																																				<div class="col-md-2 mar-btm">
@@ -94,18 +95,18 @@
 																																												}
 																																												?>
 																																								</div>
-																																								<button id="invoice-products-add" type="button" class="btn btn-default btn-labeled fa fa-plus">Добавить продукт</button>
+																																								<button id="invoice-products-add" type="button" class="btn btn-default btn-labeled fa fa-plus">Add product</button>
 																																				</div>
 																																</div>
 																																<div class="form-group">
-																																				<label class="col-sm-2 control-label">Сумма</label>
+																																				<label class="col-sm-2 control-label">Amount</label>
 																																				<div class="col-sm-10">
-																																								<p class="form-control-static"><span id="invoice-amount"><?= $data['invoice']['main']['amount'] ?></span> руб. 00 коп.</p>
+																																								<p class="form-control-static"><span id="invoice-amount"><?= $data['invoice']['main']['amount'] ?></span> RUR</p>
 																																				</div>
 																																</div>
 																															<div class="form-group">
                                     <div class="col-sm-offset-2 col-sm-10">
-                                        	<button class="btn palette-Teal bg waves-effect btn-lg" type="submit">Сохранить изменения</button> последний раз редактировался <?= date('d.m.Y H:i:s', $data['invoice']['main']['up_date']) ?>
+                                        	<button class="btn palette-Teal bg waves-effect btn-lg" type="submit">Save changes</button> last update <?= date('d.m.Y H:i:s', $data['invoice']['main']['up_date']) ?>
                                     </div>
                                 </div>
 																												</div>

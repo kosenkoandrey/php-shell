@@ -34,38 +34,38 @@
                             </div>
 																												<div class="panel-body">
 																																<div class="form-group">
-																																				<label for="user_id" class="col-sm-2 control-label">Пользователь</label>
+																																				<label for="user_id" class="col-sm-2 control-label">User</label>
 																																				<div class="col-sm-3">
 																																								<input type="text" name="invoice[user_id]" id="user_id" class="form-control" />
 																																				</div>
 																																</div>
 																																<div class="form-group">
-																																				<label for="invoice-state" class="col-md-2 control-label">Состояние</label>
+																																				<label for="invoice-state" class="col-md-2 control-label">State</label>
 																																				<div class="col-md-3">
 																																								<select id="invoice-state" name="invoice[state]" class="selectpicker form-control" data-width="100%">
-																																												<option value="new">не оплачен</option>
-																																												<option value="processed">в работе</option>
-																																												<option value="pay">провести оплату после создания</option>
+																																												<option value="new">not paid</option>
+																																												<option value="processed">processed</option>
+																																												<option value="success">paid</option>
 																																								</select>
 																																				</div>
 																																</div>
 																																<div class="form-group">
-																																				<label class="col-md-2 control-label">Продукты</label>
+																																				<label class="col-md-2 control-label">Products</label>
 																																				<div class="col-md-8">
 																																								<div id="invoice-products"></div>
-																																								<button id="invoice-products-add" type="button" class="btn btn-default btn-labeled fa fa-plus">Добавить продукт</button>
+																																								<button id="invoice-products-add" type="button" class="btn btn-default btn-labeled fa fa-plus">Add product</button>
 																																				</div>
 																																</div>
 																																<div class="form-group">
-																																				<label for="invoice-comment" class="col-md-2 control-label">Комментарий</label>
+																																				<label for="invoice-comment" class="col-md-2 control-label">Comment</label>
 																																				<div class="col-md-6">
 																																								<textarea id="invoice-comment" name="invoice[comment]" rows="7" class="form-control"></textarea>
 																																				</div>
 																																</div>
 																																<div class="form-group">
-																																				<label class="col-sm-2 control-label">Сумма</label>
+																																				<label class="col-sm-2 control-label">Amount</label>
 																																				<div class="col-sm-10">
-																																								<p class="form-control-static"><span id="invoice-amount">0</span> руб. 00 коп.</p>
+																																								<p class="form-control-static"><span id="invoice-amount">0</span> RUR</p>
 																																				</div>
 																																</div>
 																																<div class="form-group">

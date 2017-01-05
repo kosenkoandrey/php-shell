@@ -43,7 +43,7 @@
                                         <i class="zmdi zmdi-more-vert"></i>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-right">
-                                        <li><a href="<?= APP::Module('Routing')->root ?>admin/billing/invoices/add">Add invoice</a></li>
+                                        <li><a href="<?= APP::Module('Routing')->root ?>admin/billing/invoices/add">Create invoice</a></li>
                                     </ul>
                                 </li>
                             </ul>
@@ -57,7 +57,7 @@
                                         <th data-column-id="amount">Amount</th>
                                         <th data-column-id="author">Author</th>
 																																								<th data-column-id="state">State</th>
-																																								<th data-column-id="up_date">Up_date</th>
+																																								<th data-column-id="up_date">Update</th>
                                         <th data-column-id="actions" data-formatter="actions" data-sortable="false">Actions</th>
                                     </tr>
                                 </thead>
