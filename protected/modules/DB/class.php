@@ -32,6 +32,7 @@ class DB {
                     case 'NOT LIKE':    $list[] = $val[0] . ' NOT LIKE "' . $val[2] . '"'; break;
                     case 'REGEXP':      $list[] = $val[0] . ' REGEXP "' . $val[2] . '"'; break;
                     case 'NOT REGEXP':  $list[] = $val[0] . ' NOT REGEXP "' . $val[2] . '"'; break;
+                    case 'IS NOT':      $list[] = $val[0] . ' IS NOT ' . $val[2]; break;
                     case 'IN':
                     case 'NOT IN':      $list[] = is_array($val[2]) ? $val[0] . ' ' . $val[1] . ' ("' . implode('","', $val[2]) . '")' : $val[0] . ' ' . $val[1] . ' (' . $val[2] . ')'; break;
                     default:            $list[] = $val[0] . ' ' . $val[1] . ' :' . str_replace(['.','(',')',',', '-', ' ', '"'], '', $val[0]); break;
@@ -53,6 +54,7 @@ class DB {
                     case 'NOT LIKE':
                     case 'REGEXP':
                     case 'NOT REGEXP':
+                    case 'IS NOT':
                     case 'IN':
                     case 'NOT IN': break;
                     default: $sql->bindParam(':' . str_replace(['.','(',')',',','-',' ','"'], '', $val[0]), $val[2], $val[3]); break;
@@ -64,19 +66,25 @@ class DB {
     
     public function Insert($connection, $table, $values) {
         $val = [];
-
+        $bind = [];
+        
         foreach ((array) $values as $key => $value) {
             if (is_array($value)) {
-                $val[] = $value[0] ? ':' . str_replace('.', '_', $key) : '0';
+                if (empty($value[0]) && (!is_numeric($value[0]))) {
+                    $val[] = 'NULL';
+                } else {
+                    $val[] = ':' . str_replace('.', '_', $key);
+                    array_push($bind, $key);
+                }
             } else {
-                $val[] = $value ? $value : '0';
+                $val[] = (empty($value) && (!is_numeric($value))) ? 'NULL' : $value;
             }
         }
 
         $sql = $this->Open($connection)->prepare('INSERT INTO ' . $table . ' VALUES (' . implode(',', $val) . ')');
 
         foreach ((array) $values as $key => $value) {
-            if ((is_array($value)) && ($value[0])) {
+            if (array_search($key, $bind) !== false) {
                 $sql->bindParam(':' .str_replace('.', '_', $key), $value[0], $value[1]);
             }
         }
@@ -164,6 +172,8 @@ class DB {
         if ($limit) {
             $operators[] = 'LIMIT ' . implode(',', $limit);
         }
+        
+        //print_r($operators);
 
         $sql = $this->Open($connection)->prepare(implode(' ', $operators));
 

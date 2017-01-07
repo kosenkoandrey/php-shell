@@ -1,3 +1,6 @@
+<?
+$filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Decode($_GET['filters']) : '{"logic":"intersect","rules":[{"method":"amount","settings":{"logic":">","value":"0"}}]}');
+?>
 <!DOCTYPE html>
 <!--[if IE 9 ]><html class="ie9"><![endif]-->
     <head>
@@ -14,6 +17,7 @@
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/google-material-color/dist/palette.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bootgrid/jquery.bootgrid.min.css" rel="stylesheet">
+        <link href="<?= APP::Module('Routing')->root ?>public/modules/billing/invoices/rules.css" rel="stylesheet">
 
         <style>
             #invoices-table-header .actionBar .actions > button {
@@ -43,10 +47,25 @@
                                         <i class="zmdi zmdi-more-vert"></i>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-right">
-                                        <li><a href="<?= APP::Module('Routing')->root ?>admin/billing/invoices/add">Create invoice</a></li>
+                                        <li><a href="<?= APP::Module('Routing')->root ?>admin/billing/invoices/add">Add invoice</a></li>
                                     </ul>
                                 </li>
                             </ul>
+                        </div>
+                        <div class="card-body card-padding">
+                            <input type="hidden" name="search" value="<?= $filters ?>" id="search">
+                            <div class="btn-group">
+                                <button type="button" id="render-table" class="btn btn-default"><i class="zmdi zmdi-check"></i> Apply</button>
+
+                                <div class="btn-group">
+                                    <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">
+                                        Actions <span class="caret"></span>
+                                    </button>
+                                    <ul id="search_results_actions" class="dropdown-menu" role="menu">
+                                        <li><a data-action="remove" href="javascript:void(0)">Remove</a></li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                         <div class="card-body">
                             <table class="table table-hover table-vmiddle" id="invoices-table">
@@ -56,8 +75,8 @@
                                         <th data-column-id="user_id">User</th>
                                         <th data-column-id="amount">Amount</th>
                                         <th data-column-id="author">Author</th>
-																																								<th data-column-id="state">State</th>
-																																								<th data-column-id="up_date">Update</th>
+                                        <th data-column-id="state">State</th>
+                                        <th data-column-id="up_date">UpDate</th>
                                         <th data-column-id="actions" data-formatter="actions" data-sortable="false">Actions</th>
                                     </tr>
                                 </thead>
@@ -83,10 +102,41 @@
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bootgrid/jquery.bootgrid.updated.min.js"></script>
 
+        <script src="<?= APP::Module('Routing')->root ?>public/modules/billing/invoices/rules.js"></script>
+
         <? APP::Render('core/widgets/js') ?>
 
         <script>
             $(document).ready(function() {
+                $('#search').BillingInvoicesRules({
+                    'debug': true
+                });
+
+                $(document).on('click', '#search_results_actions a', function () {
+                    var action = $(this).data('action');
+
+                    swal({
+                        title: 'Are you sure?',
+                        text: 'You will not be able to recover this action',
+                        type: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#DD6B55',
+                        confirmButtonText: 'Yes',
+                        cancelButtonText: 'No',
+                        closeOnConfirm: false,
+                        closeOnCancel: true
+                    }, function(isConfirm){
+                        if (isConfirm) {
+                            $.post('<?= APP::Module('Routing')->root ?>admin/billing/invoices/api/action.json', {
+                                action: action,
+                                rules: $('#search').val()
+                            }, function() {
+                                invoices_table.bootgrid('reload', true);
+                                swal('Complete!', 'Action has been completed', 'success');
+                            });
+                        }
+                    });
+                });
 
                 $(document).on('click', '#render-table', function () {
                     $('#invoices-table').bootgrid('reload');
@@ -127,11 +177,11 @@
                     formatters: {
                         actions: function(column, row) {
                             return  '<a href="<?= APP::Module('Routing')->root ?>admin/billing/invoices/edit/' + row.invoice_id_token + '" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-edit"></span></a> ' +
-                                    '<a href="javascript:void(0)" class="btn btn-sm btn-default btn-icon waves-effect waves-circle remove-cost" data-invoice-id="' + row.id + '"><span class="zmdi zmdi-delete"></span></a>';
+                                    '<a href="javascript:void(0)" class="btn btn-sm btn-default btn-icon waves-effect waves-circle remove-invoice" data-invoice-id="' + row.id + '"><span class="zmdi zmdi-delete"></span></a>';
                         }
                     }
                 }).on('loaded.rs.jquery.bootgrid', function () {
-                    invoices_table.find('.remove-cost').on('click', function (e) {
+                    invoices_table.find('.remove-invoice').on('click', function (e) {
                         var invoice_id = $(this).data('invoice-id');
 
                         swal({
@@ -150,7 +200,14 @@
                                     id: invoice_id
                                 }, function() {
                                     invoices_table.bootgrid('reload', true);
-                                    swal('Deleted!', 'Invoice has been deleted', 'success');
+                                    swal({
+                                        title: 'Deleted!',
+                                        text: 'Invoice has been deleted',
+                                        type: 'success',
+                                        showCancelButton: false,
+                                        confirmButtonText: 'Ok',
+                                        closeOnConfirm: false
+                                    });
                                 });
                             }
                         });

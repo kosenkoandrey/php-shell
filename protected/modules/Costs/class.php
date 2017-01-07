@@ -497,6 +497,7 @@ class Costs {
     public function APIUpdateSettings() {
         APP::Module('Registry')->Update(['value' => $_POST['module_costs_db_connection']], [['item', '=', 'module_costs_db_connection', PDO::PARAM_STR]]);
         APP::Module('Registry')->Update(['value' => $_POST['module_costs_tmp_dir']], [['item', '=', 'module_costs_tmp_dir', PDO::PARAM_STR]]);
+        APP::Module('Registry')->Update(['value' => $_POST['module_costs_max_execution_time']], [['item', '=', 'module_costs_max_execution_time', PDO::PARAM_STR]]);
         APP::Module('Registry')->Update(['value' => $_POST['module_costs_yandex_utm_source']], [['item', '=', 'module_costs_yandex_utm_source', PDO::PARAM_STR]]);
         APP::Module('Registry')->Update(['value' => $_POST['module_costs_yandex_utm_medium']], [['item', '=', 'module_costs_yandex_utm_medium', PDO::PARAM_STR]]);
         APP::Module('Registry')->Update(['value' => $_POST['module_costs_yandex_client_id']], [['item', '=', 'module_costs_yandex_client_id', PDO::PARAM_STR]]);
@@ -505,6 +506,7 @@ class Costs {
         APP::Module('Triggers')->Exec('update_costs_settings', [
             'db_connection' => $_POST['module_costs_db_connection'],
             'tmp_dir' => $_POST['module_costs_tmp_dir'],
+            'max_execution_time' => $_POST['module_costs_max_execution_time'],
             'yandex_utm_source' => $_POST['module_costs_yandex_utm_source'],
             'yandex_utm_medium' => $_POST['module_costs_yandex_utm_medium'],
             'yandex_client_id' => $_POST['module_costs_yandex_client_id'],

@@ -49,6 +49,7 @@ class Utils {
                 case 'http_proxy_tunnel': curl_setopt($curl, CURLOPT_HTTPPROXYTUNNEL, $value); break;
                 case 'http_version': curl_setopt($curl, CURLOPT_HTTP_VERSION, $value); break;
                 case 'cookie': curl_setopt($curl, CURLOPT_COOKIE, $value); break;
+                case 'custom_request': curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $value); break;
                 case 'post': 
                     curl_setopt($curl, CURLOPT_POST, true); 
                     curl_setopt($curl, CURLOPT_POSTFIELDS, is_array($value) ? http_build_query($value) : $value);
