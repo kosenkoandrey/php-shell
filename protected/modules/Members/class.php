@@ -175,8 +175,7 @@ class Members {
                     'title' => $item['name'],
                     'type' => 'group',
                     'id' => $item['id'],
-                    'sub_id' => $item['sub_id'],
-                    'items' => array_merge($this->BuildSubGroupTree($item['id'], $list, $group_id, $pages, $group_id == $item['id'] ? true : false), isset($pages[$item['id']]) ? $pages[$item['id']] : [])
+                    'sub_id' => $item['sub_id']
                 ];
                 
                 if($item['id'] == $group_id){
