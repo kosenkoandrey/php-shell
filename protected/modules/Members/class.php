@@ -130,9 +130,16 @@ class Members {
                     ['id', 'group_id', 'title'], 'members_pages',
                     [['id', '=', $item_id, PDO::PARAM_INT]]
                 );
-                $pages[$page['group_id']] = $page;
+                
+                $pages[$page['group_id']] = [
+                    'type' => 'page',
+                    'id' => $page['id'],
+                    'title' => $page['title']
+                ];
                 $group_id = $page['group_id'];
-                        
+                
+                if(!$page['group_id']) return $pages;
+     
                 break;
         }
         
@@ -241,7 +248,7 @@ class Members {
         $group_sub_id = (int) isset(APP::Module('Routing')->get['group_sub_id_hash']) ? APP::Module('Crypt')->Decode(APP::Module('Routing')->get['group_sub_id_hash']) : 0;
 
         $list = [];
-
+print_r($this->GetMemberAccess(56)); die();
         foreach (APP::Module('DB')->Select(
             $this->settings['module_members_db_connection'], ['fetchAll', PDO::FETCH_ASSOC],
             ['id', 'name'], 'members_pages_groups',
