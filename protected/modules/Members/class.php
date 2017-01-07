@@ -69,31 +69,160 @@ class Members {
 
         return $this->GetPagesGroups($out, $out[0]);
     }
-
-    public function GetPagesSubGroupsId($group_id){
-        $out = [];
-
-        $out[] = APP::Module('DB')->Select(
-            $this->settings['module_members_db_connection'], ['fetch', PDO::FETCH_COLUMN],
-            ['id'], 'members_pages_groups',
-            [['id', '=', $group_id, PDO::PARAM_INT]]
+    
+    public function GetMemberAccess($user_id){
+        $pages = [];
+        $tree = [];
+        
+        $member_access = APP::Module('DB')->Select(
+            $this->settings['module_members_db_connection'], ['fetchAll', PDO::FETCH_ASSOC],
+            ['item_id', 'item'], 'members_access',
+            [['user_id', '=', $user_id, PDO::PARAM_INT]]
         );
+        
+        foreach(APP::Module('DB')->Select(
+            $this->settings['module_members_db_connection'], ['fetchAll', PDO::FETCH_ASSOC],
+            ['id', 'group_id', 'title'], 'members_pages',
+            [['id', '!=', 0, PDO::PARAM_INT]]
+        )as $page){
+            $pages[$page['id']] = [
+                'type' => 'page',
+                'id' => $page['id'],
+                'title' => $page['title']
+            ];
+            
+        }
+        
+        foreach ($member_access as $item) {
+            $tree[] = $this->GetTreeByGroup($item['item'], $item['item_id']);
+        }
 
-        if(count($out)){
-            $page_groups = APP::Module('DB')->Select(
-                $this->settings['module_members_db_connection'], ['fetchAll', PDO::FETCH_ASSOC],
-                ['id', 'sub_id'], 'members_pages_groups',
-                [['sub_id', '=', $group_id, PDO::PARAM_INT]]
-            );
-
-            foreach ($page_groups as $group) {
-                if($group['sub_id']){
-                    $out = array_merge($out, $this->GetPagesSubGroupsId($group['id']));
+        return $tree;
+    }
+    
+    public function GetTreeByGroup($type, $item_id){
+        $out = [];
+        $list = [];
+        $pages = [];
+        $page_id = 0;
+        
+        switch ($type) {
+            case 'g':
+                
+                $group_id = $item_id;
+                
+                foreach(APP::Module('DB')->Select(
+                    $this->settings['module_members_db_connection'], ['fetchAll', PDO::FETCH_ASSOC],
+                    ['id', 'group_id', 'title'], 'members_pages',
+                    [['id', '=', 0, PDO::PARAM_INT]]
+                ) as $page){
+                    $pages[$page['group_id']][] = [
+                        'type' => 'page',
+                        'id' => $page['id'],
+                        'title' => $page['title']
+                    ];
+                }
+                
+                break;
+            case 'p':
+                
+                $page = APP::Module('DB')->Select(
+                    $this->settings['module_members_db_connection'], ['fetch', PDO::FETCH_ASSOC],
+                    ['id', 'group_id', 'title'], 'members_pages',
+                    [['id', '=', $item_id, PDO::PARAM_INT]]
+                );
+                $pages[$page['group_id']] = $page;
+                $group_id = $page['group_id'];
+                        
+                break;
+        }
+        
+        foreach(APP::Module('DB')->Select(
+            $this->settings['module_members_db_connection'], ['fetchAll', PDO::FETCH_ASSOC],
+            ['id', 'group_id', 'title'], 'members_pages',
+            [['id', '=', 0, PDO::PARAM_INT]]
+        ) as $page){
+            $pages[$page['group_id']][] = [
+                'type' => 'page',
+                'id' => $page['id'],
+                'title' => $page['title']
+            ];
+        }
+        
+        $groups = APP::Module('DB')->Select(
+            $this->settings['module_members_db_connection'], ['fetchAll', PDO::FETCH_ASSOC],
+            ['id', 'sub_id', 'name'], 'members_pages_groups',
+            [['id', '!=', 0, PDO::PARAM_INT]]
+        );
+        
+        foreach ($groups as $group) {
+            if($group['sub_id']){
+                $list[$group['sub_id']][$group['id']] = [
+                    'type' => 'group',
+                    'id'   => $group['id'],
+                    'title' => $group['name'],
+                    'items' => [],
+                    'sub_id' => $group['sub_id']
+                ];
+            }
+            
+            $sub_group[$group['id']] = $group['sub_id'];
+        }
+                 
+        foreach ($groups as $item) {
+            if(!$item['sub_id']){
+                $out[$item['id']] = [
+                    'title' => $item['name'],
+                    'type' => 'group',
+                    'id' => $item['id'],
+                    'sub_id' => $item['sub_id']
+                ];
+                
+                if($item['id'] == $group_id){
+                    $out[$item['id']]['items'] = array_merge($this->BuildSubGroupTree($item['id'], $list, $group_id, $pages, $group_id == $item['id'] ? true : false), isset($pages[$item['id']]) ? $pages[$item['id']] : []);
+                }else{
+                    $out[$item['id']]['items'] = $this->BuildSubGroupTree($item['id'], $list, $group_id, $pages);
                 }
             }
         }
+    
+        $id = $this->GetMainParentGroup($sub_group, $group_id);
+        return $out[$id];
+    }
+    
+    private function BuildSubGroupTree($id, $list, $group_id = false, $pages = [], $access = false){
+        $out = [];
 
+        if(isset($list[$id])){
+            foreach ($list[$id] as $item) {
+                if($access || ($group_id && $group_id == $item['id'])){
+                    $out[] = [
+                        'title' => $item['title'],
+                        'type' => 'group',
+                        'id' => $item['id'],
+                        'sub_id' => $item['sub_id'],
+                        'items' => array_merge($this->BuildSubGroupTree($item['id'], $list, $group_id, $pages, true), isset($pages[$item['id']]) ? $pages[$item['id']] : [])
+                    ];
+                }else{
+                    $out[] = [
+                        'title' => $item['title'],
+                        'type' => 'group',
+                        'id' => $item['id'],
+                        'sub_id' => $item['sub_id'],
+                        'items' =>  $this->BuildSubGroupTree($item['id'], $list, $group_id, $pages, $access)
+                    ];
+                }
+            }
+        }
         return $out;
+    }
+    
+    private function GetMainParentGroup($list, $id) {
+        if($list[$id]){
+            return $this->GetMainParentGroup($list, $list[$id]);
+        }else{
+            return $id;
+        }
     }
 
     private function GetPagesGroups($groups, $data) {
