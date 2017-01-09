@@ -179,13 +179,13 @@ class Costs {
                 ['COUNT(id)'], 'costs',
                 [
                     ['cost_date', '=', $date, PDO::PARAM_STR],
-                    ['utm_source', '=', $value['utm_source'], PDO::PARAM_STR],
-                    ['utm_medium', '=', $value['utm_medium'], PDO::PARAM_STR],
-                    ['utm_campaign', '=', $value['utm_campaign'], PDO::PARAM_STR],
-                    ['utm_term', '=', $value['utm_term'], PDO::PARAM_STR],
-                    ['utm_content', '=', $value['utm_content'], PDO::PARAM_STR],
-                    ['utm_compaing_desc', '=', $value['utm_compaing_desc'], PDO::PARAM_STR],
-                    ['utm_content_desc', '=', $value['utm_content_desc'], PDO::PARAM_STR]
+                    ['utm_source', '=', '"' . $value['utm_source'] . '"', PDO::PARAM_STR],
+                    ['utm_medium', '=', '"' . $value['utm_medium'] . '"', PDO::PARAM_STR],
+                    ['utm_campaign', '=', '"' . $value['utm_campaign'] . '"', PDO::PARAM_STR],
+                    ['utm_term', '=', '"' . $value['utm_term'] . '"', PDO::PARAM_STR],
+                    ['utm_content', '=', '"' . $value['utm_content'] . '"', PDO::PARAM_STR],
+                    ['utm_compaing_desc', '=', '"' . $value['utm_compaing_desc'] . '"', PDO::PARAM_STR],
+                    ['utm_content_desc', '=', '"' . $value['utm_content_desc'] . '"', PDO::PARAM_STR]
                 ]
             )) {
                 APP::Module('DB')->Insert(
@@ -209,7 +209,13 @@ class Costs {
             }
         }
         
-        APP::Module('Triggers')->Exec('download_yandex_costs', $out);
+        APP::Module('Triggers')->Exec(
+            'download_yandex_costs', 
+            [
+                'out' => $out, 
+                'date' => $date
+            ]
+        );
         
         if (isset(APP::Module('Routing')->get['debug'])) {
             echo 'TOTAL AMT: ' . $total_amt;
@@ -491,6 +497,7 @@ class Costs {
     public function APIUpdateSettings() {
         APP::Module('Registry')->Update(['value' => $_POST['module_costs_db_connection']], [['item', '=', 'module_costs_db_connection', PDO::PARAM_STR]]);
         APP::Module('Registry')->Update(['value' => $_POST['module_costs_tmp_dir']], [['item', '=', 'module_costs_tmp_dir', PDO::PARAM_STR]]);
+        APP::Module('Registry')->Update(['value' => $_POST['module_costs_max_execution_time']], [['item', '=', 'module_costs_max_execution_time', PDO::PARAM_STR]]);
         APP::Module('Registry')->Update(['value' => $_POST['module_costs_yandex_utm_source']], [['item', '=', 'module_costs_yandex_utm_source', PDO::PARAM_STR]]);
         APP::Module('Registry')->Update(['value' => $_POST['module_costs_yandex_utm_medium']], [['item', '=', 'module_costs_yandex_utm_medium', PDO::PARAM_STR]]);
         APP::Module('Registry')->Update(['value' => $_POST['module_costs_yandex_client_id']], [['item', '=', 'module_costs_yandex_client_id', PDO::PARAM_STR]]);
@@ -499,6 +506,7 @@ class Costs {
         APP::Module('Triggers')->Exec('update_costs_settings', [
             'db_connection' => $_POST['module_costs_db_connection'],
             'tmp_dir' => $_POST['module_costs_tmp_dir'],
+            'max_execution_time' => $_POST['module_costs_max_execution_time'],
             'yandex_utm_source' => $_POST['module_costs_yandex_utm_source'],
             'yandex_utm_medium' => $_POST['module_costs_yandex_utm_medium'],
             'yandex_client_id' => $_POST['module_costs_yandex_client_id'],
@@ -514,6 +522,45 @@ class Costs {
             'errors' => []
         ]);
         exit;
+    }
+    
+    
+    public function BackwardCompatibilityYandexCosts($id, $data) {
+        foreach ($data['out'] as $key => $value) {
+            if (!APP::Module('DB')->Select(
+                'pult_ref', ['fetch', PDO::FETCH_COLUMN], 
+                ['COUNT(id)'], 'cost',
+                [
+                    ['cost_date', '=', $data['date'], PDO::PARAM_STR],
+                    ['utm_source', '=', '"' . $value['utm_source'] . '"', PDO::PARAM_STR],
+                    ['utm_medium', '=', '"' . $value['utm_medium'] . '"', PDO::PARAM_STR],
+                    ['utm_campaign', '=', '"' . $value['utm_campaign'] . '"', PDO::PARAM_STR],
+                    ['utm_term', '=', '"' . $value['utm_term'] . '"', PDO::PARAM_STR],
+                    ['utm_content', '=', '"' . $value['utm_content'] . '"', PDO::PARAM_STR],
+                    ['utm_compaing_desc', '=', '"' . $value['utm_compaing_desc'] . '"', PDO::PARAM_STR],
+                    ['utm_content_desc', '=', '"' . $value['utm_content_desc'] . '"', PDO::PARAM_STR]
+                ]
+            )) {
+                APP::Module('DB')->Insert(
+                    'pult_ref', 'cost',
+                    Array(
+                        'id' => 'NULL',
+                        'user_id' => '"0"',
+                        'comment' => '"auto"',
+                        'cost' => [$value['amount'], PDO::PARAM_STR],
+                        'cost_date' => [$data['date'], PDO::PARAM_STR],
+                        'cr_date' => 'NOW()',
+                        'utm_source' => [$value['utm_source'], PDO::PARAM_STR],
+                        'utm_medium' => [$value['utm_medium'], PDO::PARAM_STR],
+                        'utm_campaign' => [$value['utm_campaign'], PDO::PARAM_STR],
+                        'utm_term' => [$value['utm_term'], PDO::PARAM_STR],
+                        'utm_content' => [$value['utm_content'], PDO::PARAM_STR],
+                        'utm_compaing_desc' => [$value['utm_compaing_desc'], PDO::PARAM_STR],
+                        'utm_content_desc' => [$value['utm_content_desc'], PDO::PARAM_STR],
+                    )
+                );
+            }
+        }
     }
     
 }

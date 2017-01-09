@@ -1,8 +1,8 @@
 <?
-APP::$insert['js_flot']           = ['js', 'file', 'before', '</body>', APP::Module('Routing')->root . 'public/ui/vendors/bower_components/flot/jquery.flot.js'];
-APP::$insert['js_flot_resize']    = ['js', 'file', 'before', '</body>', APP::Module('Routing')->root . 'public/ui/vendors/bower_components/flot/jquery.flot.resize.js'];
-APP::$insert['js_flot_time']      = ['js', 'file', 'before', '</body>', APP::Module('Routing')->root . 'public/ui/vendors/bower_components/flot/jquery.flot.time.js'];
-APP::$insert['js_moment']         = ['js', 'file', 'before', '</body>', APP::Module('Routing')->root . 'public/ui/vendors/bower_components/moment/min/moment.min.js'];
+APP::$insert['js_flot'] = ['js', 'file', 'before', '</body>', APP::Module('Routing')->root . 'public/ui/vendors/bower_components/flot/jquery.flot.js'];
+APP::$insert['js_flot_resize'] = ['js', 'file', 'before', '</body>', APP::Module('Routing')->root . 'public/ui/vendors/bower_components/flot/jquery.flot.resize.js'];
+APP::$insert['js_flot_time'] = ['js', 'file', 'before', '</body>', APP::Module('Routing')->root . 'public/ui/vendors/bower_components/flot/jquery.flot.time.js'];
+APP::$insert['js_moment'] = ['js', 'file', 'before', '</body>', APP::Module('Routing')->root . 'public/ui/vendors/bower_components/moment/min/moment.min.js'];
 APP::$insert['js_datetimepicker'] = ['js', 'file', 'before', '</body>', APP::Module('Routing')->root . 'public/ui/vendors/bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js'];
 ob_start();
 ?>
@@ -22,14 +22,14 @@ ob_start();
         var fail = false
 
         if (!text) {
-            return fail
+          return fail
         }
 
         // Unecessary spaces
         text = text.replace(/^\s+|\s+$/g, '')
-                .replace(/\s{2,}/g, ' ')
-                .replace(/[\t\r\n]/g, '')
-                .toLowerCase()
+          .replace(/\s{2,}/g, ' ')
+          .replace(/[\t\r\n]/g, '')
+          .toLowerCase()
 
         // in contrast to php, js Date.parse function interprets:
         // dates given as yyyy-mm-dd as in timezone: UTC,
@@ -38,131 +38,131 @@ ob_start();
         // etc...etc...
         // ...therefore we manually parse lots of common date formats
         var pattern = new RegExp([
-            '^(\\d{1,4})',
-            '([\\-\\.\\/:])',
-            '(\\d{1,2})',
-            '([\\-\\.\\/:])',
-            '(\\d{1,4})',
-            '(?:\\s(\\d{1,2}):(\\d{2})?:?(\\d{2})?)?',
-            '(?:\\s([A-Z]+)?)?$'
+          '^(\\d{1,4})',
+          '([\\-\\.\\/:])',
+          '(\\d{1,2})',
+          '([\\-\\.\\/:])',
+          '(\\d{1,4})',
+          '(?:\\s(\\d{1,2}):(\\d{2})?:?(\\d{2})?)?',
+          '(?:\\s([A-Z]+)?)?$'
         ].join(''))
         match = text.match(pattern)
 
         if (match && match[2] === match[4]) {
-            if (match[1] > 1901) {
-                switch (match[2]) {
-                    case '-':
-                        // YYYY-M-D
-                        if (match[3] > 12 || match[5] > 31) {
-                            return fail
-                        }
-
-                        return new Date(match[1], parseInt(match[3], 10) - 1, match[5],
-                                match[6] || 0, match[7] || 0, match[8] || 0, match[9] || 0) / 1000
-                    case '.':
-                        // YYYY.M.D is not parsed by strtotime()
-                        return fail
-                    case '/':
-                        // YYYY/M/D
-                        if (match[3] > 12 || match[5] > 31) {
-                            return fail
-                        }
-
-                        return new Date(match[1], parseInt(match[3], 10) - 1, match[5],
-                                match[6] || 0, match[7] || 0, match[8] || 0, match[9] || 0) / 1000
+          if (match[1] > 1901) {
+            switch (match[2]) {
+              case '-':
+                // YYYY-M-D
+                if (match[3] > 12 || match[5] > 31) {
+                  return fail
                 }
-            } else if (match[5] > 1901) {
-                switch (match[2]) {
-                    case '-':
-                        // D-M-YYYY
-                        if (match[3] > 12 || match[1] > 31) {
-                            return fail
-                        }
 
-                        return new Date(match[5], parseInt(match[3], 10) - 1, match[1],
-                                match[6] || 0, match[7] || 0, match[8] || 0, match[9] || 0) / 1000
-                    case '.':
-                        // D.M.YYYY
-                        if (match[3] > 12 || match[1] > 31) {
-                            return fail
-                        }
-
-                        return new Date(match[5], parseInt(match[3], 10) - 1, match[1],
-                                match[6] || 0, match[7] || 0, match[8] || 0, match[9] || 0) / 1000
-                    case '/':
-                        // M/D/YYYY
-                        if (match[1] > 12 || match[3] > 31) {
-                            return fail
-                        }
-
-                        return new Date(match[5], parseInt(match[1], 10) - 1, match[3],
-                                match[6] || 0, match[7] || 0, match[8] || 0, match[9] || 0) / 1000
+                return new Date(match[1], parseInt(match[3], 10) - 1, match[5],
+                match[6] || 0, match[7] || 0, match[8] || 0, match[9] || 0) / 1000
+              case '.':
+                // YYYY.M.D is not parsed by strtotime()
+                return fail
+              case '/':
+                // YYYY/M/D
+                if (match[3] > 12 || match[5] > 31) {
+                  return fail
                 }
-            } else {
-                switch (match[2]) {
-                    case '-':
-                        // YY-M-D
-                        if (match[3] > 12 || match[5] > 31 || (match[1] < 70 && match[1] > 38)) {
-                            return fail
-                        }
 
-                        year = match[1] >= 0 && match[1] <= 38 ? +match[1] + 2000 : match[1]
-                        return new Date(year, parseInt(match[3], 10) - 1, match[5],
-                                match[6] || 0, match[7] || 0, match[8] || 0, match[9] || 0) / 1000
-                    case '.':
-                        // D.M.YY or H.MM.SS
-                        if (match[5] >= 70) {
-                            // D.M.YY
-                            if (match[3] > 12 || match[1] > 31) {
-                                return fail
-                            }
-
-                            return new Date(match[5], parseInt(match[3], 10) - 1, match[1],
-                                    match[6] || 0, match[7] || 0, match[8] || 0, match[9] || 0) / 1000
-                        }
-                        if (match[5] < 60 && !match[6]) {
-                            // H.MM.SS
-                            if (match[1] > 23 || match[3] > 59) {
-                                return fail
-                            }
-
-                            today = new Date()
-                            return new Date(today.getFullYear(), today.getMonth(), today.getDate(),
-                                    match[1] || 0, match[3] || 0, match[5] || 0, match[9] || 0) / 1000
-                        }
-
-                        // invalid format, cannot be parsed
-                        return fail
-                    case '/':
-                        // M/D/YY
-                        if (match[1] > 12 || match[3] > 31 || (match[5] < 70 && match[5] > 38)) {
-                            return fail
-                        }
-
-                        year = match[5] >= 0 && match[5] <= 38 ? +match[5] + 2000 : match[5]
-                        return new Date(year, parseInt(match[1], 10) - 1, match[3],
-                                match[6] || 0, match[7] || 0, match[8] || 0, match[9] || 0) / 1000
-                    case ':':
-                        // HH:MM:SS
-                        if (match[1] > 23 || match[3] > 59 || match[5] > 59) {
-                            return fail
-                        }
-
-                        today = new Date()
-                        return new Date(today.getFullYear(), today.getMonth(), today.getDate(),
-                                match[1] || 0, match[3] || 0, match[5] || 0) / 1000
-                }
+                return new Date(match[1], parseInt(match[3], 10) - 1, match[5],
+                match[6] || 0, match[7] || 0, match[8] || 0, match[9] || 0) / 1000
             }
+          } else if (match[5] > 1901) {
+            switch (match[2]) {
+              case '-':
+                // D-M-YYYY
+                if (match[3] > 12 || match[1] > 31) {
+                  return fail
+                }
+
+                return new Date(match[5], parseInt(match[3], 10) - 1, match[1],
+                match[6] || 0, match[7] || 0, match[8] || 0, match[9] || 0) / 1000
+              case '.':
+                // D.M.YYYY
+                if (match[3] > 12 || match[1] > 31) {
+                  return fail
+                }
+
+                return new Date(match[5], parseInt(match[3], 10) - 1, match[1],
+                match[6] || 0, match[7] || 0, match[8] || 0, match[9] || 0) / 1000
+              case '/':
+                // M/D/YYYY
+                if (match[1] > 12 || match[3] > 31) {
+                  return fail
+                }
+
+                return new Date(match[5], parseInt(match[1], 10) - 1, match[3],
+                match[6] || 0, match[7] || 0, match[8] || 0, match[9] || 0) / 1000
+            }
+          } else {
+            switch (match[2]) {
+              case '-':
+                // YY-M-D
+                if (match[3] > 12 || match[5] > 31 || (match[1] < 70 && match[1] > 38)) {
+                  return fail
+                }
+
+                year = match[1] >= 0 && match[1] <= 38 ? +match[1] + 2000 : match[1]
+                return new Date(year, parseInt(match[3], 10) - 1, match[5],
+                match[6] || 0, match[7] || 0, match[8] || 0, match[9] || 0) / 1000
+              case '.':
+                // D.M.YY or H.MM.SS
+                if (match[5] >= 70) {
+                  // D.M.YY
+                  if (match[3] > 12 || match[1] > 31) {
+                    return fail
+                  }
+
+                  return new Date(match[5], parseInt(match[3], 10) - 1, match[1],
+                  match[6] || 0, match[7] || 0, match[8] || 0, match[9] || 0) / 1000
+                }
+                if (match[5] < 60 && !match[6]) {
+                  // H.MM.SS
+                  if (match[1] > 23 || match[3] > 59) {
+                    return fail
+                  }
+
+                  today = new Date()
+                  return new Date(today.getFullYear(), today.getMonth(), today.getDate(),
+                  match[1] || 0, match[3] || 0, match[5] || 0, match[9] || 0) / 1000
+                }
+
+                // invalid format, cannot be parsed
+                return fail
+              case '/':
+                // M/D/YY
+                if (match[1] > 12 || match[3] > 31 || (match[5] < 70 && match[5] > 38)) {
+                  return fail
+                }
+
+                year = match[5] >= 0 && match[5] <= 38 ? +match[5] + 2000 : match[5]
+                return new Date(year, parseInt(match[1], 10) - 1, match[3],
+                match[6] || 0, match[7] || 0, match[8] || 0, match[9] || 0) / 1000
+              case ':':
+                // HH:MM:SS
+                if (match[1] > 23 || match[3] > 59 || match[5] > 59) {
+                  return fail
+                }
+
+                today = new Date()
+                return new Date(today.getFullYear(), today.getMonth(), today.getDate(),
+                match[1] || 0, match[3] || 0, match[5] || 0) / 1000
+            }
+          }
         }
 
         // other formats and "now" should be parsed by Date.parse()
         if (text === 'now') {
-            return now === null || isNaN(now)
-                    ? new Date().getTime() / 1000 | 0
-                    : now | 0
+          return now === null || isNaN(now)
+            ? new Date().getTime() / 1000 | 0
+            : now | 0
         }
         if (!isNaN(parsed = Date.parse(text))) {
-            return parsed / 1000 | 0
+          return parsed / 1000 | 0
         }
         // Browsers !== Chrome have problems parsing ISO 8601 date strings, as they do
         // not accept lower case characters, space, or shortened time zones.
@@ -172,222 +172,148 @@ ob_start();
         //   2015-04-15 20:33:59z
         //   2015-04-15t20:33:59+02:00
         pattern = new RegExp([
-            '^([0-9]{4}-[0-9]{2}-[0-9]{2})',
-            '[ t]',
-            '([0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?)',
-            '([\\+-][0-9]{2}(:[0-9]{2})?|z)'
+          '^([0-9]{4}-[0-9]{2}-[0-9]{2})',
+          '[ t]',
+          '([0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?)',
+          '([\\+-][0-9]{2}(:[0-9]{2})?|z)'
         ].join(''))
         match = text.match(pattern)
         if (match) {
-            // @todo: time zone information
-            if (match[4] === 'z') {
-                match[4] = 'Z'
-            } else if (match[4].match(/^([\+-][0-9]{2})$/)) {
-                match[4] = match[4] + ':00'
-            }
+          // @todo: time zone information
+          if (match[4] === 'z') {
+            match[4] = 'Z'
+          } else if (match[4].match(/^([\+-][0-9]{2})$/)) {
+            match[4] = match[4] + ':00'
+          }
 
-            if (!isNaN(parsed = Date.parse(match[1] + 'T' + match[2] + match[4]))) {
-                return parsed / 1000 | 0
-            }
+          if (!isNaN(parsed = Date.parse(match[1] + 'T' + match[2] + match[4]))) {
+            return parsed / 1000 | 0
+          }
         }
 
         date = now ? new Date(now * 1000) : new Date()
         days = {
-            'sun': 0,
-            'mon': 1,
-            'tue': 2,
-            'wed': 3,
-            'thu': 4,
-            'fri': 5,
-            'sat': 6
+          'sun': 0,
+          'mon': 1,
+          'tue': 2,
+          'wed': 3,
+          'thu': 4,
+          'fri': 5,
+          'sat': 6
         }
         ranges = {
-            'yea': 'FullYear',
-            'mon': 'Month',
-            'day': 'Date',
-            'hou': 'Hours',
-            'min': 'Minutes',
-            'sec': 'Seconds'
+          'yea': 'FullYear',
+          'mon': 'Month',
+          'day': 'Date',
+          'hou': 'Hours',
+          'min': 'Minutes',
+          'sec': 'Seconds'
         }
 
-        function lastNext(type, range, modifier) {
-            var diff
-            var day = days[range]
+        function lastNext (type, range, modifier) {
+          var diff
+          var day = days[range]
 
-            if (typeof day !== 'undefined') {
-                diff = day - date.getDay()
+          if (typeof day !== 'undefined') {
+            diff = day - date.getDay()
 
-                if (diff === 0) {
-                    diff = 7 * modifier
-                } else if (diff > 0 && type === 'last') {
-                    diff -= 7
-                } else if (diff < 0 && type === 'next') {
-                    diff += 7
-                }
-
-                date.setDate(date.getDate() + diff)
+            if (diff === 0) {
+              diff = 7 * modifier
+            } else if (diff > 0 && type === 'last') {
+              diff -= 7
+            } else if (diff < 0 && type === 'next') {
+              diff += 7
             }
+
+            date.setDate(date.getDate() + diff)
+          }
         }
 
-        function process(val) {
-            // @todo: Reconcile this with regex using \s, taking into account
-            // browser issues with split and regexes
-            var splt = val.split(' ')
-            var type = splt[0]
-            var range = splt[1].substring(0, 3)
-            var typeIsNumber = /\d+/.test(type)
-            var ago = splt[2] === 'ago'
-            var num = (type === 'last' ? -1 : 1) * (ago ? -1 : 1)
+        function process (val) {
+          // @todo: Reconcile this with regex using \s, taking into account
+          // browser issues with split and regexes
+          var splt = val.split(' ')
+          var type = splt[0]
+          var range = splt[1].substring(0, 3)
+          var typeIsNumber = /\d+/.test(type)
+          var ago = splt[2] === 'ago'
+          var num = (type === 'last' ? -1 : 1) * (ago ? -1 : 1)
 
-            if (typeIsNumber) {
-                num *= parseInt(type, 10)
-            }
+          if (typeIsNumber) {
+            num *= parseInt(type, 10)
+          }
 
-            if (ranges.hasOwnProperty(range) && !splt[1].match(/^mon(day|\.)?$/i)) {
-                return date['set' + ranges[range]](date['get' + ranges[range]]() + num)
-            }
+          if (ranges.hasOwnProperty(range) && !splt[1].match(/^mon(day|\.)?$/i)) {
+            return date['set' + ranges[range]](date['get' + ranges[range]]() + num)
+          }
 
-            if (range === 'wee') {
-                return date.setDate(date.getDate() + (num * 7))
-            }
+          if (range === 'wee') {
+            return date.setDate(date.getDate() + (num * 7))
+          }
 
-            if (type === 'next' || type === 'last') {
-                lastNext(type, range, num)
-            } else if (!typeIsNumber) {
-                return false
-            }
+          if (type === 'next' || type === 'last') {
+            lastNext(type, range, num)
+          } else if (!typeIsNumber) {
+            return false
+          }
 
-            return true
+          return true
         }
 
         times = '(years?|months?|weeks?|days?|hours?|minutes?|min|seconds?|sec' +
-                '|sunday|sun\\.?|monday|mon\\.?|tuesday|tue\\.?|wednesday|wed\\.?' +
-                '|thursday|thu\\.?|friday|fri\\.?|saturday|sat\\.?)'
+          '|sunday|sun\\.?|monday|mon\\.?|tuesday|tue\\.?|wednesday|wed\\.?' +
+          '|thursday|thu\\.?|friday|fri\\.?|saturday|sat\\.?)'
         regex = '([+-]?\\d+\\s' + times + '|' + '(last|next)\\s' + times + ')(\\sago)?'
 
         match = text.match(new RegExp(regex, 'gi'))
         if (!match) {
-            return fail
+          return fail
         }
 
         for (i = 0, len = match.length; i < len; i++) {
-            if (!process(match[i])) {
-                return fail
-            }
+          if (!process(match[i])) {
+            return fail
+          }
         }
 
         return (date.getTime() / 1000)
     }
 </script>
 <?
-APP::$insert['js_strtotime']      = ['js', 'code', 'before', '</body>', ob_get_contents()];
+APP::$insert['js_strtotime'] = ['js', 'code', 'before', '</body>', ob_get_contents()];
 ob_end_clean();
 ?>
 <script>
-    $(document).on('click', "#analytics-stats-erros-period > button", function () {
-        var period = $(this).data('period');
-
-        var to = Math.round(new Date().getTime() / 1000);
-        var from = strtotime("-" + period, to);
-
-        var to_date = new Date(to * 1000);
-        var from_date = new Date(from * 1000);
-
-        $('#analytics-stat-date-to').val(to);
-        $('#analytics-stat-date-from').val(from);
-
-        $('#analytics-stats-calendar-from').html(from_date.getDate() + '.' + (from_date.getMonth() + 1) + '.' + from_date.getFullYear());
-        $('#analytics-stats-calendar-to').html(to_date.getDate() + '.' + (to_date.getMonth() + 1) + '.' + to_date.getFullYear());
-
-        Analytics(period);
-    });
-
-    $(document).on('click', '#tab-nav-<?= $data['hash'] ?> > a', function () {
-        $('#analytics-stats-erros-period > button[data-period="1 months"]').trigger('click');
-    });
-
-    $('#analytics-stats-calendar').popover({
-        html: true,
-        content: [
-            '<div class="form-group">',
-            '<div class="row">',
-            '<div class="col-md-6">',
-            '<div id="analytics-stat-calendar-from"></div>',
-            '</div>',
-            '<div class="col-md-6">',
-            '<div id="analytics-stat-calendar-to"></div>',
-            '</div>',
-            '</div>',
-            '</div>'
-        ].join(''),
-        placement: 'bottom',
-        title: 'Set date range',
-        trigger: 'click'
-    }).on('show.bs.popover', function () {
-        $(this).data('bs.popover').tip().css({
-            'max-width': '640px',
-            'width': '640px'
-        });
-    }).on('shown.bs.popover', function () {
-        var to_date = new Date(parseInt($('#analytics-stat-date-to').val()) * 1000);
-        var from_date = new Date(parseInt($('#analytics-stat-date-from').val()) * 1000);
-
-        $('#analytics-stat-calendar-from').datetimepicker({
-            inline: true,
-            sideBySide: true,
-            format: 'DD/MM/YYYY'
-        });
-        $('#analytics-stat-calendar-to').datetimepicker({
-            useCurrent: false,
-            inline: true,
-            sideBySide: true,
-            format: 'DD/MM/YYYY'
-        });
-
-        $('#analytics-stat-calendar-from').on('dp.change', function (e) {
-            $('#analytics-stat-date-from').val(Math.round(e.date._d.getTime() / 1000));
-            $('#analytics-stats-erros-period > button').removeAttr('disabled');
-            $('#analytics-stat-calendar-to').data('DateTimePicker').minDate(e.date);
-            $('#analytics-stats-calendar-from').html(e.date._d.getDate() + '.' + (e.date._d.getMonth() + 1) + '.' + e.date._d.getFullYear());
-            Analytics(false);
-        });
+    function GetAnalytics(nav) {
+        $('#analytics-period > button').removeAttr('disabled');
+        if (nav) $('#analytics-period > button[data-period="' + nav + '"]').attr('disabled', 'disabled');
+        $('#analytics-chart').html('<div class="text-center"><div class="preloader pl-xxl"><svg class="pl-circular" viewBox="25 25 50 50"><circle class="plc-path" cx="50" cy="50" r="20" /></svg></div></div>');
         
-        $('#analytics-stat-calendar-to').on('dp.change', function (e) {
-            $('#analytics-stat-date-to').val(Math.round(e.date._d.getTime() / 1000));
-            $('#analytics-stats-erros-period > button').removeAttr('disabled');
-            $('#analytics-stat-calendar-from').data('DateTimePicker').maxDate(e.date);
-            $('#analytics-stats-calendar-to').html(e.date._d.getDate() + '.' + (e.date._d.getMonth() + 1) + '.' + e.date._d.getFullYear());
-            Analytics(false);
-        });
-
-        $('#analytics-stat-calendar-from').data('DateTimePicker').date(moment(from_date));
-        $('#analytics-stat-calendar-to').data('DateTimePicker').date(moment(to_date));
-    });
-
-    function 	Analytics(nav) {
-        $('#analytics-stats-erros-period > button').removeAttr('disabled');
-        if (nav) $('#analytics-stats-erros-period > button[data-period="' + nav + '"]').attr('disabled', 'disabled');
-        $('#analytics-stats-chart').html('<div class="text-center"><div class="preloader pl-xxl"><svg class="pl-circular" viewBox="25 25 50 50"><circle class="plc-path" cx="50" cy="50" r="20" /></svg></div></div>');
-
         $.ajax({
-            type: 'post',
             url: '<?= APP::Module('Routing')->root ?>admin/analytics/api/dashboard.json',
             data: {
                 date: {
-                    from: $('#analytics-stat-date-from').val(),
-                    to: $('#analytics-stat-date-to').val()
+                    from: $('#analytics-date-from').val(),
+                    to: $('#analytics-date-to').val()
                 }
             },
+            type: 'POST',
+            dataType: 'json',
             success: function(data) {
+                console.log(data);
                 
-                $.plot("#analytics-stats-chart", [
-                    {
-                        label: "Visit",
-                        data: data.yandex.visit
+                $.plot("#analytics-chart", [
+                    { 
+                        label: "Visits", 
+                        data: data.visits 
                     },
-                    {
-                        label: "Page views",
-                        data: data.yandex.page_views
+                    { 
+                        label: "Users", 
+                        data: data.users 
+                    },
+                    { 
+                        label: "Page views", 
+                        data: data.pageviews 
                     }
                 ], {
                     series: {
@@ -398,30 +324,31 @@ ob_end_clean();
                             show: true
                         }
                     },
-                    grid: {
+                    legend: {
+                        noColumns: 2
+                    },
+                    grid : {
                         borderWidth: 1,
                         borderColor: '#eee',
-                        show: true,
-                        hoverable: true,
-                        clickable: true
+                        show : true,
+                        hoverable : true,
+                        clickable : true
                     },
-
-                    yaxis: {
+                    yaxis: { 
                         tickColor: '#eee',
                         tickDecimals: 0,
-                        font: {
+                        font :{
                             lineHeight: 13,
                             style: "normal",
                             color: "#9f9f9f",
                         },
                         shadowSize: 0
                     },
-
                     xaxis: {
                         mode: "time",
                         tickColor: '#fff',
                         tickDecimals: 0,
-                        font: {
+                        font :{
                             lineHeight: 13,
                             style: "normal",
                             color: "#9f9f9f"
@@ -430,127 +357,110 @@ ob_end_clean();
                     }
                 });
                 
-                $('#analytics-stats-list').html('');
+                $('<div id="card-<?= $data['hash'] ?>-tooltip"></div>').css({
+                    position: "absolute",
+                    display: "none",
+                    border: "1px solid #fdd",
+                    padding: "2px",
+                    "background-color": "#fee",
+                    opacity: 0.80
+		}).appendTo("body");
 
-                $('#analytics-stats-list')
-                .append(
-                    $('<div/>', {
-                        class: 'row'
-                    })
-                    .append(
-                        $('<div/>', {
-                            class: 'col-lg-2'
+		$("#analytics-chart").bind("plothover", function (event, pos, item) {
+                    if (item) {
+                        var date = new Date(item.datapoint[0]);
+
+                        $("#card-<?= $data['hash'] ?>-tooltip")
+                        .html(item.datapoint[1] + ' ' + item.series.label + ' of ' + date.getDate() + '-' + (date.getMonth() + 1) + '-' + date.getFullYear())
+                        .css({
+                            top: item.pageY+5, 
+                            left: item.pageX+5
                         })
-                        .append(
-                            $('<div/>', {
-                                class: 'bgm-blue brd-2 p-15'
-                            })
-                            .append(
-                                $('<h2/>', {
-                                    class: 'c-white m-b-5'
-                                })
-                                .append(data.stat.cy)
-                            )
-                            .append(
-                                $('<span/>', {
-                                    class: 'm-0 c-white f-300'
-                                })
-                                .append('ТИЦ')
-                            )                           
-                        )
-                    )
-                )
-                .append(
-                    $('<div/>', {
-                        id: 'stat-lines-legend'
-                    })
-                    .css({
-                        'margin-bottom': '25px'
-                    })
-                )
-                .append(
-                    $('<table/>', {
-                        id: 'stat-table',
-                        class: 'table table-hover'
-                    })
-                    .append(
-                        $('<thead/>')
-                        .append(
-                            $('<tr/>')
-                            .append(
-                                $('<th/>')
-                                .css({
-                                    width: '50%'
-                                })
-                                .append('Дата')
-                            )
-                            .append(
-                                $('<th/>')
-                                .css({
-                                    width: '25%'
-                                })
-                                .append('Визиты')
-                            )
-                            .append(
-                                $('<th/>')
-                                .css({
-                                    width: '25%'
-                                })
-                                .append('Просмотры')
-                            )
-                        )
-                    )
-                    .append(
-                        $('<tbody/>')
-                    )
-                );
-
-                var range_total = {
-                    visits: 0,
-                    page_views: 0
-                };
-
-                $.each(data.yandex_list, function() {
-                    range_total.visits += parseInt(this.visits);
-                    range_total.page_views += parseInt(this.page_views);
-
-                    $('#stat-table tbody')
-                    .prepend(
-                        $('<tr/>')
-                        .append(
-                            $('<td/>')
-                            .append(this.cr_date)
-                        )
-                        .append(
-                            $('<td/>')
-                            .append(parseInt(this.visits).toLocaleString())
-                        )
-                        .append(
-                            $('<td/>')
-                            .append(parseInt(this.page_views).toLocaleString())
-                        )
-                    );
-                });
-
-                $('#stat-table tbody')
-                .append(
-                    $('<tr/>', {
-                        class: 'text-2x'
-                    })
-                    .append(
-                        $('<td/>')
-                        .append('Итого')
-                    )
-                    .append(
-                        $('<td/>')
-                        .append(parseInt(range_total.visits).toLocaleString())
-                    )
-                    .append(
-                        $('<td/>')
-                        .append(parseInt(range_total.page_views).toLocaleString())
-                    )
-                );
-            }
+                        .fadeIn(200);
+                    } else {
+                        $("#card-<?= $data['hash'] ?>-tooltip").hide();
+                    }
+		});
+            } 
         });
     }
+
+    $(document).on('click', "#analytics-period > button",function() {
+        var period = $(this).data('period');
+
+        var to = Math.round(new Date().getTime() / 1000);
+        var from = strtotime("-" + period, to);
+
+        var to_date = new Date(to * 1000);
+        var from_date = new Date(from * 1000);
+
+        $('#analytics-date-to').val(to);
+        $('#analytics-date-from').val(from);
+
+        $('#analytics-calendar-from').html(from_date.getDate() + '.' + (from_date.getMonth() + 1) + '.' + from_date.getFullYear());
+        $('#analytics-calendar-to').html(to_date.getDate() + '.' + (to_date.getMonth() + 1) + '.' + to_date.getFullYear());
+
+        GetAnalytics(period);
+    }); 
+
+    $('#analytics-calendar').popover({
+        html: true,
+        content: [
+            '<div class="form-group">',
+                '<div class="row">',
+                    '<div class="col-md-6">',
+                        '<div id="analytics-calendar-from"></div>',
+                    '</div>',
+                    '<div class="col-md-6">',
+                        '<div id="analytics-calendar-to"></div>',
+                    '</div>',
+                '</div>',
+            '</div>'
+        ].join(''),
+        placement: 'bottom',
+        title: 'Set date range',
+        trigger: 'click'
+    }).on('show.bs.popover', function() { 
+        $(this).data('bs.popover').tip().css({
+            'max-width': '640px',
+            'width': '640px'
+        });
+    }).on('shown.bs.popover', function() { 
+        var to_date = new Date(parseInt($('#analytics-date-to').val()) * 1000);
+        var from_date = new Date(parseInt($('#analytics-date-from').val()) * 1000);
+
+        $('#analytics-calendar-from').datetimepicker({
+            inline: true,
+            sideBySide: true,
+            format: 'DD/MM/YYYY'
+        });
+        $('#analytics-calendar-to').datetimepicker({
+            useCurrent: false,
+            inline: true,
+            sideBySide: true,
+            format: 'DD/MM/YYYY'
+        });
+
+        $('#analytics-calendar-from').on('dp.change', function(e) {
+            $('#analytics-date-from').val(Math.round(e.date._d.getTime() / 1000));
+            $('#analytics-period > button').removeAttr('disabled');
+            $('#analytics-calendar-to').data('DateTimePicker').minDate(e.date);
+            $('#analytics-calendar-from').html(e.date._d.getDate() + '.' + (e.date._d.getMonth() + 1) + '.' + e.date._d.getFullYear());
+            GetAnalytics(false);
+        });
+        $('#analytics-calendar-to').on('dp.change', function(e) {
+            $('#analytics-date-to').val(Math.round(e.date._d.getTime() / 1000));
+            $('#analytics-period > button').removeAttr('disabled');
+            $('#analytics-calendar-from').data('DateTimePicker').maxDate(e.date);
+            $('#analytics-calendar-to').html(e.date._d.getDate() + '.' + (e.date._d.getMonth() + 1) + '.' + e.date._d.getFullYear());
+            GetAnalytics(false);
+        });
+
+        $('#analytics-calendar-from').data('DateTimePicker').date(moment(from_date));
+        $('#analytics-calendar-to').data('DateTimePicker').date(moment(to_date));
+    });
+    
+    $(document).on('click', '#tab-nav-<?= $data['hash'] ?> > a',function() {
+        $('#analytics-period > button[data-period="1 months"]').trigger('click');
+    });
 </script>
