@@ -71,7 +71,7 @@ class Members {
         return $this->GetPagesGroups($out, $out[0]);
     }
     
-    public function CheckAccess($user_id, $type, $item_id){
+    public function CheckAccess($user_id, $type, $item_id) {
         $groups = [];
         $pages = [];
         
@@ -335,6 +335,11 @@ class Members {
     public function ManageUserPages() {
         $group_sub_id = (int) isset(APP::Module('Routing')->get['group_sub_id_hash']) ? APP::Module('Crypt')->Decode(APP::Module('Routing')->get['group_sub_id_hash']) : 0;
 
+        if (!$this->CheckAccess(APP::Module('Users')->user['id'], 'g', $group_sub_id)) {
+            header('Location: ' . APP::Module('Routing')->root . 'users/actions/login' . '?return=' . APP::Module('Crypt')->SafeB64Encode(APP::Module('Routing')->SelfUrl()));
+            exit;
+        }
+        
         $list = [];
 
         foreach (APP::Module('DB')->Select(
@@ -360,8 +365,13 @@ class Members {
         ]);
     }
     
-    public function ViewPage() {
+    public function ViewUserPage() {
         $page_id = (int) APP::Module('Crypt')->Decode(APP::Module('Routing')->get['page_id_hash']);
+        
+        if (!$this->CheckAccess(APP::Module('Users')->user['id'], 'p', $page_id)) {
+            header('Location: ' . APP::Module('Routing')->root . 'users/actions/login' . '?return=' . APP::Module('Crypt')->SafeB64Encode(APP::Module('Routing')->SelfUrl()));
+            exit;
+        }
 
         APP::Render(
             'members/page/view', 'include',
