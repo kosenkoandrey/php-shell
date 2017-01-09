@@ -113,8 +113,7 @@ class Members {
                 
                 foreach(APP::Module('DB')->Select(
                     $this->settings['module_members_db_connection'], ['fetchAll', PDO::FETCH_ASSOC],
-                    ['id', 'group_id', 'title'], 'members_pages',
-                    [['id', '=', 0, PDO::PARAM_INT]]
+                    ['id', 'group_id', 'title'], 'members_pages'
                 ) as $page){
                     $pages[$page['group_id']][] = [
                         'type' => 'page',
@@ -131,22 +130,17 @@ class Members {
                     ['id', 'group_id', 'title'], 'members_pages',
                     [['id', '=', $item_id, PDO::PARAM_INT]]
                 );
-                $pages[$page['group_id']] = $page;
+                
+                $pages[$page['group_id']] = [
+                    'type' => 'page',
+                    'id' => $page['id'],
+                    'title' => $page['title']
+                ];
                 $group_id = $page['group_id'];
-                        
+                
+                if(!$page['group_id']) return $pages;
+     
                 break;
-        }
-        
-        foreach(APP::Module('DB')->Select(
-            $this->settings['module_members_db_connection'], ['fetchAll', PDO::FETCH_ASSOC],
-            ['id', 'group_id', 'title'], 'members_pages',
-            [['id', '=', 0, PDO::PARAM_INT]]
-        ) as $page){
-            $pages[$page['group_id']][] = [
-                'type' => 'page',
-                'id' => $page['id'],
-                'title' => $page['title']
-            ];
         }
         
         $groups = APP::Module('DB')->Select(
