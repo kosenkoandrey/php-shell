@@ -297,14 +297,14 @@
                                                         case 'g':
                                                             ?>
                                                             <tr>
-                                                                <td style="font-size: 16px"><span style="display: inline-block" class="avatar-char palette-Teal bg m-r-5"><i class="zmdi zmdi-folder"></i></span> <a style="color: #4C4C4C" href="<?= APP::Module('Routing')->root ?>members/pages/<?= APP::Module('Crypt')->Encode($item['id']) ?>" target="_blank"><?= $item['title'] ?></a></td>
+                                                                <td style="font-size: 16px"><span style="display: inline-block" class="avatar-char palette-Teal bg m-r-5"><i class="zmdi zmdi-folder"></i></span> <a style="color: #4C4C4C" href="<?= APP::Module('Routing')->root ?>admin/members/pages/<?= APP::Module('Crypt')->Encode($item['id']) ?>" target="_blank"><?= $item['title'] ?></a></td>
                                                             </tr>
                                                             <?
                                                             break;
                                                         case 'p':
                                                             ?>
                                                             <tr>
-                                                                <td style="font-size: 16px;"><span style="display: inline-block" class="avatar-char palette-Orange-400 bg m-r-5"><i class="zmdi zmdi-file"></i></span> <a style="color: #4C4C4C" href="<?= APP::Module('Routing')->root ?>members/page/<?= APP::Module('Crypt')->Encode($item['id']) ?>" target="_blank"><?= $item['title'] ?></a></td>
+                                                                <td style="font-size: 16px;"><span style="display: inline-block" class="avatar-char palette-Orange-400 bg m-r-5"><i class="zmdi zmdi-file"></i></span> <a style="color: #4C4C4C" href="<?= APP::Module('Routing')->root ?>admin/members/page/<?= APP::Module('Crypt')->Encode($item['id']) ?>" target="_blank"><?= $item['title'] ?></a></td>
                                                             </tr>
                                                             <?
                                                             break;
