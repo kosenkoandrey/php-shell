@@ -90,16 +90,16 @@ class Members {
                     break;
             }
         }
-        
+
         switch ($type) {
             case 'g':
                 if(in_array($item_id, array_unique($groups))) return true;
                 break;
-            case 'p':
+            case 'p':              
                 $pages = array_merge($pages, APP::Module('DB')->Select(
                     $this->settings['module_members_db_connection'], ['fetchAll', PDO::FETCH_COLUMN],
                     ['id'], 'members_pages',
-                    [['group_id', 'IN', array_unique($groups), PDO::PARAM_INT]]
+                    [['group_id', 'IN', array_unique($groups), PDO::PARAM_INT], ['group_id', '!=', 0, PDO::PARAM_INT]]
                 ));
                 if(in_array($item_id, array_unique($pages))) return true;
                 break;
@@ -304,7 +304,7 @@ class Members {
 
     public function ManagePages() {
         $group_sub_id = (int) isset(APP::Module('Routing')->get['group_sub_id_hash']) ? APP::Module('Crypt')->Decode(APP::Module('Routing')->get['group_sub_id_hash']) : 0;
-
+        
         $list = [];
 
         foreach (APP::Module('DB')->Select(
