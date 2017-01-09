@@ -71,6 +71,64 @@ class Members {
         return $this->GetPagesGroups($out, $out[0]);
     }
     
+    public function CheckAccess($user_id, $type, $item_id){
+        $groups = [];
+        $pages = [];
+        
+        $member_access = APP::Module('DB')->Select(
+            $this->settings['module_members_db_connection'], ['fetchAll', PDO::FETCH_ASSOC],
+            ['item_id', 'item'], 'members_access',
+            [['user_id', '=', $user_id, PDO::PARAM_INT]]
+        );
+        
+        foreach($member_access as $item){
+            switch ($item['item']) {
+                case 'g':                   
+                    $groups = array_merge($this->GetAccessGroup($item['item_id']), $groups);
+                    break;
+                case 'p':
+                    $pages[] = $item['item_id'];
+                    break;
+            }
+        }
+        
+        switch ($type) {
+            case 'g':
+                if(in_array($item_id, array_unique($groups))) return true;
+                break;
+            case 'p':
+                $pages = array_merge($pages, APP::Module('DB')->Select(
+                    $this->settings['module_members_db_connection'], ['fetchAll', PDO::FETCH_COLUMN],
+                    ['id'], 'members_pages',
+                    [['group_id', 'IN', array_unique($groups), PDO::PARAM_INT]]
+                ));
+                if(in_array($item_id, array_unique($pages))) return true;
+                break;
+        }
+        
+        return false;
+    }
+       
+    private function GetAccessGroup($group_id){
+        $out[] = $group_id;
+
+        if(count($out)){
+            $page_groups = APP::Module('DB')->Select(
+                $this->settings['module_members_db_connection'], ['fetchAll', PDO::FETCH_ASSOC],
+                ['id', 'sub_id'], 'members_pages_groups',
+                [['sub_id', '=', $group_id, PDO::PARAM_INT]]
+            );
+
+            foreach ($page_groups as $group) {
+                if($group['sub_id']){
+                    $out = array_merge($out, $this->GetAccessGroup($group['id']));
+                }
+            }
+        }
+
+        return $out;
+    }
+    
     public function GetMemberAccess($user_id){
         $pages = [];
         $tree = [];
@@ -100,7 +158,7 @@ class Members {
 
         return $tree;
     }
-    
+
     public function GetTreeByGroup($type, $item_id){
         $out = [];
         $list = [];
