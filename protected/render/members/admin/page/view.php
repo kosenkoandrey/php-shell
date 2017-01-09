@@ -1,2 +1,0 @@
-<?
-echo eval('?>' . $data['page']. '<?');

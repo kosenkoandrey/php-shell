@@ -727,6 +727,38 @@ class Users {
                 ['id', 'desc']
             );
         }
+        
+        if (isset(APP::$modules['Members'])) {
+            foreach (APP::Module('DB')->Select(
+                APP::Module('Members')->settings['module_members_db_connection'], ['fetchAll', PDO::FETCH_ASSOC],
+                ['item', 'item_id'], 'members_access',
+                [['user_id', '=', $this->user['id'], PDO::PARAM_INT]]
+            ) as $value) {
+                $table = false;
+                $title = false;
+                
+                switch ($value['item']) {
+                    case 'g': 
+                        $table = 'members_pages_groups';
+                        $title = 'name'; 
+                        break;
+                    case 'p': 
+                        $table = 'members_pages'; 
+                        $title = 'title'; 
+                        break;
+                }
+                
+                $premium[] = [
+                    'type' => $value['item'],
+                    'id' => $value['item_id'],
+                    'title' => APP::Module('DB')->Select(
+                        APP::Module('Members')->settings['module_members_db_connection'], ['fetch', PDO::FETCH_COLUMN],
+                        [$title . ' AS name'], $table,
+                        [['id', '=', $value['item_id'], PDO::PARAM_INT]]
+                    )
+                ];
+            }
+        }
 
         APP::Render(
             'users/profiles/private', 'include',
@@ -743,7 +775,8 @@ class Users {
                 ),
                 'about' => $about,
                 'comments' => $comments,
-                'likes' => $likes
+                'likes' => $likes,
+                'premium' => $premium
             ]
         );
     }
@@ -793,7 +826,35 @@ class Users {
         }
         
         if (isset(APP::$modules['Members'])) {
-            $premium = APP::Module('Members')->GetMemberAccess($user_id);
+            foreach (APP::Module('DB')->Select(
+                APP::Module('Members')->settings['module_members_db_connection'], ['fetchAll', PDO::FETCH_ASSOC],
+                ['item', 'item_id'], 'members_access',
+                [['user_id', '=', $user_id, PDO::PARAM_INT]]
+            ) as $value) {
+                $table = false;
+                $title = false;
+                
+                switch ($value['item']) {
+                    case 'g': 
+                        $table = 'members_pages_groups';
+                        $title = 'name'; 
+                        break;
+                    case 'p': 
+                        $table = 'members_pages'; 
+                        $title = 'title'; 
+                        break;
+                }
+                
+                $premium[] = [
+                    'type' => $value['item'],
+                    'id' => $value['item_id'],
+                    'title' => APP::Module('DB')->Select(
+                        APP::Module('Members')->settings['module_members_db_connection'], ['fetch', PDO::FETCH_COLUMN],
+                        [$title . ' AS name'], $table,
+                        [['id', '=', $value['item_id'], PDO::PARAM_INT]]
+                    )
+                ];
+            }
         }
 
         APP::Render(

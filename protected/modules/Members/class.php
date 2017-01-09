@@ -17,6 +17,7 @@ class Members {
         return APP::Render('members/admin/nav', 'content');
     }
 
+    
     private function RenderPagesGroupsPath($group) {
         return $this->GetPagesGroupsPath(0, $this->RenderPagesGroups(), $group);
     }
@@ -244,6 +245,7 @@ class Members {
         );
     }
 
+    
     public function ManagePages() {
         $group_sub_id = (int) isset(APP::Module('Routing')->get['group_sub_id_hash']) ? APP::Module('Crypt')->Decode(APP::Module('Routing')->get['group_sub_id_hash']) : 0;
 
@@ -272,35 +274,45 @@ class Members {
         ]);
     }
     
+    public function ManageUserPages() {
+        $group_sub_id = (int) isset(APP::Module('Routing')->get['group_sub_id_hash']) ? APP::Module('Crypt')->Decode(APP::Module('Routing')->get['group_sub_id_hash']) : 0;
+
+        $list = [];
+
+        foreach (APP::Module('DB')->Select(
+            $this->settings['module_members_db_connection'], ['fetchAll', PDO::FETCH_ASSOC],
+            ['id', 'name'], 'members_pages_groups',
+            [['sub_id', '=', $group_sub_id, PDO::PARAM_INT],['id', '!=', 0, PDO::PARAM_INT]]
+        ) as $value) {
+            $list[] = ['group', $value['id'], $value['name']];
+        }
+
+        foreach (APP::Module('DB')->Select(
+            $this->settings['module_members_db_connection'], ['fetchAll', PDO::FETCH_ASSOC],
+            ['id', 'title'], 'members_pages',
+            [['group_id', '=', $group_sub_id, PDO::PARAM_INT]]
+        ) as $value) {
+            $list[] = ['page', $value['id'], $value['title']];
+        }
+
+        APP::Render('members/page/index', 'include', [
+            'group_sub_id' => $group_sub_id,
+            'path' => $this->RenderPagesGroupsPath($group_sub_id),
+            'list' => $list
+        ]);
+    }
+    
     public function ViewPage() {
         $page_id = (int) APP::Module('Crypt')->Decode(APP::Module('Routing')->get['page_id_hash']);
 
         APP::Render(
-            'members/admin/page/view', 'include',
-            [
-                'page' => APP::Module('DB')->Select(
-                    $this->settings['module_members_db_connection'], ['fetch', PDO::FETCH_COLUMN],
-                    ['content'], 'members_pages',
-                    [['id', '=', $page_id, PDO::PARAM_INT]]
-                )
-            ]
-        );
-    }
-
-    public function PreviewPage() {
-        $group_sub_id = (int) isset(APP::Module('Routing')->get['group_sub_id_hash']) ? APP::Module('Crypt')->Decode(APP::Module('Routing')->get['group_sub_id_hash']) : 0;
-        $page_id = (int) APP::Module('Crypt')->Decode(APP::Module('Routing')->get['page_id_hash']);
-
-        APP::Render(
-            'members/admin/page/preview', 'include',
+            'members/page/view', 'include',
             [
                 'page' => APP::Module('DB')->Select(
                     $this->settings['module_members_db_connection'], ['fetch', PDO::FETCH_ASSOC],
                     ['title', 'content'], 'members_pages',
                     [['id', '=', $page_id, PDO::PARAM_INT]]
-                ),
-                'group_sub_id' => $group_sub_id,
-                'path' => $this->RenderPagesGroupsPath($group_sub_id)
+                )
             ]
         );
     }
@@ -363,6 +375,7 @@ class Members {
         APP::Render('members/admin/settings');
     }
 
+    
     public function APIAddPage() {
         $out = [
             'status' => 'success',
@@ -647,4 +660,5 @@ class Members {
 
         echo json_encode(APP::Module('DB')->Select($this->settings['module_members_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], $_POST['select'], 'members_pages', $_POST['where']));
     }
+    
 }
