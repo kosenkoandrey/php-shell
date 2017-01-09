@@ -698,6 +698,7 @@ class Users {
         $about = [];
         $comments = false;
         $likes = false;
+        $premium = false;
 
         foreach (APP::Module('DB')->Select(
             $this->settings['module_users_db_connection'], ['fetchAll', PDO::FETCH_ASSOC],
@@ -752,7 +753,7 @@ class Users {
         $about = [];
         $comments = false;
         $likes = false;
-        $members = false;
+        $premium = false;
 
         if (!APP::Module('DB')->Select(
             $this->settings['module_users_db_connection'], ['fetchColumn', 0],
@@ -792,13 +793,7 @@ class Users {
         }
         
         if (isset(APP::$modules['Members'])) {
-            $members = APP::Module('DB')->Select(
-                APP::Module('Likes')->settings['module_likes_db_connection'], ['fetchAll', PDO::FETCH_ASSOC],
-                ['id', 'url', 'UNIX_TIMESTAMP(up_date) as up_date'], 'likes_list',
-                [['user', '=', $user_id, PDO::PARAM_INT]],
-                false, false, false,
-                ['id', 'desc']
-            );
+            $premium = APP::Module('Members')->GetMemberAccess($user_id);
         }
 
         APP::Render(
@@ -817,7 +812,7 @@ class Users {
                 'about' => $about,
                 'comments' => $comments,
                 'likes' => $likes,
-                'members' => $members
+                'premium' => $premium
             ]
         );
     }

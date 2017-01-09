@@ -90,6 +90,7 @@
                                 <li class="active waves-effect"><a href="#tab-about" aria-controls="tab-about" role="tab" data-toggle="tab">About</a></li>
                                 <? if ($data['comments']) { ?><li class="waves-effect"><a href="#tab-comments" aria-controls="tab-comments" role="tab" data-toggle="tab">Comments</a></li><? } ?>
                                 <? if ($data['likes']) { ?><li class="waves-effect"><a href="#tab-likes" aria-controls="tab-likes" role="tab" data-toggle="tab">Likes</a></li><? } ?>
+                                <? if ($data['premium']) { ?><li class="waves-effect"><a href="#tab-premium" aria-controls="tab-premium" role="tab" data-toggle="tab">Premium</a></li><? } ?>
                             </ul>
                             
                             <div class="tab-content">
@@ -276,6 +277,14 @@
                                             <?
                                         }
                                         ?>
+                                    </div>
+                                    <?
+                                }
+                                
+                                if ($data['premium']) {
+                                    ?>
+                                    <div role="tabpanel" class="tab-pane" id="tab-premium">
+                                        <pre><? print_r($data['premium']) ?></pre>
                                     </div>
                                     <?
                                 }
