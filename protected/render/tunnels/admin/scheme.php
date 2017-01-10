@@ -1306,7 +1306,7 @@
                                                 })
                                                 .append(
                                                     $('<input/>', {
-                                                        type: 'hidden',
+                                                        type: 'text',
                                                         class: 'form-control',
                                                         id: 'in_letter'
                                                     })
@@ -1331,7 +1331,7 @@
                                                 })
                                                 .append(
                                                     $('<input/>', {
-                                                        type: 'hidden',
+                                                        type: 'text',
                                                         class: 'form-control',
                                                         id: 'in_sender'
                                                     })
@@ -1388,7 +1388,7 @@
                                                         $('<option/>', {
                                                             value: ''
                                                         })
-                                                        .append('SendGrid')
+                                                        .append('SendThis')
                                                     )
                                                     .val(TunnelEditor.Objects.Actions[id].settings.transport)
                                                 )
@@ -2310,8 +2310,8 @@
                                             )
                                         )
                                         .on('submit', function(e) {
-                                            if ($('#process_id').val()) {
-                                                TunnelEditor.Objects.Actions[id].settings.tunnel_id = $('#process_id').val();
+                                            if ($('#tunnel_id').val()) {
+                                                TunnelEditor.Objects.Actions[id].settings.tunnel_id = $('#tunnel_id').val();
                                             } else {
                                                 delete TunnelEditor.Objects.Actions[id].settings.tunnel_id;
                                             }
@@ -2586,8 +2586,8 @@
                                             )
                                         )
                                         .on('submit', function(e) {
-                                            if ($('#process_id').val()) {
-                                                TunnelEditor.Objects.Actions[id].settings.tunnel_id = $('#process_id').val();
+                                            if ($('#tunnel_id').val()) {
+                                                TunnelEditor.Objects.Actions[id].settings.tunnel_id = $('#tunnel_id').val();
                                             } else {
                                                 delete TunnelEditor.Objects.Actions[id].settings.tunnel_id;
                                             }
@@ -2951,8 +2951,8 @@
                             case 'action':
                                 switch (TunnelEditor.Objects.Actions[id].action) {
                                     case 'send_mail':
-                                        $('#in_letter').MailingLetterSelector();
-                                        $('#in_sender').MailingSenderSelector();
+                                        //$('#in_letter').MailingLetterSelector();
+                                        //$('#in_sender').MailingSenderSelector();
                                         break;
                                     case 'subscribe':
                                         $('#in_process_0').TunnelSelector();
