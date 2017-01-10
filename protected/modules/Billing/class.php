@@ -338,21 +338,26 @@ class Billing {
         $product_id = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['product_id_hash']);
 
         $product  = APP::Module('DB')->Select(
-            $this->settings['module_billing_db_connection'], ['fetch', PDO::FETCH_ASSOC], ['name', 'amount', 'access_link', 'descr_link', 'members_access', 'related_products', 'plus_products'], 'billing_products', [['id', '=', $product_id, PDO::PARAM_INT]]
+            $this->settings['module_billing_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
+            ['name', 'amount', 'members_access', 'secondary_products', 'access_link', 'descr_link'], 'billing_products', 
+            [['id', '=', $product_id, PDO::PARAM_INT]]
         );
-        $product['plus_products'] = json_decode($product['plus_products'], true);
+        
+        $product['secondary_products'] = json_decode($product['secondary_products'], true);
 
         $products = [];
+        
         foreach (APP::Module('DB')->Select(
-            $this->settings['module_billing_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], ['name', 'amount', 'access_link', 'descr_link', 'members_access', 'related_products', 'id'], 'billing_products'
+            $this->settings['module_billing_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            ['name', 'amount', 'id'], 'billing_products'
         ) as $item) {
             $products[$item['id']] = $item;
         }
 
         APP::Render(
             'billing/admin/products/edit', 'include', [
-            'product'  => $product,
-            'products' => $products,
+                'product'  => $product,
+                'products_list' => $products,
             ]
         );
     }
@@ -552,24 +557,24 @@ class Billing {
         if ($out['status'] == 'success') {
             APP::Module('DB')->Update($this->settings['module_billing_db_connection'], 'billing_products',
                 [
-                    'access_link'      => $_POST['access_link'],
-                    'descr_link'       => $_POST['descr_link'],
-                    'name'             => $_POST['name'],
-                    'amount'           => $_POST['amount'],
-                    'members_access'   => $_POST['members_access'],
-                    'related_products' => $_POST['related_products'],
-                    'plus_products'    => json_encode($_POST['plus_products'])
+                    'name' => $_POST['name'],
+                    'amount' => $_POST['amount'],
+                    'members_access' => $_POST['members_access'],
+                    'secondary_products' => json_encode($_POST['secondary_products']),
+                    'access_link' => $_POST['access_link'],
+                    'descr_link' => $_POST['descr_link']
                 ],
                 [['id', '=', $product_id, PDO::PARAM_INT]]
             );
 
             APP::Module('Triggers')->Exec('update_product', [
-                'id'               => $product_id,
-                'name'             => $_POST['name'],
-                'amount'           => $_POST['amount'],
-                'members_access'   => $_POST['members_access'],
-                'related_products' => $_POST['related_products'],
-                'plus_products'    => $_POST['plus_products']
+                'id'  => $product_id,
+                'name' => $_POST['name'],
+                'amount' => $_POST['amount'],
+                'members_access' => $_POST['members_access'],
+                'secondary_products' => json_encode($_POST['secondary_products']),
+                'access_link' => $_POST['access_link'],
+                'descr_link' => $_POST['descr_link']
             ]);
         }
 

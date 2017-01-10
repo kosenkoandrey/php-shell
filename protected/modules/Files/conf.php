@@ -2,12 +2,14 @@
 
 return [
     'routes'  => [
-        ['admin\/files\/file\/(?P<group_sub_id_hash>.*)\/preview\/(?P<file_id_hash>.*)',        'Files', 'PreviewFile'], // Preview file
+        ['files\/download\/(?P<file_id_hash>.*)',                                               'Files', 'DownloadFile'], // Download file
+        
         ['admin\/files\/file\/(?P<group_sub_id_hash>.*)\/groups\/add',                          'Files', 'AddFilesGroup'], // Add file group
         ['admin\/files\/file\/(?P<group_sub_id_hash>.*)\/groups\/(?P<group_id_hash>.*)\/edit',  'Files', 'EditFilesGroup'], // Edit file group
         ['admin\/files\/file\/(?P<group_sub_id_hash>.*)\/add(\?.*)?',                           'Files', 'AddFile'], // Add file
         ['admin\/files\/file\/(?P<group_sub_id_hash>.*)\/edit\/(?P<file_id_hash>.*)',           'Files', 'EditFile'], // Edit file
         ['admin\/files\/file\/(?P<group_sub_id_hash>.*)',                                       'Files', 'ManageFiles'], // Manage file
+        ['admin\/files\/preview\/(?P<file_id_hash>.*)',                                         'Files', 'PreviewFile'], // Preview file
         ['admin\/files\/settings(\?.*)?',                                                       'Files', 'Settings'], // Files settings
         // API
         ['admin\/files\/api\/file\/add\.json(\?.*)?',                                           'Files', 'APIAddFile'], // [API] Add file

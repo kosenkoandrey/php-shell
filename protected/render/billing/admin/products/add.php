@@ -184,7 +184,7 @@
                         $('#add-product').find('[type="submit"]').html('Add').attr('disabled', false);
                     }
                 });
-              });
+            });
         });
     </script>
 </body>

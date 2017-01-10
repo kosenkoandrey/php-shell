@@ -25,6 +25,32 @@
             <section id="content">
                 <div class="container">
                     <?
+                    preg_match_all('/\[file-([0-9]+)]/i', $data['page']['content'], $files_out);
+                    
+                    foreach ($files_out[1] as $key => $value) {
+                        $file_data = APP::Module('DB')->Select(
+                            APP::Module('Files')->settings['module_files_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
+                            ['title', 'type'], 'files', 
+                            [['id', '=', $value, PDO::PARAM_INT]]
+                        ); 
+                        
+                        $file_html = '';
+                        
+                        switch ($file_data['type']) {
+                            case 'video/mp4':
+                                $file_html = '<video width="640" height="480" controls><source src="' . APP::Module('Routing')->root . 'files/download/' . APP::Module('Crypt')->Encode($value) . '" type="video/mp4"></video><hr><a class="btn btn-lg palette-Teal bg waves-effect" target="_blank" href="' . APP::Module('Routing')->root . 'files/download/' . APP::Module('Crypt')->Encode($value) .'" target="_blank"><i class="zmdi zmdi-download"></i> Download</a>';
+                                break;
+                            case 'application/pdf':
+                                $file_html = '<p>Preview is not supported</p><hr><a class="btn btn-lg palette-Teal bg waves-effect" target="_blank" href="' . APP::Module('Routing')->root . 'files/download/' . APP::Module('Crypt')->Encode($value) .'" target="_blank"><i class="zmdi zmdi-download"></i> Download</a>';
+                                break;
+                            case 'image/jpeg':
+                                $file_html = '<img src="' . APP::Module('Routing')->root . 'files/download/' . APP::Module('Crypt')->Encode($value) . '"><hr><a class="btn btn-lg palette-Teal bg waves-effect" target="_blank" href="' . APP::Module('Routing')->root . 'files/download/' . APP::Module('Crypt')->Encode($value) .'" target="_blank"><i class="zmdi zmdi-download"></i> Download</a>';
+                                break;
+                        }
+                        
+                        $data['page']['content'] = str_replace($files_out[0][$key], $file_html, $data['page']['content']);
+                    }
+                    
                     echo eval('?>' . $data['page']['content'] . '<?');
                     ?>
                 </div>

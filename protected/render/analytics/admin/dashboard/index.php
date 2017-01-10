@@ -1,6 +1,6 @@
 <?
 $title = 'Overview';
-$tab = 'Analytics';
+$tab = 'Traffic';
 $hash = md5($title . $tab);
 
 return [[

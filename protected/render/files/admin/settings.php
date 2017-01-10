@@ -52,7 +52,7 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="module_files_path" class="col-sm-2 control-label">Path</label>
+                                            <label for="module_files_path" class="col-sm-2 control-label">Path to storage</label>
                                             <div class="col-sm-10">
                                                 <div class="fg-line">
                                                     <input type="text" class="form-control" name="module_files_path" id="module_files_path">
@@ -61,8 +61,8 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="module_files_mime" class="col-sm-2 control-label">Mime type</label>
-                                            <div class="col-sm-2">
+                                            <label for="module_files_mime" class="col-sm-2 control-label">Allow mime types</label>
+                                            <div class="col-sm-6">
                                                 <div class="fg-line">
                                                     <textarea class="form-control" rows="4" name="module_files_mime" id="module_files_mime"><?= APP::Module('Files')->settings['module_files_mime'] ?></textarea>
                                                 </div>

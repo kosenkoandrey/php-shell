@@ -141,18 +141,54 @@ class Files {
     }
 
     public function PreviewFile() {
-        $group_sub_id = (int) isset(APP::Module('Routing')->get['group_sub_id_hash']) ? APP::Module('Crypt')->Decode(APP::Module('Routing')->get['group_sub_id_hash']) : 0;
-        $file_id      = (int) APP::Module('Crypt')->Decode(APP::Module('Routing')->get['file_id_hash']);
+        $file_id = (int) APP::Module('Crypt')->Decode(APP::Module('Routing')->get['file_id_hash']);
 
         APP::Render(
             'files/admin/file/preview', 'include', [
-            'file'         => APP::Module('DB')->Select(
-                $this->settings['module_files_db_connection'], ['fetch', PDO::FETCH_ASSOC], ['title', 'type', 'id'], 'files', [['id', '=', $file_id, PDO::PARAM_INT]]
-            ),
-            'group_sub_id' => $group_sub_id,
-            'path'         => $this->RenderFilesGroupsPath($group_sub_id)
+                'file' => APP::Module('DB')->Select(
+                    $this->settings['module_files_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
+                    ['title', 'type', 'id'], 'files', 
+                    [['id', '=', $file_id, PDO::PARAM_INT]]
+                ),
             ]
         );
+    }
+    
+    public function DownloadFile() {
+        $file_id = (int) APP::Module('Crypt')->Decode(APP::Module('Routing')->get['file_id_hash']);
+
+        $file = APP::Module('DB')->Select(
+            $this->settings['module_files_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
+            ['title', 'type', 'id'], 'files', 
+            [['id', '=', $file_id, PDO::PARAM_INT]]
+        );
+        
+        $file_ext = false;
+        
+        switch ($file['type']) {
+            case 'video/mp4':
+                $file_ext = 'mp4';
+                break;
+            case 'application/pdf':
+                $file_ext = 'pdf';
+                break;
+            case 'image/jpeg':
+                $file_ext = 'jpg';
+                break;
+        }
+        
+        $file_path = $this->settings['module_files_path'] . '/' . $file_id . '.' . $file_ext;
+        
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename="'. $file['title'] .'"');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($file_path));
+        
+        readfile($file_path);
+        exit;
     }
 
     public function AddFile() {
