@@ -2747,7 +2747,7 @@ class Tunnels {
                             'settings' => $object['settings'],
                             'result' => APP::Module('Mail')->Send(
                                 APP::Module('DB')->Select(
-                                    $this->settings['module_tunnels_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                                    $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
                                     ['email'], 'users',
                                     [['id', '=', $tunnel['user_id'], PDO::PARAM_INT]]
                                 ),
@@ -2847,6 +2847,207 @@ class Tunnels {
                 ], [
                     ['id', '=', $tunnel['id'], PDO::PARAM_INT]
                 ]);
+                break;
+            // Подписка на туннель
+            case 'subscribe':                
+                $this->Subscribe([
+                    'email'             => APP::Module('DB')->Select(
+                        $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                        ['email'], 'users',
+                        [['id', '=', $tunnel['user_id'], PDO::PARAM_INT]]
+                    ),
+                    'tunnel'            => [
+                        $object['settings']['tunnel_id'],
+                        $object['settings']['process_obj_type'],
+                        $object['settings']['process_obj_id'],
+                        $object['settings']['process_timeout']
+                    ],
+                    'activation'        => [
+                        $object['settings']['activation_letter'],
+                        $object['settings']['activation_url']
+                    ],
+                    'source'            => 'process',
+                    'roles_tunnel'      => isset($object['settings']['roles_tunnel']) ? $object['settings']['roles_tunnel'] : false,
+                    'welcome'           => isset($object['settings']['welcome']) ? $object['settings']['welcome'] : false,
+                    'queue_timeout'     => isset($object['settings']['queue_timeout']) ? $object['settings']['queue_timeout'] : $this->settings['module_tunnels_default_queue_timeout'],
+                    'complete_tunnels'  => isset($object['settings']['complete_tunnels']) ? $object['settings']['complete_tunnels'] : false,
+                    'pause_tunnels'     => isset($object['settings']['pause_tunnels']) ? $object['settings']['pause_tunnels'] : false,
+                    'input_data'        => isset($tunnel['input_data']) ? $tunnel['input_data'] : false,
+                    'about_user'        => isset($object['settings']['about_user']) ? $object['settings']['about_user'] : [],
+                    'auto_save_about'   => isset($object['settings']['auto_save_about']) ? $object['settings']['auto_save_about'] : false,
+                    'save_utm'          => isset($object['settings']['save_utm']) ? $object['settings']['save_utm'] : false
+                ]);
+                break;
+            // Случайная подписка на туннель из списка
+            case 'random_subscribe':                
+                $user_tunnels = APP::Module('DB')->Select(
+                    $this->settings['module_tunnels_db_connection'], ['fetchAll', PDO::FETCH_COLUMN], 
+                    ['tunnel_id'], 'tunnels_users',
+                    [['user_id', '=', $tunnel['user_id'], PDO::PARAM_INT]]
+                );
+                
+                $target_tunnels = [];
+                foreach ($object['settings']['processes'] as $target_tunnel) {
+                    $target_tunnels[$target_tunnel['tunnel_id']] = $target_tunnel;
+                }
+                
+                $available_tunnels = array_diff_key($target_tunnels, array_flip($user_tunnels));
+                shuffle($available_tunnels);
+                $available_tunnels = array_values($available_tunnels);
+                
+                $this->Subscribe([
+                    'email'             => APP::Module('DB')->Select(
+                        $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                        ['email'], 'users',
+                        [['id', '=', $tunnel['user_id'], PDO::PARAM_INT]]
+                    ),
+                    'tunnel'            => [
+                        $available_tunnels[0]['process_id'],
+                        $available_tunnels[0]['process_obj_type'],
+                        $available_tunnels[0]['process_obj_id'],
+                        $available_tunnels[0]['process_timeout']
+                    ],
+                    'activation'        => [
+                        $available_tunnels[0]['activation_letter'],
+                        $available_tunnels[0]['activation_url']
+                    ],
+                    'source'            => 'process',
+                    'roles_tunnel'      => isset($available_tunnels[0]['roles_tunnel']) ? $available_tunnels[0]['roles_tunnel'] : false,
+                    'welcome'           => isset($available_tunnels[0]['welcome']) ? $available_tunnels[0]['welcome'] : false,
+                    'queue_timeout'     => isset($available_tunnels[0]['queue_timeout']) ? $available_tunnels[0]['queue_timeout'] : $this->settings['module_tunnels_default_queue_timeout'],
+                    'complete_tunnels'  => isset($available_tunnels[0]['complete_tunnels']) ? $available_tunnels[0]['complete_tunnels'] : false,
+                    'pause_tunnels'     => isset($available_tunnels[0]['pause_tunnels']) ? $available_tunnels[0]['pause_tunnels'] : false,
+                    'input_data'        => isset($tunnel['input_data']) ? $tunnel['input_data'] : false,
+                    'about_user'        => isset($available_tunnels[0]['about_user']) ? $available_tunnels[0]['about_user'] : [],
+                    'auto_save_about'   => isset($available_tunnels[0]['auto_save_about']) ? $available_tunnels[0]['auto_save_about'] : false,
+                    'save_utm'          => isset($available_tunnels[0]['save_utm']) ? $available_tunnels[0]['save_utm'] : false
+                ]);
+                break;
+            // Установка/обновление метки пользователя
+            case 'set_user_tag':
+                if (APP::Module('DB')->Select(
+                    $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                    ['id'], 'users_tags',
+                    [
+                        ['user', '=', $tunnel['user_id'], PDO::PARAM_INT],
+                        ['item', '=', $object['settings']['tag_id'], PDO::PARAM_STR]
+                    ]
+                )) {                                        
+                    APP::Module('DB')->Insert(
+                        $this->settings['module_tunnels_db_connection'], 'tunnels_tags',
+                        [
+                            'id' => 'NULL',
+                            'user_tunnel_id' => [$tunnel['id'], PDO::PARAM_INT],
+                            'label_id' => ['update_user_tag', PDO::PARAM_STR],
+                            'token' => '""',
+                            'info' => [json_encode([
+                                'result' => APP::Module('DB')->Update($this->settings['module_users_db_connection'], 'users_tags', [
+                                    'value' => $object['settings']['tag_details']
+                                ], [
+                                    ['user', '=', $tunnel['user_id'], PDO::PARAM_INT],
+                                    ['item', '=', $object['settings']['tag_id'], PDO::PARAM_STR]
+                                ]), 
+                                'user_tunnel_id' => $tunnel['id'], 
+                                'settings' => $object['settings']
+                            ]), PDO::PARAM_STR],
+                            'cr_date' => 'NOW()'
+                        ]
+                    );
+                } else {
+                    APP::Module('DB')->Insert(
+                        $this->settings['module_tunnels_db_connection'], 'tunnels_tags',
+                        [
+                            'id' => 'NULL',
+                            'user_tunnel_id' => [$tunnel['id'], PDO::PARAM_INT],
+                            'label_id' => ['insert_user_tag', PDO::PARAM_STR],
+                            'token' => '""',
+                            'info' => [json_encode([
+                                'result' => APP::Module('DB')->Insert(
+                                    $this->settings['module_users_db_connection'], 'users_tags',
+                                    [
+                                        'id' => 'NULL',
+                                        'user' => [$tunnel['user_id'], PDO::PARAM_INT],
+                                        'item' => [$object['settings']['tag_id'], PDO::PARAM_STR],
+                                        'value' => [$object['settings']['tag_details'], PDO::PARAM_STR],
+                                        'cr_date' => 'NOW()'
+                                    ]
+                                ), 
+                                'user_tunnel_id' => $tunnel['id'], 
+                                'settings' => $object['settings']
+                            ]), PDO::PARAM_STR],
+                            'cr_date' => 'NOW()'
+                        ]
+                    );
+                }
+                break;
+            // Снятие туннеля с паузы
+            case 'activate_process':
+                $result = false;
+                
+                if ($user_tunnel_id = APP::Module('DB')->Select(
+                    $this->settings['module_tunnels_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                    ['id'], 'tunnels_users',
+                    [
+                        ['tunnel_id', '=', $object['settings']['tunnel_id'], PDO::PARAM_INT],
+                        ['user_id', '=', $tunnel['user_id'], PDO::PARAM_INT],
+                        ['state', '=', 'pause', PDO::PARAM_STR]
+                    ]
+                )) {                 
+                    APP::Module('DB')->Insert(
+                        $this->settings['module_tunnels_db_connection'], 'tunnels_tags',
+                        [
+                            'id' => 'NULL',
+                            'user_tunnel_id' => [$user_tunnel_id, PDO::PARAM_INT],
+                            'label_id' => ['activate_process', PDO::PARAM_STR],
+                            'token' => '""',
+                            'info' => [json_encode([
+                                'mode' => 'child',
+                                'result' => APP::Module('DB')->Update($this->settings['module_tunnels_db_connection'], 'tunnels_users', [
+                                    'state' => 'active'
+                                ], [
+                                    ['id', '=', $user_tunnel_id, PDO::PARAM_INT]
+                                ]), 
+                                'user_tunnel_id' => $user_tunnel_id, 
+                                'settings' => $object['settings']
+                            ]), PDO::PARAM_STR],
+                            'cr_date' => 'NOW()'
+                        ]
+                    );
+                }
+                break;      
+            // Возврат в точку подписки
+            case 'recycle_process':
+                $run_tag_info = json_decode(APP::Module('DB')->Select(
+                    $this->settings['module_tunnels_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                    ['info'], 'tunnels_tags',
+                    [
+                        ['label_id', '=', 'subscribe', PDO::PARAM_STR],
+                        ['user_tunnel_id', '=', $tunnel['id'], PDO::PARAM_INT]
+                    ]
+                ), true);
+                
+                APP::Module('DB')->Insert(
+                    $this->settings['module_tunnels_db_connection'], 'tunnels_tags',
+                    [
+                        'id' => 'NULL',
+                        'user_tunnel_id' => [$tunnel['id'], PDO::PARAM_INT],
+                        'label_id' => ['recycle_process', PDO::PARAM_STR],
+                        'token' => '""',
+                        'info' => [json_encode([
+                            'mode' => 'child',
+                            'result' => APP::Module('DB')->Update($this->settings['module_tunnels_db_connection'], 'tunnels_users', [
+                                'state' => 'active',
+                                'resume_date' => date('Y-m-d H:i:s'),
+                                'object' => $run_tag_info['tunnel'][1] . ':' . $run_tag_info['tunnel'][2]
+                            ], [
+                                ['id', '=', $tunnel['id'], PDO::PARAM_INT]
+                            ]), 
+                            'user_tunnel_id' => $tunnel['id'], 
+                            'settings' => $object['settings']
+                        ]), PDO::PARAM_STR],
+                        'cr_date' => 'NOW()'
+                    ]
+                );
                 break;
         }
         
@@ -3190,7 +3391,146 @@ class Tunnels {
         
         fclose($lock);
     }
+    
+    public function drawTimer($data){
+        $font = $data['font'];
+        $font_size = $data['font_size'];
+        $string_array = str_split($data['str']);
+        $image = $data['image'];
+        $image_size = getimagesize($image);
+        //Расчитываем размеры таймера
+        //Ширина разделителя
+        $width_timer = (20*3) + $image_size[0]*8;
+        $height_timer = 110;
 
+        //Создаем фон таймера
+        $im = imagecreatetruecolor($width_timer, $height_timer);
+        $bg_color = imagecolorallocate($im, 255, 255, 255);
+        imagecolortransparent($im, $bg_color);
+        imagefilledrectangle($im, 0, 0, $width_timer, $height_timer, $bg_color);
+
+        $bg_font = imagecreatetruecolor($image_size[0], $image_size[1]);
+        $font_color = imagecolorallocate($bg_font, 204, 204, 204);
+        $shadow_color = imagecolorallocate($bg_font, 0, 0, 0);
+        $color = imagecolorallocate($bg_font, 0, 0, 0);
+        $w = 0;
+
+        imagettftext($im, 12, 0, 45, 15, $color, $font, 'дней');
+        imagettftext($im, 12, 0, 182, 15, $color, $font, 'часов');
+        imagettftext($im, 12, 0, 325, 15, $color, $font, 'минут');
+        imagettftext($im, 12, 0, 463, 15, $color, $font, 'секунд');
+
+        foreach ($string_array as $key => $str) {
+            if(!preg_match('/[0-9]/', $str)){
+                $box = imagettfbbox($font_size, 0, $font, $str);
+                $y = round($height/2+($image_size[1]/2));
+                $plus_w = 20;
+                $bg = imagecreatetruecolor(20, $image_size[1]);
+                imagefilledrectangle($bg, 0, 0, 20, $image_size[1], $bg_color);
+                imagettftext(
+                    $bg, 
+                    $font_size, 
+                    0, 
+                    0, 
+                    70, 
+                    $shadow_color, 
+                    $font,
+                    $str
+                );
+                imagecopymerge($im, $bg, $w, 20, 0, 0, 20, $image_size[1], 75);
+                imagedestroy($bg);
+            }else{
+                $bg = imagecreatefrompng($image);
+                $box = imagettfbbox($font_size, 0, $font, $str);
+                $width = abs($box[4] - $box[0]);
+                $height = abs($box[5] - $box[1]);
+                $y = round($height/2+($image_size[1]/2));
+                $plus_w = $image_size[0];
+
+                imagettftext($bg, $font_size, 0, 11, $y+1, $shadow_color, $font, $str);
+                imagettftext($bg, $font_size, 0, 10, $y, $font_color, $font, $str);
+                imagecopymerge($im, $bg, $w, 20, 0, 0, $image_size[0], $image_size[1], 75);
+                imagedestroy($bg);
+            }
+           
+            $w = $w+$plus_w;
+        }
+        imagedestroy($bg_font);
+        return $im;
+    }
+    
+    public function Timer($data = []){
+        if(!count($data)){
+            $data = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['input']);
+            $data = json_decode($data, true);
+        }
+     
+    	if(!count($data)){
+            return false;
+            $data = [
+                'image' => APP::Module('Routing')->root.'public/modules/tunnels/resources/bg.png',
+                'font' => ROOT."public/modules/tunnels/resources/arial.ttf",
+                'font_size' => 60,
+                'time_end' => time() + 3600
+            ];
+    	}
+        
+        $file = ROOT . '/protected/class/gifencoder.php';
+        include $file;
+        
+        $gif = new Egifencoder();
+       
+        if(isset($data['time_end']) && $data['time_end']){
+            $time_end = $data['time_end'];
+        }else{
+            $time_end = 0;
+        }
+
+        $available_time = $time_end - time();
+        if($available_time > 60 and preg_match('/[0-9]{10}/', $time_end)){
+            
+            $rDate1 = datetime::createFromFormat('U', $time_end);
+
+            for($i = 0; $i <= 80; $i++){
+                $rDate2 = datetime::createFromFormat('U',time()+$i);
+                $diff = $rDate1->diff($rDate2);
+                $text = ($diff->d < 10 ? '0'.$diff->d : $diff->d).":".($diff->h < 10 ? '0'.$diff->h : $diff->h).":".($diff->i < 10 ? '0'.$diff->i : $diff->i).":".($diff->s < 10 ? '0'.$diff->s : $diff->s);//"M:".$diff->m." D:".$diff->d." t:".//$diff['y']."-".
+                $img = $this->drawTimer([
+                        'image' => $data['image'],
+                        'str'   => $text,
+                        'font'  => $data['font'],
+                        'font_size' => $data['font_size']
+                ]);
+
+                ob_start();
+                imagegif($img);
+                $frames[] = ob_get_contents();
+                $framed[] = 120;
+                ob_end_clean();
+            }
+
+            $gif->GIFEncoder($frames,$framed,0,2,0,0,0,'bin');
+            header ('Content-type:image/gif');
+            echo  $gif->GetAnimation();
+        }else{
+            $img = $this->drawTimer([
+                'image' => $data['image'],
+                'str'   => '00:00:00:00',
+                'font'  => $data['font'],
+                'font_size' => $data['font_size']
+            ]);
+
+            ob_start();
+            imagegif($img);
+            $frames[] = ob_get_contents();
+            $framed[] = 120;
+            ob_end_clean();
+
+            $gif->GIFEncoder($frames,$framed,0,2,0,0,0,'bin');
+            header ('Content-type:image/gif');
+            echo  $gif->GetAnimation();	
+        }
+    }
 }
 
 class TunnelsSearch {
@@ -3211,5 +3551,4 @@ class TunnelsActions {
     public function remove($id, $settings) {
         return APP::Module('DB')->Delete(APP::Module('Tunnels')->settings['module_tunnels_db_connection'], 'tunnels', [['id', 'IN', $id]]);
     }
-    
 }

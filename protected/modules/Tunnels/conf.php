@@ -34,7 +34,9 @@ return [
         ['tunnels\/exec(\?.*)?',                                    'Tunnels', 'Exec'],
         ['tunnels\/queue(\?.*)?',                                   'Tunnels', 'Queue'],
         
-        ['admin\/tunnels\/test\/subscribe(\?.*)?',                  'Tunnels', 'TestSubscribe'],
+        ['tunnels\/timer\/(?P<input>.*)',                           'Tunnels', 'Timer'],
+        
+        ['admin\/tunnels\/test\/subscribe(\?.*)?',                  'Tunnels', 'TestSubscribe'],   
     ],
     'init' => true
 ];
