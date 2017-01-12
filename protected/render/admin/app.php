@@ -40,7 +40,8 @@
                                         'Timezone'      => APP::$conf['timezone'],
                                         'Memory limit'  => APP::$conf['memory_limit'],
                                         'Debug mode'    => APP::$conf['debug'] ? 'On': 'Off',
-                                        'Logs'          => APP::$conf['logs']
+                                        'Logs'          => APP::$conf['logs'],
+                                        'Date'          => date('r')
                                     ] as $key => $value) {
                                         ?>
                                         <tr>

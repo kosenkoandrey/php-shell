@@ -66,6 +66,8 @@ class Mail {
             return ['error', 2];
         }
         
+        $params['recepient'] = $recepient;
+        
         $letter = APP::Module('DB')->Select(
             $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
             ['id', 'group_id', 'sender', 'subject', 'html', 'plaintext', 'transport', 'priority'], 'mail_letters',

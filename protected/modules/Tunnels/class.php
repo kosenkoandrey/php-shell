@@ -2649,7 +2649,7 @@ class Tunnels {
             ) as $tunnel) {
                 $this->t_factors[$tunnel['id']] = json_decode($tunnel['factors'], true);
             }
-            
+
             foreach (APP::Module('DB')->Select(
                 $this->settings['module_tunnels_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
                 ['id', 'action', 'settings', 'child_object'], 'tunnels_actions'
@@ -2786,7 +2786,7 @@ class Tunnels {
                         $this->settings['module_tunnels_db_connection'], 'tunnels_users',
                         [
                             'id' => 'NULL',
-                            'tunnel_id' => [$object['settings']['process_id'], PDO::PARAM_INT],
+                            'tunnel_id' => [$object['settings']['tunnel_id'], PDO::PARAM_INT],
                             'user_id' => [$tunnel['user_id'], PDO::PARAM_INT],
                             'state' => ['complete', PDO::PARAM_STR],
                             'resume_date' => ['0000-00-00 00:00:00', PDO::PARAM_STR],
