@@ -20,6 +20,10 @@ return [
         ['admin\/mail\/transport\/add',                                                             'Mail', 'AddTransport'],        // Add transport
         ['admin\/mail\/transport\/edit\/(?P<transport_id_hash>.*)',                                 'Mail', 'EditTransport'],       // Edit transport
         
+        ['admin\/mail\/shortcodes(\?.*)?',                                                          'Mail', 'ManageShortcodes'],    // Manage short codes
+        ['admin\/mail\/shortcodes\/add',                                                            'Mail', 'AddShortcode'],        // Add short code
+        ['admin\/mail\/shortcodes\/edit\/(?P<shortcode_id_hash>.*)',                                'Mail', 'EditShortcode'],       // Edit short code
+        
         ['admin\/mail\/log(\?.*)?',                                                                 'Mail', 'ManageLog'],           // Manage log
         ['admin\/mail\/queue(\?.*)?',                                                               'Mail', 'ManageQueue'],         // Manage queue
         ['admin\/mail\/fbl(\?.*)?',                                                                 'Mail', 'ManageFBLReports'],    // Manage FBL reports
@@ -53,6 +57,11 @@ return [
         ['admin\/mail\/api\/transport\/add\.json(\?.*)?',               'Mail', 'APIAddTransport'],         // [API] Add transport
         ['admin\/mail\/api\/transport\/update\.json(\?.*)?',            'Mail', 'APIUpdateTransport'],      // [API] Update transport
         ['admin\/mail\/api\/transport\/remove\.json(\?.*)?',            'Mail', 'APIRemoveTransport'],      // [API] Remove transport
+        
+        ['admin\/mail\/api\/shortcodes\/list\.json(\?.*)?',             'Mail', 'APIListShortcodes'],       // [API] List shortcodes
+        ['admin\/mail\/api\/shortcodes\/add\.json(\?.*)?',              'Mail', 'APIAddShortcode'],         // [API] Add shortcode
+        ['admin\/mail\/api\/shortcodes\/update\.json(\?.*)?',           'Mail', 'APIUpdateShortcode'],      // [API] Update shortcode
+        ['admin\/mail\/api\/shortcodes\/remove\.json(\?.*)?',           'Mail', 'APIRemoveShortcode'],      // [API] Remove shortcode
         
         ['admin\/mail\/api\/log\/list\.json(\?.*)?',                    'Mail', 'APIListLog'],              // [API] List log
         ['admin\/mail\/api\/log\/remove\.json(\?.*)?',                  'Mail', 'APIRemoveLogEntry'],       // [API] Remove log entry

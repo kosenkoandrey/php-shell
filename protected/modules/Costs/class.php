@@ -545,7 +545,7 @@ class Costs {
                     'pult_ref', 'cost',
                     Array(
                         'id' => 'NULL',
-                        'user_id' => '"0"',
+                        'user_id' => 'NULL',
                         'comment' => '"auto"',
                         'cost' => [$value['amount'], PDO::PARAM_STR],
                         'cost_date' => [$data['date'], PDO::PARAM_STR],
