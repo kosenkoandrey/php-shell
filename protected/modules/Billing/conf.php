@@ -10,7 +10,8 @@ return [
         ['admin\/billing\/invoices\/add(\?.*)?',                        'Billing', 'AddInvoice'],
         ['admin\/billing\/invoices\/edit\/(?P<invoice_id_hash>.*)',     'Billing', 'EditInvoice'],
         
-        ['billing\/payments\/make\/(?P<invoice_id>.*)',                 'Billing', 'PaymentMake'],
+        ['admin\/billing\/payments(\?.*)?',                             'Billing', 'ManagePayments'],
+        ['billing\/payments\/make\/(?P<invoice_id_hash>.*)',                 'Billing', 'PaymentMake'],
         ['admin\/billing\/settings(\?.*)?',                             'Billing', 'Settings'],
         // API
         ['admin\/billing\/products\/api\/search\.json(\?.*)?',          'Billing', 'APISearchProducts'],
@@ -26,6 +27,9 @@ return [
         ['admin\/billing\/invoices\/api\/remove\.json(\?.*)?',          'Billing', 'APIRemoveInvoice'],
         
         ['admin\/billing\/invoices\/api\/details\/update.json(\?.*)?',  'Billing', 'APIUpdateInvoicesDetails'],
+        
+        ['admin\/billing\/payments\/api\/search\.json(\?.*)?',          'Billing', 'APISearchPayments'],
+        ['admin\/billing\/payments\/api\/action\.json(\?.*)?',          'Billing', 'APISearchPaymentsAction'],
         
         ['admin\/billing\/api\/settings\/update\.json(\?.*)?',          'Billing', 'APIUpdateSettings']
     ]

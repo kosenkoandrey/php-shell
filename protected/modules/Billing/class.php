@@ -5,9 +5,11 @@ class Billing {
     
     private $products_search;
     private $invoices_search;
+    private $payments_search;
     
     private $products_actions;
     private $invoices_actions;
+    private $payments_actions;
 
     function __construct($conf) {
         foreach ($conf['routes'] as $route) APP::Module('Routing')->Add($route[0], $route[1], $route[2]);
@@ -20,9 +22,11 @@ class Billing {
 
         $this->products_search  = new ProductsSearch();
         $this->invoices_search  = new InvoicesSearch();
+        $this->payments_search  = new PaymentsSearch();
         
         $this->products_actions = new ProductsActions();
         $this->invoices_actions = new InvoicesActions();
+        $this->payments_actions = new PaymentsActions();
     }
 
     public function Admin() {
@@ -62,6 +66,29 @@ class Billing {
 
         if (array_key_exists('children', (array) $rules)) {
             $out[] = array_flip((array) $this->InvoicesSearch($rules['children']));
+        }
+
+        if (count($out) > 1) {
+            switch ($rules['logic']) {
+                case 'intersect': return array_keys((array) call_user_func_array('array_intersect_key', $out));
+                    break;
+                case 'merge': return array_keys((array) call_user_func_array('array_replace', $out));
+                    break;
+            }
+        } else {
+            return array_keys($out[0]);
+        }
+    }
+    
+    public function PaymentsSearch($rules) {
+        $out = Array();
+
+        foreach ((array) $rules['rules'] as $rule) {
+            $out[] = array_flip((array) $this->payments_search->{$rule['method']}($rule['settings']));
+        }
+
+        if (array_key_exists('children', (array) $rules)) {
+            $out[] = array_flip((array) $this->PaymentsSearch($rules['children']));
         }
 
         if (count($out) > 1) {
@@ -314,6 +341,10 @@ class Billing {
     public function ManageInvoices() {
         APP::Render('billing/admin/invoices/index');
     }
+    
+    public function ManagePayments() {
+        APP::Render('billing/admin/payments/index');
+    }
 
     public function AddProduct() {
         APP::Render(
@@ -416,6 +447,31 @@ class Billing {
         ]);
         exit;
     }
+    
+    public function APISearchPayments() {
+        $request = json_decode(file_get_contents('php://input'), true);
+        $out     = $this->PaymentsSearch(json_decode($request['search'], 1));
+        $rows    = [];
+
+        foreach (APP::Module('DB')->Select(
+            $this->settings['module_billing_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], ['id', 'invoice_id', 'method', 'cr_date'], 'billing_payments', [['id', 'IN', $out, PDO::PARAM_INT]], false, false, false, [$request['sort_by'], $request['sort_direction']], $request['rows'] === -1 ? false : [($request['current'] - 1) * $request['rows'], $request['rows']]
+        ) as $row) {
+            $row['payment_id_token'] = APP::Module('Crypt')->Encode($row['id']);
+            array_push($rows, $row);
+        }
+
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+
+        echo json_encode([
+            'current'  => $request['current'],
+            'rowCount' => $request['rows'],
+            'rows'     => $rows,
+            'total'    => count($out)
+        ]);
+        exit;
+    }
 
     public function APISearchProductsAction() {
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -432,6 +488,15 @@ class Billing {
         header('Content-Type: application/json');
 
         echo json_encode($this->invoices_actions->{$_POST['action']}($this->InvoicesSearch(json_decode($_POST['rules'], 1)), isset($_POST['settings']) ? $_POST['settings'] : false));
+        exit;
+    }
+    
+    public function APISearchPaymentsAction() {
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+
+        echo json_encode($this->payments_actions->{$_POST['action']}($this->PaymentsSearch(json_decode($_POST['rules'], 1)), isset($_POST['settings']) ? $_POST['settings'] : false));
         exit;
     }
 
@@ -504,13 +569,6 @@ class Billing {
         echo json_encode($out);
         exit;
     }
-
-    
-    
-    
-    
-    
-    
     
     public function APIRemoveProduct() {
         $out = [
@@ -860,6 +918,8 @@ class Billing {
     }
 
     public function PaymentMake() {
+        $invoice_id = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['invoice_id_hash']);
+        
         $data['packages']                     = [];
         $data['products']                     = [];
         $data['coupon']['state']              = 'open';
@@ -877,7 +937,7 @@ class Billing {
             ['fetch', PDO::FETCH_ASSOC],
             ['users.email', 'billing_invoices.id', 'billing_invoices.amount', 'billing_invoices.state', 'billing_invoices.author', 'billing_invoices.user_id'],
             'billing_invoices',
-            [['billing_invoices.id', '=', 1, PDO::PARAM_STR]],
+            [['billing_invoices.id', '=', $invoice_id, PDO::PARAM_STR]],
             [
                 'left join/users' => [
                     ['users.id', '=', 'billing_invoices.user_id']
@@ -959,6 +1019,29 @@ class InvoicesActions {
     
     public function remove($id, $settings) {
         return APP::Module('DB')->Delete(APP::Module('Billing')->settings['module_billing_db_connection'], 'billing_invoices', [['id', 'IN', $id]]);
+    }
+}
+
+class PaymentsActions {
+    
+    public function remove($id, $settings) {
+        return APP::Module('DB')->Delete(APP::Module('Billing')->settings['module_billing_db_connection'], 'billing_payments', [['id', 'IN', $id]]);
+    }
+    
+}
+
+class PaymentsSearch {
+    
+    public function invoice($settings) {
+        return APP::Module('DB')->Select(
+            APP::Module('Billing')->settings['module_billing_db_connection'], ['fetchAll', PDO::FETCH_COLUMN], ['id'], 'billing_payments', [['invoice_id', $settings['logic'], $settings['value'], PDO::PARAM_INT]]
+        );
+    }
+    
+    public function method($settings) {
+        return APP::Module('DB')->Select(
+            APP::Module('Billing')->settings['module_billing_db_connection'], ['fetchAll', PDO::FETCH_COLUMN], ['id'], 'billing_payments', [['method', $settings['logic'], $settings['value'], PDO::PARAM_STR]]
+        );
     }
     
 }
