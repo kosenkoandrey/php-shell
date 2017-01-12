@@ -261,10 +261,10 @@ class Comments {
             
             $out['message'] = $message;
             $out['id'] = APP::Module('DB')->Insert(
-                $this->settings['module_comments_db_connection'], ' comments_messages',
+                $this->settings['module_comments_db_connection'], 'comments_messages',
                 [
                     'id' => 'NULL',
-                    'sub_id' => [$sub_id, PDO::PARAM_INT],
+                    'sub_id' => [(int)$sub_id, PDO::PARAM_INT],
                     'user' => [APP::Module('Users')->user['id'], PDO::PARAM_INT],
                     'object_type' => [$token['type'], PDO::PARAM_INT],
                     'object_id' => [$token['id'], PDO::PARAM_INT],

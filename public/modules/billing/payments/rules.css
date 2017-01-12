@@ -1,0 +1,50 @@
+.trigger_rules {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.trigger_rule {
+    border: 1px solid #e3e3e3;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+.trigger_logic {
+    margin-bottom: 20px;
+}
+.remove_trigger_rule,
+.remove_rule_item {
+    float: right;
+    margin-left: 10px; 
+}
+
+.trigger_rule_item {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #e3e3e3;
+}
+
+.trigger_rule_item .trigger_settings .accordion {
+    margin: 15px 0 0 0;
+}
+
+.trigger_rule_item .trigger_settings .accordion > .panel {
+    background: #ffffff;
+    border: 1px solid #e3e3e3;
+}
+
+.trigger_holder_controls_single {
+    display: none;
+}
+
+
+
+
+.btn-group.bootstrap-select {
+    margin-top: 4px;
+}
+
+.bootgrid-header {
+    padding: 0 33px 10px !important;
+}
