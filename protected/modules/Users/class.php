@@ -2,6 +2,8 @@
 class Users {
 
     public $settings;
+    private $users_search;
+    private $users_actions;
     public $user = [];
     public $about = [
         'username',
@@ -47,6 +49,9 @@ class Users {
             'module_users_tmp_dir',
             'module_users_profile_picture'
         ]);
+        
+        $this->users_search = new UsersSearch();
+        $this->users_actions = new UsersActions();
 
         $this->user = &APP::Module('Sessions')->session['modules']['users']['user'];
 
@@ -101,7 +106,27 @@ class Users {
                 exit;
             }
         }
+    }
+    
+    public function UsersSearch($rules) {
+        $out = Array();
 
+        foreach ((array) $rules['rules'] as $rule) {
+            $out[] = array_flip((array) $this->users_search->{$rule['method']}($rule['settings']));
+        }
+        
+        if (array_key_exists('children', (array) $rules)) {
+            $out[] = array_flip((array) $this->UsersSearch($rules['children']));
+        }
+        
+        if (count($out) > 1) {
+            switch ($rules['logic']) {
+                case 'intersect': return array_keys((array) call_user_func_array('array_intersect_key', $out)); break;
+                case 'merge': return array_keys((array) call_user_func_array('array_replace', $out)); break;
+            }
+        } else {
+            return array_keys($out[0]);
+        }
     }
 
     public function Admin() {
@@ -878,6 +903,45 @@ class Users {
         );
     }
 
+    public function APISearchUsers() {
+        $request = json_decode(file_get_contents('php://input'), true);
+        $out = $this->UsersSearch(json_decode($request['search'], 1));
+        $rows = [];
+
+        foreach (APP::Module('DB')->Select(
+            $this->settings['module_users_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            ['id', 'email', 'password', 'role', 'reg_date', 'last_visit'], 'users',
+            [['id', 'IN', $out, PDO::PARAM_INT]], 
+            false, false, false,
+            [$request['sort_by'], $request['sort_direction']],
+            $request['rows'] ? [($request['current'] - 1) * $request['rows'], $request['rows']] : false
+        ) as $row) {
+            $row['auth_token'] = APP::Module('Crypt')->Encode(json_encode([$row['email'], $row['password']]));
+            $row['user_id_token'] = APP::Module('Crypt')->Encode($row['id']);
+            array_push($rows, $row);
+        }
+        
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode([
+            'current' => $request['current'],
+            'rowCount' => $request['rows'],
+            'rows' => $rows,
+            'total' => count($out)
+        ]);
+        exit;
+    }
+    
+    public function APISearchUsersAction() {
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+
+        echo json_encode($this->users_actions->{$_POST['action']}($this->UsersSearch(json_decode($_POST['rules'], 1)), isset($_POST['settings']) ? $_POST['settings'] : false));
+        exit;
+    }
 
     public function APIListUsers() {
         $rows = [];
@@ -2161,5 +2225,80 @@ class Users {
             APP::Render('users/errors', 'include', 'auth_ya_code');
         }
     }
+}
 
+class UsersSearch {
+
+    public function id($settings) {
+        return APP::Module('DB')->Select(
+            APP::Module('Users')->settings['module_users_db_connection'], 
+            ['fetchAll', PDO::FETCH_COLUMN], 
+            ['id'], 'users',
+            [['id', $settings['logic'], $settings['value'], PDO::PARAM_STR]]
+        );
+    }
+    
+    public function email($settings) {
+        return APP::Module('DB')->Select(
+            APP::Module('Users')->settings['module_users_db_connection'], 
+            ['fetchAll', PDO::FETCH_COLUMN], 
+            ['id'], 'users',
+            [['email', $settings['logic'], $settings['value'], PDO::PARAM_STR]]
+        );
+    }
+    
+    public function role($settings) {
+        return APP::Module('DB')->Select(
+            APP::Module('Users')->settings['module_users_db_connection'], 
+            ['fetchAll', PDO::FETCH_COLUMN], 
+            ['id'], 'users',
+            [['role', $settings['logic'], $settings['value'], PDO::PARAM_STR]]
+        );
+    }
+
+}
+
+class UsersActions {
+
+    public function remove($id, $settings) {
+        return APP::Module('DB')->Delete(APP::Module('Users')->settings['module_users_db_connection'], 'users', [['id', 'IN', $id]]);
+    }
+    
+    public function tunnel_subscribe($id, $settings){
+        $out = [
+            'status' => 'success'
+        ];
+        
+        $users = APP::Module('DB')->Select(
+            APP::Module('Users')->settings['module_users_db_connection'], 
+            ['fetchAll', PDO::FETCH_ASSOC], 
+            ['id', 'email'], 'users',
+            [['id', 'IN', $id, PDO::PARAM_INT]]
+        );
+
+        foreach($users as $user){
+            APP::Module('Tunnels')->Subscribe([
+                'email'             => $user['email'],
+                'tunnel'            => $settings['tunnel'],
+                'activation'        => $settings['activation'],
+                'source'            => isset($settings['source']) && $settings['source'] ? substr($settings['source'], 0, 100) : 'APISubscribe',
+                'roles_tunnel'      => isset($settings['roles_tunnel']) ? $settings['roles_tunnel'] : false,
+                'welcome'           => isset($settings['welcome']) && $settings['welcome'][0] ? $settings['welcome'] : false,
+                'queue_timeout'     => isset($settings['queue_timeout']) ? $settings['queue_timeout'] : APP::Module('Tunnels')->settings['module_tunnels_default_queue_timeout'],
+                'complete_tunnels'  => isset($settings['complete_tunnels']) && count($settings['complete_tunnels']) ? $settings['complete_tunnels'] : false,
+                'pause_tunnels'     => isset($settings['pause_tunnels']) && count($settings['pause_tunnels']) ? $settings['pause_tunnels'] : false,
+                'input_data'        => isset($settings['input_data']) ? $settings['input_data'] : [],
+                'about_user'        => isset($settings['about_user']) ? $settings['about_user'] : [],
+                'auto_save_about'   => isset($settings['auto_save_about']) ? $settings['auto_save_about'] : false,
+                'save_utm'          => isset($settings['save_utm']) ? $settings['save_utm'] : false
+            ]);
+            
+            if(isset($result['status']) && $result['status'] == 'error'){
+                $out['status'] = 'error';
+                $out['code'][] = $result['code'];
+            }
+        }
+        
+        return $out;
+    }
 }

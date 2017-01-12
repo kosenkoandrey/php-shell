@@ -1,3 +1,6 @@
+<?
+$filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Decode($_GET['filters']) : '{"logic":"intersect","rules":[{"method":"email","settings":{"logic":"LIKE","value":"%"}}]}');
+?>
 <!DOCTYPE html>
 <!--[if IE 9 ]><html class="ie9"><![endif]-->
     <head>
@@ -13,7 +16,8 @@
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/google-material-color/dist/palette.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bootgrid/jquery.bootgrid.min.css" rel="stylesheet">
-
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/css/bootstrap-select.css" rel="stylesheet">
+        <link href="<?= APP::Module('Routing')->root ?>public/modules/users/rules.css" rel="stylesheet">
         <style>
             #users-table-header .actionBar .actions > button {
                 display: none;
@@ -54,6 +58,22 @@
                                 </li>
                             </ul>
                         </div>
+                        <div class="card-body card-padding">
+                            <input type="hidden" name="search" value="<?= $filters ?>" id="search">
+                            <div class="btn-group">
+                                <button type="button" id="render-table" class="btn btn-default"><i class="zmdi zmdi-check"></i> Apply</button>
+                            
+                                <div class="btn-group">
+                                    <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">
+                                        Actions <span class="caret"></span>
+                                    </button>
+                                    <ul id="search_results_actions" class="dropdown-menu" role="menu">
+                                        <li><a data-action="remove" href="javascript:void(0)">Remove</a></li>
+                                        <li><a data-action="tunnel_subscribe" href="javascript:void(0)">Subscribe Tunnel</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                         <div class="card-body">
                             <table class="table table-hover table-vmiddle" id="users-table">
                                 <thead>
@@ -71,6 +91,23 @@
                     </div>
                 </div>
             </section>
+            
+            <div class="modal fade" id="user-modal" tabindex="-1" role="dialog" aria-hidden="true" data-keyboard="false">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title"></h4>
+                        </div>
+                        <div class="modal-body">
+                            <form id="user-action-form" method="post" class="form-horizontal"></form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-link" id="send_action">Save changes</button>
+                            <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <? APP::Render('admin/widgets/footer') ?>
         </section>
@@ -84,25 +121,247 @@
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/Waves/dist/waves.min.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.min.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/json/dist/jquery.json.min.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bootgrid/jquery.bootgrid.updated.min.js"></script>
-
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bootstrap-wizard/jquery.bootstrap.wizard.min.js"></script>
+                
+        <script src="<?= APP::Module('Routing')->root ?>public/modules/users/rules.js"></script> 
         <? APP::Render('core/widgets/js') ?>
-        
         <script>
             $(document).ready(function() {
+                $('#search').RefRulesEditor({
+                    'debug': true
+                });
+                
+                var user_modal = {
+                    build : function(action, rules){
+                        var modal = $('#user-modal');
+                        var form = $('#user-action-form', modal);
+
+                        form.append(
+                            [
+                                "<input type='hidden' value='"+action+"' name='action' />",
+                                "<input type='hidden' value='"+rules+"' name='rules' />"
+                            ].join('')
+                        );
+                
+                        switch(action){
+                            case 'tunnel_subscribe' :
+                                $('.modal-title', modal).html('Subscribe Tunnel');
+                                form.append(
+                                    [
+                                        '<div class="form-group">',
+                                            '<label for="" class="col-sm-4 control-label">Tunnel ID</label>',
+                                            '<div class="col-sm-8">',
+                                                '<div class="fg-line">',
+                                                    '<input type="text" value="" name="settings[tunnel][0]" class="form-control" />',
+                                                '</div>',
+                                            '</div>',
+                                        '</div>',
+
+                                        '<div class="form-group">',
+                                            '<label for="" class="col-sm-4 control-label">Tunnel Action</label>',
+                                            '<div class="col-sm-8">',
+                                                '<div class="select">',
+                                                    '<select name="settings[tunnel][1]"  class="form-control">',
+                                                        '<option value="actions">actions</option>',
+                                                        '<option value="conditions">conditions</option>',
+                                                        '<option value="timeouts">timeouts</option>',
+                                                    '</select>',
+                                                '</div>',
+                                            '</div>',
+                                        '</div>',
+
+                                        '<div class="form-group">',
+                                            '<label for="" class="col-sm-4 control-label">Tunnel Action ID</label>',
+                                            '<div class="col-sm-8">',
+                                                '<div class="fg-line">',
+                                                    '<input type="text" value="" name="settings[tunnel][2]" class="form-control" />',
+                                                '</div>',
+                                            '</div>',
+                                        '</div>',
+
+                                        '<div class="form-group">',
+                                            '<label for="" class="col-sm-4 control-label">Tunnel Timeout</label>',
+                                            '<div class="col-sm-8">',
+                                                '<div class="fg-line">',
+                                                    '<input type="text" value="" name="settings[tunnel][3]" class="form-control" />',
+                                                '</div>',
+                                            '</div>',
+                                        '</div>',
+                                        
+                                        '<div class="form-group">',
+                                            '<label for="" class="col-sm-4 control-label">Welcome Tunnel ID</label>',
+                                            '<div class="col-sm-8">',
+                                                '<div class="fg-line">',
+                                                    '<input type="text" value="" name="settings[welcome][0]" class="form-control" />',
+                                                '</div>',
+                                            '</div>',
+                                        '</div>',
+
+                                        '<div class="form-group">',
+                                            '<label for="" class="col-sm-4 control-label">Welcome Tunnel Action</label>',
+                                            '<div class="col-sm-8">',
+                                                '<div class="select">',
+                                                    '<select name="settings[welcome][1]"  class="form-control">',
+                                                        '<option value="actions">actions</option>',
+                                                        '<option value="conditions">conditions</option>',
+                                                        '<option value="timeouts">timeouts</option>',
+                                                    '</select>',
+                                                '</div>',
+                                            '</div>',
+                                        '</div>',
+
+                                        '<div class="form-group">',
+                                            '<label for="" class="col-sm-4 control-label">Welcome Tunnel Action ID</label>',
+                                            '<div class="col-sm-8">',
+                                                '<div class="fg-line">',
+                                                    '<input type="text" value="" name="settings[welcome][2]" class="form-control" />',
+                                                '</div>',
+                                            '</div>',
+                                        '</div>',
+
+                                        '<div class="form-group">',
+                                            '<label for="" class="col-sm-4 control-label">Welcome Tunnel Timeout</label>',
+                                            '<div class="col-sm-8">',
+                                                '<div class="fg-line">',
+                                                    '<input type="text" value="" name="settings[welcome][3]" class="form-control" />',
+                                                '</div>',
+                                            '</div>',
+                                        '</div>',
+                                        
+                                        '<div class="panel-body">',
+                                            '<div class="form-group">',
+                                                '<label for="" class="col-sm-4 control-label">Activation ID</label>',
+                                                '<div class="col-sm-8">',
+                                                    '<div class="fg-line">',
+                                                        '<input type="text" value="" name="settings[activation][0]" class="form-control" />',
+                                                    '</div>',
+                                                '</div>',
+                                            '</div>',
+
+                                            '<div class="form-group">',
+                                                '<label for="" class="col-sm-4 control-label">Activation Url</label>',
+                                                '<div class="col-sm-8">',
+                                                    '<div class="fg-line">',
+                                                        '<input type="text" value="" name="settings[activation][1]" class="form-control" />',
+                                                    '</div>',
+                                                '</div>',
+                                            '</div>',
+
+                                            '<div class="form-group">',
+                                                '<label for="" class="col-sm-4 control-label">Queue Timeout</label>',
+                                                '<div class="col-sm-8">',
+                                                    '<div class="fg-line">',
+                                                        '<input type="text" value="" name="settings[queue_timeout]" class="form-control" />',
+                                                    '</div>',
+                                                '</div>',
+                                            '</div>',
+                                        '</div>',
+                                        
+                                        '<div class="form-group">',
+                                            '<label for="" class="col-sm-4 control-label">Source</label>',
+                                            '<div class="col-sm-8">',
+                                                '<div class="fg-line">',
+                                                    '<input type="text" value="" name="settings[source]" class="form-control" />',
+                                                '</div>',
+                                            '</div>',
+                                        '</div>'
+                                        
+                                    ].join('')
+                                );
+                                modal.modal('show');
+                                break;
+                            case 'remove' :
+                                var data = form.serialize();
+                                user_modal.send(data);
+                                break;
+                        }
+                        
+                    },
+                    send : function(data){
+                        var modal = $('#user-modal');
+                        $.post('<?= APP::Module('Routing')->root ?>admin/users/api/action.json', data, function(res) { 
+                            if(res.status == 'success'){
+                                modal.modal('hide');
+                                $("#users-table").bootgrid('reload', true);
+                                swal('Complete!', 'Action has been completed', 'success');
+                            }else{
+                                swal('Error!', 'Action has been error', 'error');
+                            }
+                        });
+                        return false;
+                    }
+                };
+                
+                $(document).on('click', '#render-table', function () {
+                    $('#users-table').bootgrid('reload');
+                });
+                
+                $(document).on('click', '#search_results_actions a', function () {
+                    var action = $(this).data('action');
+                    
+                    swal({
+                        title: 'Are you sure?',
+                        text: 'You will not be able to recover this action',
+                        type: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#DD6B55',
+                        confirmButtonText: 'Yes',
+                        cancelButtonText: 'No',
+                        closeOnConfirm: true,
+                        closeOnCancel: true
+                    }, function(isConfirm){
+                        if (isConfirm) {
+                            user_modal.build(action, $('#search').val());
+                        }
+                    });
+                });
+                
+                $(document).on('click', '#send_action', function(){
+                    var modal = $('#user-modal');
+                    var form = $('#user-action-form', modal);
+                    var data = form.serialize();
+                    user_modal.send(data);
+                    return false;
+                });
+                
+                $('#user-modal').on('hide.bs.modal', function (event) {
+                    $('#user-action-form', $(this)).html('');
+                });
+
                 var users_table = $("#users-table").bootgrid({
+                    requestHandler: function (request) {
+                        var model = {
+                            search: $('#search').val(),
+                            current: request.current,
+                            rows: request.rowCount
+                        };
+
+                        for (var key in request.sort) {
+                            model.sort_by = key;
+                            model.sort_direction = request.sort[key];
+                        }
+
+                        return JSON.stringify(model);
+                    },
                     ajax: true,
                     ajaxSettings: {
                         method: 'POST',
-                        cache: false
+                        cache: false,
+                        contentType: 'application/json'
                     },
-                    url: '<?= APP::Module('Routing')->root ?>admin/users/api/list.json',
+                    url: '<?= APP::Module('Routing')->root ?>admin/users/api/search.json',
                     css: {
                         icon: 'zmdi icon',
                         iconColumns: 'zmdi-view-module',
                         iconDown: 'zmdi-chevron-down pull-left',
                         iconRefresh: 'zmdi-refresh',
                         iconUp: 'zmdi-chevron-up pull-left'
+                    },
+                    templates: {
+                        search: ""
                     },
                     formatters: {
                         actions: function(column, row) {
