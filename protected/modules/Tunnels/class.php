@@ -3468,8 +3468,8 @@ class Tunnels {
     	if(!count($data)){
             return false;
             $data = [
-                'image' => APP::Module('Routing')->root.'public/modules/tunnels/resources/bg.png',
-                'font' => ROOT."public/modules/tunnels/resources/arial.ttf",
+                'image' => APP::Module('Routing')->root.'protected/modules/Tunnels/resources/bg.png',
+                'font' => ROOT."protected/modules/Tunnels/resources/arial.ttf",
                 'font_size' => 60,
                 'time_end' => time() + 3600
             ];
