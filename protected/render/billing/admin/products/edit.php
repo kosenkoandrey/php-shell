@@ -87,7 +87,7 @@
                                                         <select class="form-control selectpicker" id="secondary-products-<?= $key ?>" name="secondary_products[<?= $key ?>][id]" data-placeholder="product">
                                                             <?
                                                             foreach ($data['products_list'] as $value) {
-                                                                ?><option value="<?= $value['id'] ?>"><?= $value['name'] ?> (<?= $value['amount'] ?> RUR)</option><?
+                                                                ?><option value="<?= $value['id'] ?>" <? if ($product['id'] == $value['id']) { ?>selected<? } ?>><?= $value['name'] ?> (<?= $value['amount'] ?> RUR)</option><?
                                                             }
                                                             ?>
                                                         </select>

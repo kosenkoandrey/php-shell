@@ -33,16 +33,8 @@ class Mail {
     }
     
     
-    public function Send($recepient, $letter, $params = []) {
-        if (!filter_var($recepient, FILTER_VALIDATE_EMAIL)) return ['error', 1];
-        
-        if (!APP::Module('DB')->Select(
-            $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
-            ['COUNT(id)'], 'mail_letters',
-            [['id', '=', $letter, PDO::PARAM_INT]]
-        )) {
-            return ['error', 2];
-        }
+    public function PrepareSend($recepient, $letter, $params = []) {
+        $params['recepient'] = $recepient;
         
         $letter = APP::Module('DB')->Select(
             $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
@@ -53,6 +45,27 @@ class Mail {
         $letter['subject'] = APP::Render($letter['subject'], 'eval', $params);
         $letter['html'] = APP::Render($letter['html'], 'eval', $params);
         $letter['plaintext'] = APP::Render($letter['plaintext'], 'eval', $params);
+        
+        // shortcodes
+        foreach (APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            ['code', 'content'], 'mail_shortcodes'
+        ) as $shortcode) {
+            $letter['html'] = str_replace('[' . $shortcode['code'] . ']', $shortcode['content'], $letter['html']);
+            $letter['plaintext'] = str_replace('[' . $shortcode['code'] . ']', $shortcode['content'], $letter['plaintext']);
+        }
+        //
+        
+        // [token]
+        $token = APP::Module('Crypt')->Encode(json_encode([
+            'email' => $recepient,
+            'letter' => $letter['id'],
+            'params' => $params
+        ]));
+        
+        $letter['html'] = str_replace('[token]', $token, $letter['html']);
+        $letter['plaintext'] = str_replace('[token]', $token, $letter['plaintext']);
+        //
         
         // [user_email]
         $letter['subject'] = str_replace('[user_email]', $recepient, $letter['subject']);
@@ -79,12 +92,35 @@ class Mail {
         foreach ($html_matches[0] as $key => $pattern) $letter['html'] = str_replace($pattern, APP::Module('Crypt')->Decode($html_matches[1][$key]), $letter['html']);
         foreach ($plaintext_matches[0] as $key => $pattern) $letter['plaintext'] = str_replace($pattern, APP::Module('Crypt')->Decode($plaintext_matches[1][$key]), $letter['plaintext']);
         //
+        
+        // [spamreport-link]
+        $spamreport_link = APP::Module('Routing')->root . 'mail/spamreport/[letter_hash]';
+        
+        $letter['html'] = str_replace('[spamreport-link]', $spamreport_link, $letter['html']);
+        $letter['plaintext'] = str_replace('[spamreport-link]', $spamreport_link, $letter['plaintext']);
+        //
 
         extract(APP::Module('Triggers')->Exec('before_mail_send_letter', [
             'recepient' => $recepient,
             'letter' => $letter,
             'params' => $params
         ]));
+
+        return $letter;
+    }
+    
+    public function Send($recepient, $letter, $params = []) {
+        if (!filter_var($recepient, FILTER_VALIDATE_EMAIL)) return ['error', 1];
+        
+        if (!APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
+            ['COUNT(id)'], 'mail_letters',
+            [['id', '=', $letter, PDO::PARAM_INT]]
+        )) {
+            return ['error', 2];
+        }
+        
+        $letter = $this->PrepareSend($recepient, $letter, $params);
         
         $transport = APP::Module('DB')->Select(
             $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
@@ -652,20 +688,9 @@ class Mail {
     }
     
     public function PreviewLetter() {
-        $group_sub_id = (int) isset(APP::Module('Routing')->get['group_sub_id_hash']) ? APP::Module('Crypt')->Decode(APP::Module('Routing')->get['group_sub_id_hash']) : 0;
-        $letter_id = (int) APP::Module('Crypt')->Decode(APP::Module('Routing')->get['letter_id_hash']);
-        
         APP::Render(
             'mail/admin/letters/preview', 'include', 
-            [
-                'letter' => APP::Module('DB')->Select(
-                    $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
-                    ['subject', 'html', 'plaintext'], 'mail_letters',
-                    [['id', '=', $letter_id, PDO::PARAM_INT]]
-                ),
-                'group_sub_id' => $group_sub_id,
-                'path' => $this->RenderLettersGroupsPath($group_sub_id)
-            ]
+            $this->PrepareSend(0, (int) APP::Module('Crypt')->Decode(APP::Module('Routing')->get['letter_id_hash']))
         );
     }
     
@@ -814,6 +839,39 @@ class Mail {
             [['id', '=', $transport_id, PDO::PARAM_INT]]
         ));
     }
+    
+    
+    
+    public function ManageShortcodes() {
+        APP::Render('mail/admin/shortcodes/index');
+    }
+    
+    public function AddShortcode() {
+        APP::Render('mail/admin/shortcodes/add');
+    }
+    
+    public function EditShortcode() {
+        $shortcode_id = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['shortcode_id_hash']);
+        
+        APP::Render('mail/admin/shortcodes/edit', 'include', APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
+            ['code', 'content'], 'mail_shortcodes',
+            [['id', '=', $shortcode_id, PDO::PARAM_INT]]
+        ));
+    }
+    
+    public function PreviewShortcode() {
+        APP::Render(
+            'mail/admin/shortcodes/preview', 'include', 
+            APP::Module('DB')->Select(
+                $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
+                ['code', 'content'], 'mail_shortcodes',
+                [['id', '=', (int) APP::Module('Crypt')->Decode(APP::Module('Routing')->get['shortcode_id_hash']), PDO::PARAM_INT]]
+            )
+        );
+    }
+    
+    
     
     public function ManageLog() {
         APP::Render('mail/admin/log');
@@ -1670,6 +1728,158 @@ class Mail {
         exit;
     }
     
+    
+    
+    
+    public function APIListShortcodes() {
+        $rows = [];
+        
+        foreach (APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            ['id', 'code', 'content'], 'mail_shortcodes',
+            $_POST['searchPhrase'] ? [['code', 'LIKE', $_POST['searchPhrase'] . '%' ]] : false, 
+            false, false, false,
+            [array_keys($_POST['sort'])[0], array_values($_POST['sort'])[0]],
+            [($_POST['current'] - 1) * $_POST['rowCount'], $_POST['rowCount']]
+        ) as $row) {
+            $row['token'] = APP::Module('Crypt')->Encode($row['id']);
+            array_push($rows, $row);
+        }
+        
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode([
+            'current' => $_POST['current'],
+            'rowCount' => $_POST['rowCount'],
+            'rows' => $rows,
+            'total' => APP::Module('DB')->Select($this->settings['module_mail_db_connection'], ['fetchColumn', 0], ['COUNT(id)'], 'mail_shortcodes', $_POST['searchPhrase'] ? [['code', 'LIKE', $_POST['searchPhrase'] . '%' ]] : false)
+        ]);
+        exit;
+    }
+    
+    public function APIAddShortcode() {
+        $out = [
+            'status' => 'success',
+            'errors' => []
+        ];
+
+        if (empty($_POST['code'])) {
+            $out['status'] = 'error';
+            $out['errors'][] = 1;
+        }
+        
+        if (empty($_POST['value'])) {
+            $out['status'] = 'error';
+            $out['errors'][] = 2;
+        }
+        
+        if ($out['status'] == 'success') {
+            $out['shortcode_id'] = APP::Module('DB')->Insert(
+                $this->settings['module_mail_db_connection'], ' mail_shortcodes',
+                [
+                    'id' => 'NULL',
+                    'code' => [$_POST['code'], PDO::PARAM_STR],
+                    'content' => [$_POST['value'], PDO::PARAM_STR],
+                    'up_date' => 'NOW()'
+                ]
+            );;
+        
+            APP::Module('Triggers')->Exec('mail_add_shortcode', [
+                'id' => $out['shortcode_id'],
+                'code' => $_POST['code'],
+                'content' => $_POST['value']
+            ]);
+        }
+
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode($out);
+        exit;
+    }
+    
+    public function APIUpdateShortcode() {
+        $out = [
+            'status' => 'success',
+            'errors' => []
+        ];
+        
+        $shortcode_id = APP::Module('Crypt')->Decode($_POST['shortcode_id']);
+
+        if (!APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
+            ['COUNT(id)'], 'mail_shortcodes',
+            [['id', '=', $shortcode_id, PDO::PARAM_INT]]
+        )) {
+            $out['status'] = 'error';
+            $out['errors'][] = 1;
+        }
+        
+        if (empty($_POST['code'])) {
+            $out['status'] = 'error';
+            $out['errors'][] = 2;
+        }
+        
+        if (empty($_POST['value'])) {
+            $out['status'] = 'error';
+            $out['errors'][] = 3;
+        }
+        
+        if ($out['status'] == 'success') {
+            APP::Module('DB')->Update($this->settings['module_mail_db_connection'], 'mail_shortcodes', [
+                'code' => $_POST['code'],
+                'content' => $_POST['value']
+            ], [['id', '=', $shortcode_id, PDO::PARAM_INT]]);
+            
+            APP::Module('Triggers')->Exec('mail_update_shortcode', [
+                'id' => $shortcode_id,
+                'code' => $_POST['code'],
+                'content' => $_POST['value']
+            ]);
+        }
+
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode($out);
+        exit;
+    }
+
+    public function APIRemoveShortcode() {
+        $out = [
+            'status' => 'success',
+            'errors' => []
+        ];
+
+        if (!APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
+            ['COUNT(id)'], 'mail_shortcodes',
+            [['id', '=', $_POST['id'], PDO::PARAM_INT]]
+        )) {
+            $out['status'] = 'error';
+            $out['errors'][] = 1;
+        }
+        
+        if ($out['status'] == 'success') {
+            $out['count'] = APP::Module('DB')->Delete($this->settings['module_mail_db_connection'], 'mail_shortcodes', [['id', '=', $_POST['id'], PDO::PARAM_INT]]);
+            APP::Module('Triggers')->Exec('mail_remove_shortcode', ['id' => $_POST['id'], 'result' => $out['count']]);
+        }
+
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode($out);
+        exit;
+    }
+    
+    
+    
+    
     public function APIListLog() {
         $rows = [];
         
@@ -2091,6 +2301,108 @@ class Mail {
         header('Content-Type: application/json');
         
         echo json_encode($out);
+    }
+    
+    
+    public function Spamreport() {
+        $mail_log = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['mail_log_hash']);
+        
+        if (!APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+            ['COUNT(id)'], 'mail_log',
+            [['id', '=', $mail_log, PDO::PARAM_INT]]
+        )) {
+            APP::Render(
+                'mail/spamreport', 'include', 
+                [
+                    'result' => false,
+                ]
+            );
+            exit;
+        }
+
+        $mail = APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
+            ['user', 'letter'], 'mail_log',
+            [['id', '=', $mail_log, PDO::PARAM_INT]]
+        );
+
+        if (APP::Module('DB')->Select(
+            APP::Module('Users')->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+            ['value'], 'users_about',
+            [
+                ['user', '=', $mail['user'], PDO::PARAM_INT],
+                ['item', '=', 'state', PDO::PARAM_STR]
+            ]
+        ) == 'blacklist') {
+            APP::Render(
+                'mail/spamreport', 'include', 
+                [
+                    'result' => true,
+                ]
+            );
+            exit;
+        }
+        
+        APP::Module('DB')->Insert(
+            APP::Module('Users')->settings['module_users_db_connection'], 'users_tags',
+            [
+                'id' => 'NULL',
+                'user' => [$mail['user'], PDO::PARAM_INT],
+                'item' => ['spamreport', PDO::PARAM_STR],
+                'value' => [json_encode([
+                    'item' => 'mail',
+                    'id' => $mail_log
+                ]), PDO::PARAM_STR],
+                'cr_date' => 'NOW()'
+            ]
+        );
+        
+        APP::Module('DB')->Update(
+            APP::Module('Users')->settings['module_users_db_connection'], 'users_about', 
+            [
+                'value' => 'blacklist'
+            ], 
+            [
+                ['user', '=', $mail['user'], PDO::PARAM_INT],
+                ['item', '=', 'state', PDO::PARAM_STR]
+            ]
+        );
+        
+        APP::Module('DB')->Insert(
+            $this->settings['module_mail_db_connection'], 'mail_events',
+            [
+                'id' => 'NULL',
+                'log' => [$mail_log, PDO::PARAM_INT],
+                'user' => [$mail['user'], PDO::PARAM_INT],
+                'letter' => [$mail['letter'], PDO::PARAM_INT],
+                'event' => ['spamreport', PDO::PARAM_STR],
+                'details' => 'NULL',
+                'token' => [$mail_log, PDO::PARAM_STR],
+                'cr_date' => 'NOW()'
+            ]
+        );
+        
+        $this->Send(
+            APP::Module('DB')->Select(
+                APP::Module('Users')->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                ['email'], 'users',
+                [['id', '=', $mail['user'], PDO::PARAM_INT]]
+            ),
+            APP::Module('Users')->settings['module_users_subscription_restore_letter']
+        );
+        
+        APP::Module('Triggers')->Exec('mail_spamreport', [
+            'user' => $mail['user'],
+            'label' => 'spamreport'
+        ]);
+        
+        APP::Render(
+            'mail/spamreport', 'include', 
+            [
+                'result' => true,
+            ]
+        );
     }
     
 }

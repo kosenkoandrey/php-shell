@@ -2649,7 +2649,7 @@ class Tunnels {
             ) as $tunnel) {
                 $this->t_factors[$tunnel['id']] = json_decode($tunnel['factors'], true);
             }
-            
+
             foreach (APP::Module('DB')->Select(
                 $this->settings['module_tunnels_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
                 ['id', 'action', 'settings', 'child_object'], 'tunnels_actions'
@@ -2747,7 +2747,7 @@ class Tunnels {
                             'settings' => $object['settings'],
                             'result' => APP::Module('Mail')->Send(
                                 APP::Module('DB')->Select(
-                                    $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                                    APP::Module('Users')->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
                                     ['email'], 'users',
                                     [['id', '=', $tunnel['user_id'], PDO::PARAM_INT]]
                                 ),
@@ -2848,7 +2848,6 @@ class Tunnels {
                     ['id', '=', $tunnel['id'], PDO::PARAM_INT]
                 ]);
                 break;
-            // Подписка на туннель
             case 'subscribe':                
                 $this->Subscribe([
                     'email'             => APP::Module('DB')->Select(
@@ -2878,7 +2877,6 @@ class Tunnels {
                     'save_utm'          => isset($object['settings']['save_utm']) ? $object['settings']['save_utm'] : false
                 ]);
                 break;
-            // Случайная подписка на туннель из списка
             case 'random_subscribe':                
                 $user_tunnels = APP::Module('DB')->Select(
                     $this->settings['module_tunnels_db_connection'], ['fetchAll', PDO::FETCH_COLUMN], 
@@ -2923,7 +2921,6 @@ class Tunnels {
                     'save_utm'          => isset($available_tunnels[0]['save_utm']) ? $available_tunnels[0]['save_utm'] : false
                 ]);
                 break;
-            // Установка/обновление метки пользователя
             case 'set_user_tag':
                 if (APP::Module('DB')->Select(
                     $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
@@ -2980,7 +2977,6 @@ class Tunnels {
                     );
                 }
                 break;
-            // Снятие туннеля с паузы
             case 'activate_process':
                 $result = false;
                 
@@ -3015,7 +3011,6 @@ class Tunnels {
                     );
                 }
                 break;      
-            // Возврат в точку подписки
             case 'recycle_process':
                 $run_tag_info = json_decode(APP::Module('DB')->Select(
                     $this->settings['module_tunnels_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
@@ -3392,7 +3387,91 @@ class Tunnels {
         fclose($lock);
     }
     
-    public function drawTimer($data){
+    
+    public function RenderUnsubscribeShortcode($id, $data) {
+        $user_tunnel_hash = isset($data['params']['user_tunnel_id']) ? APP::Module('Crypt')->Encode($data['params']['user_tunnel_id']) : '[user_tunnel_id]';
+        $unsubscribe_tunnel_link = APP::Module('Routing')->root . 'tunnels/unsubscribe/' . $user_tunnel_hash;
+
+        $data['letter']['html'] = str_replace('[unsubscribe-tunnel-link]', $unsubscribe_tunnel_link, $data['letter']['html']);
+        $data['letter']['plaintext'] = str_replace('[unsubscribe-tunnel-link]', $unsubscribe_tunnel_link, $data['letter']['plaintext']);
+        
+        return $data;
+    }
+    
+    public function Unsubscribe() {
+        $user_tunnel_id = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['user_tunnel_hash']);
+        
+        APP::Module('DB')->Insert(
+            $this->settings['module_tunnels_db_connection'], 'tunnels_tags',
+            [
+                'id' => 'NULL',
+                'user_tunnel_id' => [$user_tunnel_id, PDO::PARAM_INT],
+                'label_id' => ['unsubscribe', PDO::PARAM_STR],
+                'token' => 'NULL',
+                'info' => 'NULL',
+                'cr_date' => 'NOW()'
+            ]
+        );
+
+        APP::Module('DB')->Update(
+            $this->settings['module_tunnels_db_connection'], 'tunnels_users', 
+            [
+                'state' => 'complete',
+                'resume_date' => '0000-00-00 00:00:00',
+                'object' => '',
+                'input_data' => ''
+            ], 
+            [
+                ['id', '=', $user_tunnel_id, PDO::PARAM_INT]
+            ]
+        );
+        
+        APP::Render(
+            'tunnels/unsubscribe', 'include', 
+            [
+                'result' => true,
+            ]
+        );
+    }
+    
+    public function UnsubscribeUserTrigger($id, $data) {
+        foreach (APP::Module('DB')->Select(
+            $this->settings['module_tunnels_db_connection'], ['fetchAll', PDO::FETCH_COLUMN], 
+            ['id'], 'tunnels_users',
+            [
+                ['user_id', '=', $data['user'], PDO::PARAM_INT],
+                ['state', '=', 'active', PDO::PARAM_STR]
+            ]
+        ) as $user_tunnel_id) {
+            APP::Module('DB')->Insert(
+                $this->settings['module_tunnels_db_connection'], 'tunnels_tags',
+                [
+                    'id' => 'NULL',
+                    'user_tunnel_id' => [$user_tunnel_id, PDO::PARAM_INT],
+                    'label_id' => [$data['label'], PDO::PARAM_STR],
+                    'token' => 'NULL',
+                    'info' => 'NULL',
+                    'cr_date' => 'NOW()'
+                ]
+            );
+            
+            APP::Module('DB')->Update(
+                $this->settings['module_tunnels_db_connection'], 'tunnels_users', 
+                [
+                    'state' => 'complete',
+                    'resume_date' => '0000-00-00 00:00:00',
+                    'object' => '',
+                    'input_data' => ''
+                ], 
+                [
+                    ['id', '=', $user_tunnel_id, PDO::PARAM_INT]
+                ]
+            );
+        }
+    }
+    
+    
+    public function DrawTimer($data){
         $font = $data['font'];
         $font_size = $data['font_size'];
         $string_array = str_split($data['str']);
@@ -3468,8 +3547,8 @@ class Tunnels {
     	if(!count($data)){
             return false;
             $data = [
-                'image' => ROOT.'/protected/modules/Tunnels/resources/bg.png',
-                'font' => ROOT."/protected/modules/Tunnels/resources/arial.ttf",
+                'image' => ROOT.'protected/modules/Tunnels/resources/bg.png',
+                'font' => ROOT."protected/modules/Tunnels/resources/arial.ttf",
                 'font_size' => 60,
                 'time_end' => time() + 3600
             ];
@@ -3495,7 +3574,7 @@ class Tunnels {
                 $rDate2 = datetime::createFromFormat('U',time()+$i);
                 $diff = $rDate1->diff($rDate2);
                 $text = ($diff->d < 10 ? '0'.$diff->d : $diff->d).":".($diff->h < 10 ? '0'.$diff->h : $diff->h).":".($diff->i < 10 ? '0'.$diff->i : $diff->i).":".($diff->s < 10 ? '0'.$diff->s : $diff->s);//"M:".$diff->m." D:".$diff->d." t:".//$diff['y']."-".
-                $img = $this->drawTimer([
+                $img = $this->DrawTimer([
                         'image' => $data['image'],
                         'str'   => $text,
                         'font'  => $data['font'],
@@ -3513,7 +3592,7 @@ class Tunnels {
             header ('Content-type:image/gif');
             echo  $gif->GetAnimation();
         }else{
-            $img = $this->drawTimer([
+            $img = $this->DrawTimer([
                 'image' => $data['image'],
                 'str'   => '00:00:00:00',
                 'font'  => $data['font'],
@@ -3531,6 +3610,7 @@ class Tunnels {
             echo  $gif->GetAnimation();	
         }
     }
+
 }
 
 class TunnelsSearch {
@@ -3551,4 +3631,5 @@ class TunnelsActions {
     public function remove($id, $settings) {
         return APP::Module('DB')->Delete(APP::Module('Tunnels')->settings['module_tunnels_db_connection'], 'tunnels', [['id', 'IN', $id]]);
     }
+    
 }

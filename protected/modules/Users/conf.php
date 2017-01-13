@@ -11,6 +11,8 @@ return [
         ['users\/profile',                                                      'Users', 'PrivateProfile'],             // Private user profile
         ['users\/profile\/(?P<user_id_hash>.*)',                                'Users', 'PublicProfile'],              // Public user profile
         ['users\/logout(\?.*)?',                                                'Users', 'Logout'],                     // Logout
+        ['users\/unsubscribe\/(?P<mail_log_hash>.*)',                           'Users', 'Unsubscribe'],                // Unsubscribe
+        ['users\/restore\/(?P<user_email_hash>.*)',                             'Users', 'Restore'],                    // Restore
         
         ['users\/api\/login\.json(\?.*)?',                                      'Users', 'APILogin'],                   // [API] Login
         ['users\/api\/double\-login\.json(\?.*)?',                              'Users', 'APIDoubleLogin'],             // [API] Double login
@@ -20,6 +22,8 @@ return [
         ['users\/api\/reset\-password\.json(\?.*)?',                            'Users', 'APIResetPassword'],           // [API] Reset password
         ['users\/api\/change\-password\.json(\?.*)?',                           'Users', 'APIChangePassword'],          // [API] Change password
         ['users\/api\/about\/update\.json(\?.*)?',                              'Users', 'APIUpdateAbout'],             // [API] Update about current user
+        ['users\/api\/unsubscribe\.json(\?.*)?',                                'Users', 'APIUnsubscribe'],             // [API] Unsubscribe
+        ['users\/api\/pause\.json(\?.*)?',                                      'Users', 'APIPause'],                   // [API] Pause
         
         ['admin\/users(\?.*)?',                                                 'Users', 'ManageUsers'],                // Manage users
         ['admin\/users\/profile\/(?P<user_id>[0-9]+)',                          'Users', 'AdminProfile'],               // Admin user profile

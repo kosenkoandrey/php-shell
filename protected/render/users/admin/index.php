@@ -102,7 +102,7 @@ $filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Deco
                             <form id="user-action-form" method="post" class="form-horizontal"></form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-link" id="send_action">Save changes</button>
+                            <button type="button" class="btn btn-link" id="send_action">Subscribe</button>
                             <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
                         </div>
                     </div>
@@ -286,7 +286,14 @@ $filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Deco
                             if(res.status == 'success'){
                                 modal.modal('hide');
                                 $("#users-table").bootgrid('reload', true);
-                                swal('Complete!', 'Action has been completed', 'success');
+                                swal({
+                                    title: 'Done!',
+                                    text: 'Action has been completed',
+                                    type: 'success',
+                                    showCancelButton: false,
+                                    confirmButtonText: 'Ok',
+                                    closeOnConfirm: false
+                                });
                             }else{
                                 swal('Error!', 'Action has been error', 'error');
                             }
@@ -304,7 +311,6 @@ $filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Deco
                     
                     swal({
                         title: 'Are you sure?',
-                        text: 'You will not be able to recover this action',
                         type: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#DD6B55',

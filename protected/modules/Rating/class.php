@@ -110,7 +110,7 @@ class Rating {
     }
     
 
-    public function WidgetMail($id, $data) {
+    public function RenderShortcode($id, $data) {
         $data['letter']['html'] = str_replace(
             '[rating]', 
             APP::Render('rating/widgets/mail', 'content'), 

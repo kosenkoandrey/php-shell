@@ -98,7 +98,7 @@ class Costs {
         if (!empty($campaigns)) {
             $campaigns_id = [];
             
-            foreach ($campaigns['result']['Campaigns'] as $campaign) {
+            foreach ((array) $campaigns['result']['Campaigns'] as $campaign) {
                 $campaigns_id[] = $campaign['Id'];
                 
                 $banners_stat = json_decode(APP::Module('Utils')->Curl([
@@ -545,7 +545,7 @@ class Costs {
                     'pult_ref', 'cost',
                     Array(
                         'id' => 'NULL',
-                        'user_id' => '"0"',
+                        'user_id' => 'NULL',
                         'comment' => '"auto"',
                         'cost' => [$value['amount'], PDO::PARAM_STR],
                         'cost_date' => [$data['date'], PDO::PARAM_STR],
