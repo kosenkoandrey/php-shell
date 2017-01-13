@@ -7,6 +7,7 @@ class Users {
     public $user = [];
     public $about = [
         'username',
+        'state',
         'mobile_phone',
         'twitter',
         'skype'
@@ -22,6 +23,7 @@ class Users {
             'module_users_subscribe_activation_letter',
             'module_users_reset_password_letter',
             'module_users_change_password_letter',
+            'module_users_subscription_restore_letter',
             'module_users_register_letter',
             'module_users_role',
             'module_users_rule',
@@ -1661,12 +1663,14 @@ class Users {
         APP::Module('Registry')->Update(['value' => $_POST['module_users_reset_password_letter']], [['item', '=', 'module_users_reset_password_letter', PDO::PARAM_STR]]);
         APP::Module('Registry')->Update(['value' => $_POST['module_users_register_letter']], [['item', '=', 'module_users_register_letter', PDO::PARAM_STR]]);
         APP::Module('Registry')->Update(['value' => $_POST['module_users_change_password_letter']], [['item', '=', 'module_users_change_password_letter', PDO::PARAM_STR]]);
-
+        APP::Module('Registry')->Update(['value' => $_POST['module_users_subscription_restore_letter']], [['item', '=', 'module_users_subscription_restore_letter', PDO::PARAM_STR]]);
+        
         APP::Module('Triggers')->Exec('update_users_notifications_settings', [
             'register_activation_letter' => $_POST['module_users_register_activation_letter'],
             'reset_password_letter' => $_POST['module_users_reset_password_letter'],
             'register_letter' => $_POST['module_users_register_letter'],
-            'change_password_letter' => $_POST['module_users_change_password_letter']
+            'change_password_letter' => $_POST['module_users_change_password_letter'],
+            'subscription_restore_letter' => $_POST['module_users_subscription_restore_letter']
         ]);
 
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -1840,7 +1844,8 @@ class Users {
     public function APIAdminUpdateAbout() {
         $out = [
             'status' => 'success',
-            'errors' => []
+            'errors' => [],
+            'items' => []
         ];
 
         $user_id = APP::Module('Crypt')->Decode($_POST['user']);
@@ -1861,7 +1866,7 @@ class Users {
 
             foreach ($_POST['about'] as $item => $value) {
                 if ((!empty($value)) && (array_search($item, $this->about) !== false)) {
-                    APP::Module('DB')->Insert(
+                    $out['items'][$item] = APP::Module('DB')->Insert(
                         $this->settings['module_users_db_connection'], ' users_about',
                         [
                             'id' => 'NULL',
@@ -2224,6 +2229,128 @@ class Users {
         } else {
             APP::Render('users/errors', 'include', 'auth_ya_code');
         }
+    }
+    
+    
+    public function RenderUnsubscribeShortcode($id, $data) {
+        $unsubscribe_link = APP::Module('Routing')->root . 'users/unsubscribe/[letter_hash]';
+
+        $data['letter']['html'] = str_replace('[unsubscribe-link]', $unsubscribe_link, $data['letter']['html']);
+        $data['letter']['plaintext'] = str_replace('[unsubscribe-link]', $unsubscribe_link, $data['letter']['plaintext']);
+        
+        return $data;
+    }
+    
+    public function Unsubscribe() {
+        $mail_log = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['mail_log_hash']);
+        
+        if (!APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+            ['COUNT(id)'], 'mail_log',
+            [['id', '=', $mail_log, PDO::PARAM_INT]]
+        )) {
+            APP::Render(
+                'users/unsubscribe', 'include', 
+                [
+                    'result' => false,
+                ]
+            );
+            exit;
+        }
+
+        $mail = APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
+            ['user', 'letter'], 'mail_log',
+            [['id', '=', $mail_log, PDO::PARAM_INT]]
+        );
+
+        if (APP::Module('DB')->Select(
+            APP::Module('Users')->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+            ['value'], 'users_about',
+            [
+                ['user', '=', $mail['user'], PDO::PARAM_INT],
+                ['item', '=', 'state', PDO::PARAM_STR]
+            ]
+        ) != 'active') {
+            APP::Render(
+                'users/unsubscribe', 'include', 
+                [
+                    'result' => true,
+                ]
+            );
+            exit;
+        }
+        
+        APP::Module('DB')->Insert(
+            APP::Module('Users')->settings['module_users_db_connection'], 'users_tags',
+            [
+                'id' => 'NULL',
+                'user' => [$mail['user'], PDO::PARAM_INT],
+                'item' => ['unsubscribe', PDO::PARAM_STR],
+                'value' => [json_encode([
+                    'item' => 'mail',
+                    'id' => $mail_log
+                ]), PDO::PARAM_STR],
+                'cr_date' => 'NOW()'
+            ]
+        );
+        
+        APP::Module('DB')->Update(
+            APP::Module('Users')->settings['module_users_db_connection'], 'users_about', 
+            [
+                'value' => 'inactive'
+            ], 
+            [
+                ['user', '=', $mail['user'], PDO::PARAM_INT],
+                ['item', '=', 'state', PDO::PARAM_STR]
+            ]
+        );
+        
+        APP::Module('DB')->Insert(
+            $this->settings['module_mail_db_connection'], 'mail_events',
+            [
+                'id' => 'NULL',
+                'log' => [$mail_log, PDO::PARAM_INT],
+                'user' => [$mail['user'], PDO::PARAM_INT],
+                'letter' => [$mail['letter'], PDO::PARAM_INT],
+                'event' => ['unsubscribe', PDO::PARAM_STR],
+                'details' => 'NULL',
+                'token' => [$mail_log, PDO::PARAM_STR],
+                'cr_date' => 'NOW()'
+            ]
+        );
+        
+        $this->Send(
+            APP::Module('DB')->Select(
+                APP::Module('Users')->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                ['email'], 'users',
+                [['id', '=', $mail['user'], PDO::PARAM_INT]]
+            ),
+            APP::Module('Users')->settings['module_users_subscription_restore_letter']
+        );
+        
+        APP::Module('Triggers')->Exec('user_unsubscribe', [
+            'user' => $mail['user'],
+            'label' => 'unsubscribe'
+        ]);
+        
+        APP::Render(
+            'user/unsubscribe', 'include', 
+            [
+                'result' => true,
+            ]
+        );
+    }
+    
+    
+    public function RenderRestoreUserShortcode($id, $data) {
+        $user_email_hash = isset($data['params']['recepient']) ? APP::Module('Crypt')->Encode($data['params']['recepient']) : '[user_email]';
+        $unsubscribe_link = APP::Module('Routing')->root . 'users/restore/' . $user_email_hash;
+
+        $data['letter']['html'] = str_replace('[restore-user-link]', $unsubscribe_link, $data['letter']['html']);
+        $data['letter']['plaintext'] = str_replace('[restore-user-link]', $unsubscribe_link, $data['letter']['plaintext']);
+        
+        return $data;
     }
 }
 

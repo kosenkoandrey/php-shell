@@ -66,6 +66,14 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
+                                    <label for="module_users_subscription_restore_letter" class="col-sm-2 control-label">Subscription restore</label>
+                                    <div class="col-sm-3">
+                                        <div class="fg-line">
+                                            <input type="text" class="form-control" name="module_users_subscription_restore_letter" id="module_users_subscription_restore_letter">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
                                     <div class="col-sm-offset-2 col-sm-2">
                                         <button type="submit" class="btn palette-Teal bg waves-effect btn-lg">Save changes</button>
                                     </div>
@@ -98,6 +106,7 @@
                 $('#module_users_reset_password_letter').val('<?= APP::Module('Users')->settings['module_users_reset_password_letter'] ?>');
                 $('#module_users_register_letter').val('<?= APP::Module('Users')->settings['module_users_register_letter'] ?>');
                 $('#module_users_register_activation_letter').val('<?= APP::Module('Users')->settings['module_users_register_activation_letter'] ?>');
+                $('#module_users_subscription_restore_letter').val('<?= APP::Module('Users')->settings['module_users_subscription_restore_letter'] ?>');
                 
                 $('#update-notifications').submit(function(event) {
                     event.preventDefault();
@@ -106,16 +115,19 @@
                     var module_users_reset_password_letter = $(this).find('#module_users_reset_password_letter');
                     var module_users_register_letter = $(this).find('#module_users_register_letter');
                     var module_users_register_activation_letter = $(this).find('#module_users_register_activation_letter');
-
+                    var module_users_subscription_restore_letter = $(this).find('#module_users_subscription_restore_letter');
+                    
                     module_users_change_password_letter.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
                     module_users_reset_password_letter.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
                     module_users_register_letter.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
                     module_users_register_activation_letter.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
-
+                    module_users_subscription_restore_letter.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    
                     if (module_users_change_password_letter.val() === '') { module_users_change_password_letter.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-2').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
                     if (module_users_reset_password_letter.val() === '') { module_users_reset_password_letter.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-2').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
                     if (module_users_register_letter.val() === '') { module_users_register_letter.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-2').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
                     if (module_users_register_activation_letter.val() === '') { module_users_register_activation_letter.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-2').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    if (module_users_subscription_restore_letter.val() === '') { module_users_subscription_restore_letter.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-2').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
                     
                     $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
 

@@ -12,6 +12,7 @@
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" rel="stylesheet">        
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/google-material-color/dist/palette.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.css" rel="stylesheet">
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/css/bootstrap-select.css" rel="stylesheet">
         
         <? APP::Render('core/widgets/css') ?>
     </head>
@@ -114,6 +115,10 @@
                                                     <dt>Username</dt>
                                                     <dd id="about-username-value"><?= isset($data['about']['username']) ? $data['about']['username'] : 'user' . $data['user']['id'] ?></dd>
                                                 </dl>
+                                                <dl class="dl-horizontal">
+                                                    <dt>State</dt>
+                                                    <dd id="about-state-value"><?= isset($data['about']['state']) ? $data['about']['state'] : 'unknown' ?></dd>
+                                                </dl>
                                             </div>
 
                                             <form id="form-basic" class="pmbb-edit">
@@ -124,6 +129,20 @@
                                                     <dd>
                                                         <div class="fg-line">
                                                             <input type="text" id="about_username" name="about[username]" class="form-control" placeholder="user<?= $data['user']['id'] ?>">
+                                                        </div>
+                                                    </dd>
+                                                </dl>
+                                                <dl class="dl-horizontal">
+                                                    <dt class="p-t-10">State</dt>
+                                                    <dd>
+                                                        <div class="fg-line">
+                                                            <select id="about_state" name="about[state]" class="selectpicker">
+                                                                <option value="unknown">unknown</option>
+                                                                <option value="active">active</option>
+                                                                <option value="inactive">inactive</option>
+                                                                <option value="blacklist">blacklist</option>
+                                                                <option value="dropped">dropped</option>
+                                                            </select>
                                                         </div>
                                                     </dd>
                                                 </dl>
@@ -338,12 +357,14 @@
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/moment/min/moment.min.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.min.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/input-mask/input-mask.min.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
         
         <? APP::Render('core/widgets/js') ?>
         
         <script>
             $(document).ready(function() {
                 $('#about_username').val('<?= isset($data['about']['username']) ? $data['about']['username'] : '' ?>');
+                $('#about_state').val('<?= isset($data['about']['state']) ? $data['about']['state'] : 'unknown' ?>');
                 $('#about_mobile_phone').val('<?= isset($data['about']['mobile_phone']) ? $data['about']['mobile_phone'] : '' ?>');
                 $('#about_twitter').val('<?= isset($data['about']['twitter']) ? $data['about']['twitter'] : '' ?>');
                 $('#about_skype').val('<?= isset($data['about']['skype']) ? $data['about']['skype'] : '' ?>');
@@ -381,8 +402,10 @@
                             $('#form-basic').find('.toggle-basic').show();
                             
                             var about_username = $('#about_username').val();
+                            var about_state = $('#about_state').val();
                             
                             $('#about-username-value').html(about_username ? about_username : 'user<?= $data['user']['id'] ?>');
+                            $('#about-state-value').html(about_state);
                             
                             $('#view-basic').toggle();
                             $('#form-basic').toggle();

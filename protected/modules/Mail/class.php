@@ -94,19 +94,10 @@ class Mail {
         //
         
         // [spamreport-link]
-        $spamreport_user_email_hash = $recepient ? APP::Module('Crypt')->Encode($recepient) : '[user_email]';
-        $spamreport_link = APP::Module('Routing')->root . 'mail/spamreport/' . $spamreport_user_email_hash;
+        $spamreport_link = APP::Module('Routing')->root . 'mail/spamreport/[letter_hash]';
         
         $letter['html'] = str_replace('[spamreport-link]', $spamreport_link, $letter['html']);
         $letter['plaintext'] = str_replace('[spamreport-link]', $spamreport_link, $letter['plaintext']);
-        //
-        
-        // [unsubscribe-link]
-        $unsubscribe_user_email_hash = $recepient ? APP::Module('Crypt')->Encode($recepient) : '[user_email]';
-        $unsubscribe_link = APP::Module('Routing')->root . 'mail/unsubscribe/' . $unsubscribe_user_email_hash;
-        
-        $letter['html'] = str_replace('[unsubscribe-link]', $unsubscribe_link, $letter['html']);
-        $letter['plaintext'] = str_replace('[unsubscribe-link]', $unsubscribe_link, $letter['plaintext']);
         //
 
         extract(APP::Module('Triggers')->Exec('before_mail_send_letter', [
@@ -2310,6 +2301,108 @@ class Mail {
         header('Content-Type: application/json');
         
         echo json_encode($out);
+    }
+    
+    
+    public function Spamreport() {
+        $mail_log = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['mail_log_hash']);
+        
+        if (!APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+            ['COUNT(id)'], 'mail_log',
+            [['id', '=', $mail_log, PDO::PARAM_INT]]
+        )) {
+            APP::Render(
+                'mail/spamreport', 'include', 
+                [
+                    'result' => false,
+                ]
+            );
+            exit;
+        }
+
+        $mail = APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
+            ['user', 'letter'], 'mail_log',
+            [['id', '=', $mail_log, PDO::PARAM_INT]]
+        );
+
+        if (APP::Module('DB')->Select(
+            APP::Module('Users')->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+            ['value'], 'users_about',
+            [
+                ['user', '=', $mail['user'], PDO::PARAM_INT],
+                ['item', '=', 'state', PDO::PARAM_STR]
+            ]
+        ) == 'blacklist') {
+            APP::Render(
+                'mail/spamreport', 'include', 
+                [
+                    'result' => true,
+                ]
+            );
+            exit;
+        }
+        
+        APP::Module('DB')->Insert(
+            APP::Module('Users')->settings['module_users_db_connection'], 'users_tags',
+            [
+                'id' => 'NULL',
+                'user' => [$mail['user'], PDO::PARAM_INT],
+                'item' => ['spamreport', PDO::PARAM_STR],
+                'value' => [json_encode([
+                    'item' => 'mail',
+                    'id' => $mail_log
+                ]), PDO::PARAM_STR],
+                'cr_date' => 'NOW()'
+            ]
+        );
+        
+        APP::Module('DB')->Update(
+            APP::Module('Users')->settings['module_users_db_connection'], 'users_about', 
+            [
+                'value' => 'blacklist'
+            ], 
+            [
+                ['user', '=', $mail['user'], PDO::PARAM_INT],
+                ['item', '=', 'state', PDO::PARAM_STR]
+            ]
+        );
+        
+        APP::Module('DB')->Insert(
+            $this->settings['module_mail_db_connection'], 'mail_events',
+            [
+                'id' => 'NULL',
+                'log' => [$mail_log, PDO::PARAM_INT],
+                'user' => [$mail['user'], PDO::PARAM_INT],
+                'letter' => [$mail['letter'], PDO::PARAM_INT],
+                'event' => ['spamreport', PDO::PARAM_STR],
+                'details' => 'NULL',
+                'token' => [$mail_log, PDO::PARAM_STR],
+                'cr_date' => 'NOW()'
+            ]
+        );
+        
+        $this->Send(
+            APP::Module('DB')->Select(
+                APP::Module('Users')->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                ['email'], 'users',
+                [['id', '=', $mail['user'], PDO::PARAM_INT]]
+            ),
+            APP::Module('Users')->settings['module_users_subscription_restore_letter']
+        );
+        
+        APP::Module('Triggers')->Exec('mail_spamreport', [
+            'user' => $mail['user'],
+            'label' => 'spamreport'
+        ]);
+        
+        APP::Render(
+            'mail/spamreport', 'include', 
+            [
+                'result' => true,
+            ]
+        );
     }
     
 }

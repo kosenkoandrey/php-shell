@@ -3192,7 +3192,7 @@ class Tunnels {
     }
     
     
-    public function UnsubscribeShortcode($id, $data) {
+    public function RenderUnsubscribeShortcode($id, $data) {
         $user_tunnel_hash = isset($data['params']['user_tunnel_id']) ? APP::Module('Crypt')->Encode($data['params']['user_tunnel_id']) : '[user_tunnel_id]';
         $unsubscribe_tunnel_link = APP::Module('Routing')->root . 'tunnels/unsubscribe/' . $user_tunnel_hash;
 
@@ -3200,6 +3200,189 @@ class Tunnels {
         $data['letter']['plaintext'] = str_replace('[unsubscribe-tunnel-link]', $unsubscribe_tunnel_link, $data['letter']['plaintext']);
         
         return $data;
+    }
+    
+    public function Unsubscribe() {
+        $user_tunnel = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['user_tunnel_hash']);
+        
+        echo $user_tunnel;
+    }
+    
+    public function UnsubscribeUserTrigger($id, $data) {
+        foreach (APP::Module('DB')->Select(
+            $this->settings['module_tunnels_db_connection'], ['fetchAll', PDO::FETCH_COLUMN], 
+            ['id'], 'tunnels_users',
+            [
+                ['user_id', '=', $data['user'], PDO::PARAM_INT],
+                ['state', '=', 'active', PDO::PARAM_STR]
+            ]
+        ) as $user_tunnel_id) {
+            APP::Module('DB')->Insert(
+                $this->settings['module_tunnels_db_connection'], 'tunnels_tags',
+                [
+                    'id' => 'NULL',
+                    'user_tunnel_id' => [$user_tunnel_id, PDO::PARAM_INT],
+                    'label_id' => [$data['label'], PDO::PARAM_STR],
+                    'token' => 'NULL',
+                    'info' => 'NULL',
+                    'cr_date' => 'NOW()'
+                ]
+            );
+            
+            APP::Module('DB')->Update(
+                $this->settings['module_tunnels_db_connection'], 'tunnels_users', 
+                [
+                    'state' => 'complete',
+                    'resume_date' => '0000-00-00 00:00:00',
+                    'object' => '',
+                    'input_data' => ''
+                ], 
+                [
+                    ['id', '=', $user_tunnel_id, PDO::PARAM_INT]
+                ]
+            );
+        }
+    }
+    
+    
+    public function DrawTimer($data){
+        $font = $data['font'];
+        $font_size = $data['font_size'];
+        $string_array = str_split($data['str']);
+        $image = $data['image'];
+        $image_size = getimagesize($image);
+        //Расчитываем размеры таймера
+        //Ширина разделителя
+        $width_timer = (20*3) + $image_size[0]*8;
+        $height_timer = 110;
+
+        //Создаем фон таймера
+        $im = imagecreatetruecolor($width_timer, $height_timer);
+        $bg_color = imagecolorallocate($im, 255, 255, 255);
+        imagecolortransparent($im, $bg_color);
+        imagefilledrectangle($im, 0, 0, $width_timer, $height_timer, $bg_color);
+
+        $bg_font = imagecreatetruecolor($image_size[0], $image_size[1]);
+        $font_color = imagecolorallocate($bg_font, 204, 204, 204);
+        $shadow_color = imagecolorallocate($bg_font, 0, 0, 0);
+        $color = imagecolorallocate($bg_font, 0, 0, 0);
+        $w = 0;
+
+        imagettftext($im, 12, 0, 45, 15, $color, $font, 'дней');
+        imagettftext($im, 12, 0, 182, 15, $color, $font, 'часов');
+        imagettftext($im, 12, 0, 325, 15, $color, $font, 'минут');
+        imagettftext($im, 12, 0, 463, 15, $color, $font, 'секунд');
+
+        foreach ($string_array as $key => $str) {
+            if(!preg_match('/[0-9]/', $str)){
+                $box = imagettfbbox($font_size, 0, $font, $str);
+                $y = round($height/2+($image_size[1]/2));
+                $plus_w = 20;
+                $bg = imagecreatetruecolor(20, $image_size[1]);
+                imagefilledrectangle($bg, 0, 0, 20, $image_size[1], $bg_color);
+                imagettftext(
+                    $bg, 
+                    $font_size, 
+                    0, 
+                    0, 
+                    70, 
+                    $shadow_color, 
+                    $font,
+                    $str
+                );
+                imagecopymerge($im, $bg, $w, 20, 0, 0, 20, $image_size[1], 75);
+                imagedestroy($bg);
+            }else{
+                $bg = imagecreatefrompng($image);
+                $box = imagettfbbox($font_size, 0, $font, $str);
+                $width = abs($box[4] - $box[0]);
+                $height = abs($box[5] - $box[1]);
+                $y = round($height/2+($image_size[1]/2));
+                $plus_w = $image_size[0];
+
+                imagettftext($bg, $font_size, 0, 11, $y+1, $shadow_color, $font, $str);
+                imagettftext($bg, $font_size, 0, 10, $y, $font_color, $font, $str);
+                imagecopymerge($im, $bg, $w, 20, 0, 0, $image_size[0], $image_size[1], 75);
+                imagedestroy($bg);
+            }
+           
+            $w = $w+$plus_w;
+        }
+        imagedestroy($bg_font);
+        return $im;
+    }
+    
+    public function Timer($data = []){
+        if(!count($data)){
+            $data = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['input']);
+            $data = json_decode($data, true);
+        }
+     
+    	if(!count($data)){
+            return false;
+            $data = [
+                'image' => APP::Module('Routing')->root.'protected/modules/Tunnels/resources/bg.png',
+                'font' => ROOT."protected/modules/Tunnels/resources/arial.ttf",
+                'font_size' => 60,
+                'time_end' => time() + 3600
+            ];
+    	}
+        
+        $file = ROOT . '/protected/class/gifencoder.php';
+        include $file;
+        
+        $gif = new Egifencoder();
+       
+        if(isset($data['time_end']) && $data['time_end']){
+            $time_end = $data['time_end'];
+        }else{
+            $time_end = 0;
+        }
+
+        $available_time = $time_end - time();
+        if($available_time > 60 and preg_match('/[0-9]{10}/', $time_end)){
+            
+            $rDate1 = datetime::createFromFormat('U', $time_end);
+
+            for($i = 0; $i <= 80; $i++){
+                $rDate2 = datetime::createFromFormat('U',time()+$i);
+                $diff = $rDate1->diff($rDate2);
+                $text = ($diff->d < 10 ? '0'.$diff->d : $diff->d).":".($diff->h < 10 ? '0'.$diff->h : $diff->h).":".($diff->i < 10 ? '0'.$diff->i : $diff->i).":".($diff->s < 10 ? '0'.$diff->s : $diff->s);//"M:".$diff->m." D:".$diff->d." t:".//$diff['y']."-".
+                $img = $this->DrawTimer([
+                        'image' => $data['image'],
+                        'str'   => $text,
+                        'font'  => $data['font'],
+                        'font_size' => $data['font_size']
+                ]);
+
+                ob_start();
+                imagegif($img);
+                $frames[] = ob_get_contents();
+                $framed[] = 120;
+                ob_end_clean();
+            }
+
+            $gif->GIFEncoder($frames,$framed,0,2,0,0,0,'bin');
+            header ('Content-type:image/gif');
+            echo  $gif->GetAnimation();
+        }else{
+            $img = $this->DrawTimer([
+                'image' => $data['image'],
+                'str'   => '00:00:00:00',
+                'font'  => $data['font'],
+                'font_size' => $data['font_size']
+            ]);
+
+            ob_start();
+            imagegif($img);
+            $frames[] = ob_get_contents();
+            $framed[] = 120;
+            ob_end_clean();
+
+            $gif->GIFEncoder($frames,$framed,0,2,0,0,0,'bin');
+            header ('Content-type:image/gif');
+            echo  $gif->GetAnimation();	
+        }
     }
 
 }

@@ -7,8 +7,7 @@ return [
         ['admin\/mail\/letters\/(?P<group_sub_id_hash>.*)\/add(\?.*)?',                             'Mail', 'AddLetter'],           // Add letter
         ['admin\/mail\/letters\/(?P<group_sub_id_hash>.*)\/edit\/(?P<letter_id_hash>.*)',           'Mail', 'EditLetter'],          // Edit letter
         ['admin\/mail\/letters\/(?P<group_sub_id_hash>.*)',                                         'Mail', 'ManageLetters'],       // Manage letters
-        
-        
+
         ['admin\/mail\/senders\/(?P<group_sub_id_hash>.*)\/groups\/add',                            'Mail', 'AddSendersGroup'],     // Add senders group
         ['admin\/mail\/senders\/(?P<group_sub_id_hash>.*)\/groups\/(?P<group_id_hash>.*)\/edit',    'Mail', 'EditSendersGroup'],    // Edit senders group
         ['admin\/mail\/senders\/(?P<group_sub_id_hash>.*)\/add(\?.*)?',                             'Mail', 'AddSender'],           // Add sender
@@ -35,6 +34,7 @@ return [
         ['admin\/mail\/spam_lists\/ip\/status\/(?P<ip_id_hash>.*)',                                 'Mail', 'IPStatusSpamLists'],   // IP status in spam lists
 
         ['mail\/(?P<version>html|plaintext)\/(?P<letter_id_hash>.*)',                               'Mail', 'ViewCopies'],          // View copies
+        ['mail\/spamreport\/(?P<mail_log_hash>.*)',                                                 'Mail', 'Spamreport'],          // Spamreport
         
         // API
         

@@ -11,6 +11,8 @@ return [
         ['users\/profile',                                                      'Users', 'PrivateProfile'],             // Private user profile
         ['users\/profile\/(?P<user_id_hash>.*)',                                'Users', 'PublicProfile'],              // Public user profile
         ['users\/logout(\?.*)?',                                                'Users', 'Logout'],                     // Logout
+        ['users\/unsubscribe\/(?P<user_email_hash>.*)',                         'Users', 'Unsubscribe'],                // Unsubscribe
+        ['users\/restore\/(?P<user_email_hash>.*)',                             'Users', 'Restore'],                    // Restore
         
         ['users\/api\/login\.json(\?.*)?',                                      'Users', 'APILogin'],                   // [API] Login
         ['users\/api\/double\-login\.json(\?.*)?',                              'Users', 'APIDoubleLogin'],             // [API] Double login
