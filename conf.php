@@ -1,6 +1,6 @@
 <?
 return [
-    'location'          => ['http', 'pult.sendthis.ru', '/'],
+    'location'          => ['http', 'dev1.sendthis.ru', '/'],
     //'location'          => ['https', 'domain.com', '/'],
     'encoding'          => 'UTF-8',
     'locale'            => 'en_US',
