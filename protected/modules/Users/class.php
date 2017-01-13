@@ -2245,44 +2245,85 @@ class Users {
         $mail_log = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['mail_log_hash']);
         
         if (!APP::Module('DB')->Select(
-            $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+            APP::Module('Mail')->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
             ['COUNT(id)'], 'mail_log',
             [['id', '=', $mail_log, PDO::PARAM_INT]]
         )) {
             APP::Render(
                 'users/unsubscribe', 'include', 
                 [
-                    'result' => false,
+                    'error' => true,
                 ]
             );
             exit;
         }
 
+        $user_id = APP::Module('DB')->Select(
+            APP::Module('Mail')->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+            ['user'], 'mail_log',
+            [['id', '=', $mail_log, PDO::PARAM_INT]]
+        );
+        
+        APP::Render(
+            'users/unsubscribe', 
+            'include', 
+            [
+                'error' => false,
+                'active' => APP::Module('DB')->Select(
+                    $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                    ['COUNT(id)'], 'users_about',
+                    [
+                        ['user', '=', $user_id, PDO::PARAM_INT],
+                        ['item', '=', 'state', PDO::PARAM_STR],
+                        ['value', '=', 'active', PDO::PARAM_STR]
+                    ]
+                )
+            ]
+        );
+    }
+    
+    public function APIUnsubscribe() {
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        $mail_log = APP::Module('Crypt')->Decode($_POST['mail_log']);
+        
+        if (!APP::Module('DB')->Select(
+            APP::Module('Mail')->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+            ['COUNT(id)'], 'mail_log',
+            [['id', '=', $mail_log, PDO::PARAM_INT]]
+        )) {
+            echo json_encode([
+                'status' => 'error',
+                'errors' => [1]
+            ]);
+            exit;
+        }
+
         $mail = APP::Module('DB')->Select(
-            $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
+            APP::Module('Mail')->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
             ['user', 'letter'], 'mail_log',
             [['id', '=', $mail_log, PDO::PARAM_INT]]
         );
 
         if (APP::Module('DB')->Select(
-            APP::Module('Users')->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+            $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
             ['value'], 'users_about',
             [
                 ['user', '=', $mail['user'], PDO::PARAM_INT],
                 ['item', '=', 'state', PDO::PARAM_STR]
             ]
         ) != 'active') {
-            APP::Render(
-                'users/unsubscribe', 'include', 
-                [
-                    'result' => true,
-                ]
-            );
+            echo json_encode([
+                'status' => 'success',
+                'errors' => []
+            ]);
             exit;
         }
         
         APP::Module('DB')->Insert(
-            APP::Module('Users')->settings['module_users_db_connection'], 'users_tags',
+            $this->settings['module_users_db_connection'], 'users_tags',
             [
                 'id' => 'NULL',
                 'user' => [$mail['user'], PDO::PARAM_INT],
@@ -2296,7 +2337,7 @@ class Users {
         );
         
         APP::Module('DB')->Update(
-            APP::Module('Users')->settings['module_users_db_connection'], 'users_about', 
+            $this->settings['module_users_db_connection'], 'users_about', 
             [
                 'value' => 'inactive'
             ], 
@@ -2307,7 +2348,7 @@ class Users {
         );
         
         APP::Module('DB')->Insert(
-            $this->settings['module_mail_db_connection'], 'mail_events',
+            APP::Module('Mail')->settings['module_mail_db_connection'], 'mail_events',
             [
                 'id' => 'NULL',
                 'log' => [$mail_log, PDO::PARAM_INT],
@@ -2320,26 +2361,125 @@ class Users {
             ]
         );
         
-        $this->Send(
+        APP::Module('Mail')->Send(
             APP::Module('DB')->Select(
-                APP::Module('Users')->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
                 ['email'], 'users',
                 [['id', '=', $mail['user'], PDO::PARAM_INT]]
             ),
-            APP::Module('Users')->settings['module_users_subscription_restore_letter']
+            $this->settings['module_users_subscription_restore_letter']
         );
         
         APP::Module('Triggers')->Exec('user_unsubscribe', [
             'user' => $mail['user'],
             'label' => 'unsubscribe'
         ]);
+
+        echo json_encode([
+            'status' => 'success',
+            'errors' => []
+        ]);
+        exit;
+    }
+    
+    public function APIPause() {
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
         
-        APP::Render(
-            'user/unsubscribe', 'include', 
+        $mail_log = APP::Module('Crypt')->Decode($_POST['mail_log']);
+        
+        if (!APP::Module('DB')->Select(
+            APP::Module('Mail')->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+            ['COUNT(id)'], 'mail_log',
+            [['id', '=', $mail_log, PDO::PARAM_INT]]
+        )) {
+            echo json_encode([
+                'status' => 'error',
+                'errors' => [1]
+            ]);
+            exit;
+        }
+
+        $mail = APP::Module('DB')->Select(
+            APP::Module('Mail')->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
+            ['user', 'letter'], 'mail_log',
+            [['id', '=', $mail_log, PDO::PARAM_INT]]
+        );
+
+        if (APP::Module('DB')->Select(
+            $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+            ['value'], 'users_about',
             [
-                'result' => true,
+                ['user', '=', $mail['user'], PDO::PARAM_INT],
+                ['item', '=', 'state', PDO::PARAM_STR]
+            ]
+        ) != 'active') {
+            echo json_encode([
+                'status' => 'success',
+                'errors' => []
+            ]);
+            exit;
+        }
+        
+        APP::Module('TaskManager')->Add(
+            'Users', 'ActivateUserTask', 
+            date('Y-m-d H:i:s', strtotime($_POST['timeout'])), 
+            json_encode([$mail['user']]), 
+            'activate_user_' . $mail['user'], 
+            'wait'
+        );
+        
+        APP::Module('DB')->Insert(
+            $this->settings['module_users_db_connection'], 'users_tags',
+            [
+                'id' => 'NULL',
+                'user' => [$mail['user'], PDO::PARAM_INT],
+                'item' => ['pause', PDO::PARAM_STR],
+                'value' => [json_encode([
+                    'item' => 'mail',
+                    'id' => $mail_log,
+                    'timeout' => $_POST['timeout']
+                ]), PDO::PARAM_STR],
+                'cr_date' => 'NOW()'
             ]
         );
+        
+        APP::Module('DB')->Update(
+            $this->settings['module_users_db_connection'], 'users_about', 
+            [
+                'value' => 'inactive'
+            ], 
+            [
+                ['user', '=', $mail['user'], PDO::PARAM_INT],
+                ['item', '=', 'state', PDO::PARAM_STR]
+            ]
+        );
+        
+        APP::Module('DB')->Insert(
+            APP::Module('Mail')->settings['module_mail_db_connection'], 'mail_events',
+            [
+                'id' => 'NULL',
+                'log' => [$mail_log, PDO::PARAM_INT],
+                'user' => [$mail['user'], PDO::PARAM_INT],
+                'letter' => [$mail['letter'], PDO::PARAM_INT],
+                'event' => ['pause', PDO::PARAM_STR],
+                'details' => 'NULL',
+                'token' => [$mail_log, PDO::PARAM_STR],
+                'cr_date' => 'NOW()'
+            ]
+        );
+
+        APP::Module('Triggers')->Exec('user_pause', [
+            'user' => $mail['user'],
+            'label' => 'pause'
+        ]);
+
+        echo json_encode([
+            'status' => 'success',
+            'errors' => []
+        ]);
+        exit;
     }
     
     
@@ -2352,6 +2492,101 @@ class Users {
         
         return $data;
     }
+    
+    public function Restore() {
+        $user_email = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['user_email_hash']);
+        
+        if (!APP::Module('DB')->Select(
+            $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+            ['COUNT(id)'], 'users',
+            [['email', '=', $user_email, PDO::PARAM_STR]]
+        )) {
+            APP::Render('users/restore', 'include', false);
+            exit;
+        }
+
+        $user_id = APP::Module('DB')->Select(
+            $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+            ['id'], 'users',
+            [['email', '=', $user_email, PDO::PARAM_STR]]
+        );
+
+        if (APP::Module('DB')->Select(
+            $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+            ['value'], 'users_about',
+            [
+                ['user', '=', $user_id, PDO::PARAM_INT],
+                ['item', '=', 'state', PDO::PARAM_STR]
+            ]
+        ) == 'active') {
+            APP::Render('users/restore', 'include', true);
+            exit;
+        }
+        
+        APP::Module('DB')->Insert(
+            $this->settings['module_users_db_connection'], 'users_tags',
+            [
+                'id' => 'NULL',
+                'user' => [$user_id, PDO::PARAM_INT],
+                'item' => ['restore', PDO::PARAM_STR],
+                'value' => 'NULL',
+                'cr_date' => 'NOW()'
+            ]
+        );
+        
+        APP::Module('DB')->Update(
+            $this->settings['module_users_db_connection'], 'users_about', 
+            [
+                'value' => 'active'
+            ], 
+            [
+                ['user', '=', $user_id, PDO::PARAM_INT],
+                ['item', '=', 'state', PDO::PARAM_STR]
+            ]
+        );
+
+        APP::Module('Triggers')->Exec('user_restore', [
+            'user' => $user_id
+        ]);
+        
+        APP::Render('users/restore', 'include', true);
+    }
+    
+    
+    public function ActivateUserTask($user_id) {
+        if (!APP::Module('DB')->Select(
+            $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+            ['COUNT(id)'], 'users_about',
+            [
+                ['user', '=', $user_id, PDO::PARAM_INT],
+                ['item', '=', 'state', PDO::PARAM_STR],
+                ['value', '=', 'active', PDO::PARAM_STR]
+            ]
+        )) {
+            APP::Module('DB')->Update(
+                $this->settings['module_users_db_connection'], 'users_about', 
+                [
+                    'value' => 'active'
+                ], 
+                [
+                    ['user', '=', $user_id, PDO::PARAM_INT],
+                    ['item', '=', 'state', PDO::PARAM_STR]
+                ]
+            );
+            
+            APP::Module('DB')->Insert(
+                $this->settings['module_users_db_connection'], 'users_tags',
+                [
+                    'id' => 'NULL',
+                    'user' => [$user_id, PDO::PARAM_INT],
+                    'item' => ['change_state', PDO::PARAM_STR],
+                    'value' => ['active', PDO::PARAM_STR],
+                    'cr_date' => 'NOW()'
+                ]
+            );
+        }
+    }
+    
 }
 
 class UsersSearch {

@@ -2747,7 +2747,7 @@ class Tunnels {
                             'settings' => $object['settings'],
                             'result' => APP::Module('Mail')->Send(
                                 APP::Module('DB')->Select(
-                                    $this->settings['module_tunnels_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                                    APP::Module('Users')->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
                                     ['email'], 'users',
                                     [['id', '=', $tunnel['user_id'], PDO::PARAM_INT]]
                                 ),
@@ -2847,6 +2847,202 @@ class Tunnels {
                 ], [
                     ['id', '=', $tunnel['id'], PDO::PARAM_INT]
                 ]);
+                break;
+            case 'subscribe':                
+                $this->Subscribe([
+                    'email'             => APP::Module('DB')->Select(
+                        $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                        ['email'], 'users',
+                        [['id', '=', $tunnel['user_id'], PDO::PARAM_INT]]
+                    ),
+                    'tunnel'            => [
+                        $object['settings']['tunnel_id'],
+                        $object['settings']['process_obj_type'],
+                        $object['settings']['process_obj_id'],
+                        $object['settings']['process_timeout']
+                    ],
+                    'activation'        => [
+                        $object['settings']['activation_letter'],
+                        $object['settings']['activation_url']
+                    ],
+                    'source'            => 'process',
+                    'roles_tunnel'      => isset($object['settings']['roles_tunnel']) ? $object['settings']['roles_tunnel'] : false,
+                    'welcome'           => isset($object['settings']['welcome']) ? $object['settings']['welcome'] : false,
+                    'queue_timeout'     => isset($object['settings']['queue_timeout']) ? $object['settings']['queue_timeout'] : $this->settings['module_tunnels_default_queue_timeout'],
+                    'complete_tunnels'  => isset($object['settings']['complete_tunnels']) ? $object['settings']['complete_tunnels'] : false,
+                    'pause_tunnels'     => isset($object['settings']['pause_tunnels']) ? $object['settings']['pause_tunnels'] : false,
+                    'input_data'        => isset($tunnel['input_data']) ? $tunnel['input_data'] : false,
+                    'about_user'        => isset($object['settings']['about_user']) ? $object['settings']['about_user'] : [],
+                    'auto_save_about'   => isset($object['settings']['auto_save_about']) ? $object['settings']['auto_save_about'] : false,
+                    'save_utm'          => isset($object['settings']['save_utm']) ? $object['settings']['save_utm'] : false
+                ]);
+                break;
+            case 'random_subscribe':                
+                $user_tunnels = APP::Module('DB')->Select(
+                    $this->settings['module_tunnels_db_connection'], ['fetchAll', PDO::FETCH_COLUMN], 
+                    ['tunnel_id'], 'tunnels_users',
+                    [['user_id', '=', $tunnel['user_id'], PDO::PARAM_INT]]
+                );
+                
+                $target_tunnels = [];
+                foreach ($object['settings']['processes'] as $target_tunnel) {
+                    $target_tunnels[$target_tunnel['tunnel_id']] = $target_tunnel;
+                }
+                
+                $available_tunnels = array_diff_key($target_tunnels, array_flip($user_tunnels));
+                shuffle($available_tunnels);
+                $available_tunnels = array_values($available_tunnels);
+                
+                $this->Subscribe([
+                    'email'             => APP::Module('DB')->Select(
+                        $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                        ['email'], 'users',
+                        [['id', '=', $tunnel['user_id'], PDO::PARAM_INT]]
+                    ),
+                    'tunnel'            => [
+                        $available_tunnels[0]['process_id'],
+                        $available_tunnels[0]['process_obj_type'],
+                        $available_tunnels[0]['process_obj_id'],
+                        $available_tunnels[0]['process_timeout']
+                    ],
+                    'activation'        => [
+                        $available_tunnels[0]['activation_letter'],
+                        $available_tunnels[0]['activation_url']
+                    ],
+                    'source'            => 'process',
+                    'roles_tunnel'      => isset($available_tunnels[0]['roles_tunnel']) ? $available_tunnels[0]['roles_tunnel'] : false,
+                    'welcome'           => isset($available_tunnels[0]['welcome']) ? $available_tunnels[0]['welcome'] : false,
+                    'queue_timeout'     => isset($available_tunnels[0]['queue_timeout']) ? $available_tunnels[0]['queue_timeout'] : $this->settings['module_tunnels_default_queue_timeout'],
+                    'complete_tunnels'  => isset($available_tunnels[0]['complete_tunnels']) ? $available_tunnels[0]['complete_tunnels'] : false,
+                    'pause_tunnels'     => isset($available_tunnels[0]['pause_tunnels']) ? $available_tunnels[0]['pause_tunnels'] : false,
+                    'input_data'        => isset($tunnel['input_data']) ? $tunnel['input_data'] : false,
+                    'about_user'        => isset($available_tunnels[0]['about_user']) ? $available_tunnels[0]['about_user'] : [],
+                    'auto_save_about'   => isset($available_tunnels[0]['auto_save_about']) ? $available_tunnels[0]['auto_save_about'] : false,
+                    'save_utm'          => isset($available_tunnels[0]['save_utm']) ? $available_tunnels[0]['save_utm'] : false
+                ]);
+                break;
+            case 'set_user_tag':
+                if (APP::Module('DB')->Select(
+                    $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                    ['id'], 'users_tags',
+                    [
+                        ['user', '=', $tunnel['user_id'], PDO::PARAM_INT],
+                        ['item', '=', $object['settings']['tag_id'], PDO::PARAM_STR]
+                    ]
+                )) {                                        
+                    APP::Module('DB')->Insert(
+                        $this->settings['module_tunnels_db_connection'], 'tunnels_tags',
+                        [
+                            'id' => 'NULL',
+                            'user_tunnel_id' => [$tunnel['id'], PDO::PARAM_INT],
+                            'label_id' => ['update_user_tag', PDO::PARAM_STR],
+                            'token' => '""',
+                            'info' => [json_encode([
+                                'result' => APP::Module('DB')->Update($this->settings['module_users_db_connection'], 'users_tags', [
+                                    'value' => $object['settings']['tag_details']
+                                ], [
+                                    ['user', '=', $tunnel['user_id'], PDO::PARAM_INT],
+                                    ['item', '=', $object['settings']['tag_id'], PDO::PARAM_STR]
+                                ]), 
+                                'user_tunnel_id' => $tunnel['id'], 
+                                'settings' => $object['settings']
+                            ]), PDO::PARAM_STR],
+                            'cr_date' => 'NOW()'
+                        ]
+                    );
+                } else {
+                    APP::Module('DB')->Insert(
+                        $this->settings['module_tunnels_db_connection'], 'tunnels_tags',
+                        [
+                            'id' => 'NULL',
+                            'user_tunnel_id' => [$tunnel['id'], PDO::PARAM_INT],
+                            'label_id' => ['insert_user_tag', PDO::PARAM_STR],
+                            'token' => '""',
+                            'info' => [json_encode([
+                                'result' => APP::Module('DB')->Insert(
+                                    $this->settings['module_users_db_connection'], 'users_tags',
+                                    [
+                                        'id' => 'NULL',
+                                        'user' => [$tunnel['user_id'], PDO::PARAM_INT],
+                                        'item' => [$object['settings']['tag_id'], PDO::PARAM_STR],
+                                        'value' => [$object['settings']['tag_details'], PDO::PARAM_STR],
+                                        'cr_date' => 'NOW()'
+                                    ]
+                                ), 
+                                'user_tunnel_id' => $tunnel['id'], 
+                                'settings' => $object['settings']
+                            ]), PDO::PARAM_STR],
+                            'cr_date' => 'NOW()'
+                        ]
+                    );
+                }
+                break;
+            case 'activate_process':
+                $result = false;
+                
+                if ($user_tunnel_id = APP::Module('DB')->Select(
+                    $this->settings['module_tunnels_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                    ['id'], 'tunnels_users',
+                    [
+                        ['tunnel_id', '=', $object['settings']['tunnel_id'], PDO::PARAM_INT],
+                        ['user_id', '=', $tunnel['user_id'], PDO::PARAM_INT],
+                        ['state', '=', 'pause', PDO::PARAM_STR]
+                    ]
+                )) {                 
+                    APP::Module('DB')->Insert(
+                        $this->settings['module_tunnels_db_connection'], 'tunnels_tags',
+                        [
+                            'id' => 'NULL',
+                            'user_tunnel_id' => [$user_tunnel_id, PDO::PARAM_INT],
+                            'label_id' => ['activate_process', PDO::PARAM_STR],
+                            'token' => '""',
+                            'info' => [json_encode([
+                                'mode' => 'child',
+                                'result' => APP::Module('DB')->Update($this->settings['module_tunnels_db_connection'], 'tunnels_users', [
+                                    'state' => 'active'
+                                ], [
+                                    ['id', '=', $user_tunnel_id, PDO::PARAM_INT]
+                                ]), 
+                                'user_tunnel_id' => $user_tunnel_id, 
+                                'settings' => $object['settings']
+                            ]), PDO::PARAM_STR],
+                            'cr_date' => 'NOW()'
+                        ]
+                    );
+                }
+                break;      
+            case 'recycle_process':
+                $run_tag_info = json_decode(APP::Module('DB')->Select(
+                    $this->settings['module_tunnels_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                    ['info'], 'tunnels_tags',
+                    [
+                        ['label_id', '=', 'subscribe', PDO::PARAM_STR],
+                        ['user_tunnel_id', '=', $tunnel['id'], PDO::PARAM_INT]
+                    ]
+                ), true);
+                
+                APP::Module('DB')->Insert(
+                    $this->settings['module_tunnels_db_connection'], 'tunnels_tags',
+                    [
+                        'id' => 'NULL',
+                        'user_tunnel_id' => [$tunnel['id'], PDO::PARAM_INT],
+                        'label_id' => ['recycle_process', PDO::PARAM_STR],
+                        'token' => '""',
+                        'info' => [json_encode([
+                            'mode' => 'child',
+                            'result' => APP::Module('DB')->Update($this->settings['module_tunnels_db_connection'], 'tunnels_users', [
+                                'state' => 'active',
+                                'resume_date' => date('Y-m-d H:i:s'),
+                                'object' => $run_tag_info['tunnel'][1] . ':' . $run_tag_info['tunnel'][2]
+                            ], [
+                                ['id', '=', $tunnel['id'], PDO::PARAM_INT]
+                            ]), 
+                            'user_tunnel_id' => $tunnel['id'], 
+                            'settings' => $object['settings']
+                        ]), PDO::PARAM_STR],
+                        'cr_date' => 'NOW()'
+                    ]
+                );
                 break;
         }
         
@@ -3203,9 +3399,39 @@ class Tunnels {
     }
     
     public function Unsubscribe() {
-        $user_tunnel = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['user_tunnel_hash']);
+        $user_tunnel_id = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['user_tunnel_hash']);
         
-        echo $user_tunnel;
+        APP::Module('DB')->Insert(
+            $this->settings['module_tunnels_db_connection'], 'tunnels_tags',
+            [
+                'id' => 'NULL',
+                'user_tunnel_id' => [$user_tunnel_id, PDO::PARAM_INT],
+                'label_id' => ['unsubscribe', PDO::PARAM_STR],
+                'token' => 'NULL',
+                'info' => 'NULL',
+                'cr_date' => 'NOW()'
+            ]
+        );
+
+        APP::Module('DB')->Update(
+            $this->settings['module_tunnels_db_connection'], 'tunnels_users', 
+            [
+                'state' => 'complete',
+                'resume_date' => '0000-00-00 00:00:00',
+                'object' => '',
+                'input_data' => ''
+            ], 
+            [
+                ['id', '=', $user_tunnel_id, PDO::PARAM_INT]
+            ]
+        );
+        
+        APP::Render(
+            'tunnels/unsubscribe', 'include', 
+            [
+                'result' => 'success',
+            ]
+        );
     }
     
     public function UnsubscribeUserTrigger($id, $data) {
