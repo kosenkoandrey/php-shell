@@ -33,39 +33,7 @@ class Mail {
     }
     
     
-    public function Shortcodes($id, $data) {
-        foreach (APP::Module('DB')->Select(
-            $this->settings['module_mail_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
-            ['code', 'content'], 'mail_shortcodes'
-        ) as $shortcode) {
-            $data['letter']['html'] = str_replace(
-                '[' . $shortcode['code'] . ']', 
-                $shortcode['content'], 
-                $data['letter']['html']
-            );
-            
-            $data['letter']['plaintext'] = str_replace(
-                '[' . $shortcode['code'] . ']', 
-                $shortcode['content'], 
-                $data['letter']['plaintext']
-            );
-        }
-
-        return $data;
-    }
-    
-    
-    public function Send($recepient, $letter, $params = []) {
-        if (!filter_var($recepient, FILTER_VALIDATE_EMAIL)) return ['error', 1];
-        
-        if (!APP::Module('DB')->Select(
-            $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
-            ['COUNT(id)'], 'mail_letters',
-            [['id', '=', $letter, PDO::PARAM_INT]]
-        )) {
-            return ['error', 2];
-        }
-        
+    public function PrepareSend($recepient, $letter, $params = []) {
         $params['recepient'] = $recepient;
         
         $letter = APP::Module('DB')->Select(
@@ -78,10 +46,21 @@ class Mail {
         $letter['html'] = APP::Render($letter['html'], 'eval', $params);
         $letter['plaintext'] = APP::Render($letter['plaintext'], 'eval', $params);
         
+        // shortcodes
+        foreach (APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            ['code', 'content'], 'mail_shortcodes'
+        ) as $shortcode) {
+            $letter['html'] = str_replace('[' . $shortcode['code'] . ']', $shortcode['content'], $letter['html']);
+            $letter['plaintext'] = str_replace('[' . $shortcode['code'] . ']', $shortcode['content'], $letter['plaintext']);
+        }
+        //
+        
         // [token]
         $token = APP::Module('Crypt')->Encode(json_encode([
             'email' => $recepient,
-            'letter' => $letter['id']
+            'letter' => $letter['id'],
+            'params' => $params
         ]));
         
         $letter['html'] = str_replace('[token]', $token, $letter['html']);
@@ -113,12 +92,44 @@ class Mail {
         foreach ($html_matches[0] as $key => $pattern) $letter['html'] = str_replace($pattern, APP::Module('Crypt')->Decode($html_matches[1][$key]), $letter['html']);
         foreach ($plaintext_matches[0] as $key => $pattern) $letter['plaintext'] = str_replace($pattern, APP::Module('Crypt')->Decode($plaintext_matches[1][$key]), $letter['plaintext']);
         //
+        
+        // [spamreport-link]
+        $spamreport_user_email_hash = $recepient ? APP::Module('Crypt')->Encode($recepient) : '[user_email]';
+        $spamreport_link = APP::Module('Routing')->root . 'mail/spamreport/' . $spamreport_user_email_hash;
+        
+        $letter['html'] = str_replace('[spamreport-link]', $spamreport_link, $letter['html']);
+        $letter['plaintext'] = str_replace('[spamreport-link]', $spamreport_link, $letter['plaintext']);
+        //
+        
+        // [unsubscribe-link]
+        $unsubscribe_user_email_hash = $recepient ? APP::Module('Crypt')->Encode($recepient) : '[user_email]';
+        $unsubscribe_link = APP::Module('Routing')->root . 'mail/unsubscribe/' . $unsubscribe_user_email_hash;
+        
+        $letter['html'] = str_replace('[unsubscribe-link]', $unsubscribe_link, $letter['html']);
+        $letter['plaintext'] = str_replace('[unsubscribe-link]', $unsubscribe_link, $letter['plaintext']);
+        //
 
         extract(APP::Module('Triggers')->Exec('before_mail_send_letter', [
             'recepient' => $recepient,
             'letter' => $letter,
             'params' => $params
         ]));
+
+        return $letter;
+    }
+    
+    public function Send($recepient, $letter, $params = []) {
+        if (!filter_var($recepient, FILTER_VALIDATE_EMAIL)) return ['error', 1];
+        
+        if (!APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
+            ['COUNT(id)'], 'mail_letters',
+            [['id', '=', $letter, PDO::PARAM_INT]]
+        )) {
+            return ['error', 2];
+        }
+        
+        $letter = $this->PrepareSend($recepient, $letter, $params);
         
         $transport = APP::Module('DB')->Select(
             $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
@@ -686,20 +697,9 @@ class Mail {
     }
     
     public function PreviewLetter() {
-        $group_sub_id = (int) isset(APP::Module('Routing')->get['group_sub_id_hash']) ? APP::Module('Crypt')->Decode(APP::Module('Routing')->get['group_sub_id_hash']) : 0;
-        $letter_id = (int) APP::Module('Crypt')->Decode(APP::Module('Routing')->get['letter_id_hash']);
-        
         APP::Render(
             'mail/admin/letters/preview', 'include', 
-            [
-                'letter' => APP::Module('DB')->Select(
-                    $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
-                    ['subject', 'html', 'plaintext'], 'mail_letters',
-                    [['id', '=', $letter_id, PDO::PARAM_INT]]
-                ),
-                'group_sub_id' => $group_sub_id,
-                'path' => $this->RenderLettersGroupsPath($group_sub_id)
-            ]
+            $this->PrepareSend(0, (int) APP::Module('Crypt')->Decode(APP::Module('Routing')->get['letter_id_hash']))
         );
     }
     
@@ -867,6 +867,17 @@ class Mail {
             ['code', 'content'], 'mail_shortcodes',
             [['id', '=', $shortcode_id, PDO::PARAM_INT]]
         ));
+    }
+    
+    public function PreviewShortcode() {
+        APP::Render(
+            'mail/admin/shortcodes/preview', 'include', 
+            APP::Module('DB')->Select(
+                $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
+                ['code', 'content'], 'mail_shortcodes',
+                [['id', '=', (int) APP::Module('Crypt')->Decode(APP::Module('Routing')->get['shortcode_id_hash']), PDO::PARAM_INT]]
+            )
+        );
     }
     
     

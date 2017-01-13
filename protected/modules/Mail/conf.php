@@ -1,12 +1,13 @@
 <?
 return [
     'routes' => [
-        ['admin\/mail\/letters\/(?P<group_sub_id_hash>.*)\/preview\/(?P<letter_id_hash>.*)',        'Mail', 'PreviewLetter'],       // Preview letter
+        ['admin\/mail\/letters\/preview\/(?P<letter_id_hash>.*)',                                   'Mail', 'PreviewLetter'],       // Preview letter
         ['admin\/mail\/letters\/(?P<group_sub_id_hash>.*)\/groups\/add',                            'Mail', 'AddLettersGroup'],     // Add letters group
         ['admin\/mail\/letters\/(?P<group_sub_id_hash>.*)\/groups\/(?P<group_id_hash>.*)\/edit',    'Mail', 'EditLettersGroup'],    // Edit letters group
         ['admin\/mail\/letters\/(?P<group_sub_id_hash>.*)\/add(\?.*)?',                             'Mail', 'AddLetter'],           // Add letter
         ['admin\/mail\/letters\/(?P<group_sub_id_hash>.*)\/edit\/(?P<letter_id_hash>.*)',           'Mail', 'EditLetter'],          // Edit letter
         ['admin\/mail\/letters\/(?P<group_sub_id_hash>.*)',                                         'Mail', 'ManageLetters'],       // Manage letters
+        
         
         ['admin\/mail\/senders\/(?P<group_sub_id_hash>.*)\/groups\/add',                            'Mail', 'AddSendersGroup'],     // Add senders group
         ['admin\/mail\/senders\/(?P<group_sub_id_hash>.*)\/groups\/(?P<group_id_hash>.*)\/edit',    'Mail', 'EditSendersGroup'],    // Edit senders group
@@ -20,6 +21,7 @@ return [
         ['admin\/mail\/transport\/add',                                                             'Mail', 'AddTransport'],        // Add transport
         ['admin\/mail\/transport\/edit\/(?P<transport_id_hash>.*)',                                 'Mail', 'EditTransport'],       // Edit transport
         
+        ['admin\/mail\/shortcodes\/preview\/(?P<shortcode_id_hash>.*)',                             'Mail', 'PreviewShortcode'],    // Preview shortcode
         ['admin\/mail\/shortcodes(\?.*)?',                                                          'Mail', 'ManageShortcodes'],    // Manage short codes
         ['admin\/mail\/shortcodes\/add',                                                            'Mail', 'AddShortcode'],        // Add short code
         ['admin\/mail\/shortcodes\/edit\/(?P<shortcode_id_hash>.*)',                                'Mail', 'EditShortcode'],       // Edit short code

@@ -3190,6 +3190,17 @@ class Tunnels {
         
         fclose($lock);
     }
+    
+    
+    public function UnsubscribeShortcode($id, $data) {
+        $user_tunnel_hash = isset($data['params']['user_tunnel_id']) ? APP::Module('Crypt')->Encode($data['params']['user_tunnel_id']) : '[user_tunnel_id]';
+        $unsubscribe_tunnel_link = APP::Module('Routing')->root . 'tunnels/unsubscribe/' . $user_tunnel_hash;
+
+        $data['letter']['html'] = str_replace('[unsubscribe-tunnel-link]', $unsubscribe_tunnel_link, $data['letter']['html']);
+        $data['letter']['plaintext'] = str_replace('[unsubscribe-tunnel-link]', $unsubscribe_tunnel_link, $data['letter']['plaintext']);
+        
+        return $data;
+    }
 
 }
 

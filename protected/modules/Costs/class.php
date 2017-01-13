@@ -98,7 +98,7 @@ class Costs {
         if (!empty($campaigns)) {
             $campaigns_id = [];
             
-            foreach ($campaigns['result']['Campaigns'] as $campaign) {
+            foreach ((array) $campaigns['result']['Campaigns'] as $campaign) {
                 $campaigns_id[] = $campaign['Id'];
                 
                 $banners_stat = json_decode(APP::Module('Utils')->Curl([
