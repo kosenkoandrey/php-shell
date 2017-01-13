@@ -2786,7 +2786,7 @@ class Tunnels {
                         $this->settings['module_tunnels_db_connection'], 'tunnels_users',
                         [
                             'id' => 'NULL',
-                            'tunnel_id' => [$object['settings']['process_id'], PDO::PARAM_INT],
+                            'tunnel_id' => [$object['settings']['tunnel_id'], PDO::PARAM_INT],
                             'user_id' => [$tunnel['user_id'], PDO::PARAM_INT],
                             'state' => ['complete', PDO::PARAM_STR],
                             'resume_date' => ['0000-00-00 00:00:00', PDO::PARAM_STR],
@@ -3468,8 +3468,8 @@ class Tunnels {
     	if(!count($data)){
             return false;
             $data = [
-                'image' => APP::Module('Routing')->root.'protected/modules/Tunnels/resources/bg.png',
-                'font' => ROOT."protected/modules/Tunnels/resources/arial.ttf",
+                'image' => ROOT.'/protected/modules/Tunnels/resources/bg.png',
+                'font' => ROOT."/protected/modules/Tunnels/resources/arial.ttf",
                 'font_size' => 60,
                 'time_end' => time() + 3600
             ];
