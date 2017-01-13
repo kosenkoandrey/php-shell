@@ -28,6 +28,33 @@
                     echo eval('?>' . $data['page']['content'] . '<?');
                     ?>
                 </div>
+                
+                <div class="card">
+                    <?
+                    if (isset(APP::$modules['Comments'])) {
+                        $comment_object_type = APP::Module('DB')->Select(APP::Module('Comments')->settings['module_comments_db_connection'], ['fetchColumn', 0], ['id'], 'comments_objects', [['name', '=', "MemberPage", PDO::PARAM_STR]]);
+
+                        APP::Render('comments/widgets/default/list', 'include', [
+                            'type' => $comment_object_type,
+                            'id' => APP::Module('Crypt')->Decode(APP::Module('Routing')->get['page_id_hash']),
+                            'likes' => true,
+                            'class' => [
+                                'holder' => 'palette-Grey-50 bg p-l-10'
+                            ]
+                        ]);
+
+                        APP::Render('comments/widgets/default/form', 'include', [
+                            'type' => $comment_object_type,
+                            'id' => APP::Module('Crypt')->Decode(APP::Module('Routing')->get['page_id_hash']),
+                            'login' => [],
+                            'class' => [
+                                'holder' => false,
+                                'list' => 'palette-Grey-50 bg p-l-10'
+                            ]
+                        ]);
+                    }
+                    ?>
+                </div>
             </section>
 
             <? APP::Render('core/widgets/template/footer') ?>
