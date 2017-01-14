@@ -1792,6 +1792,33 @@ class Users {
         exit;
     }
 
+    public function APIAddAbout() {
+        $id = APP::Module('DB')->Insert(
+            $this->settings['module_users_db_connection'], 'users_about',
+            [
+                'id' => 'NULL',
+                'user' => [$_POST['user'], PDO::PARAM_INT],
+                'item' => [$_POST['item'], PDO::PARAM_STR],
+                'value' => [$_POST['value'], PDO::PARAM_STR],
+                'up_date' => 'NOW()'
+            ]
+        );
+        
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode($id ? [
+            'result' => 'success',
+            'action' => [
+                'id' => $id,
+                'id_hash' => APP::Module('Crypt')->Encode($id)
+            ]
+        ] : [
+            'result' => 'error',
+        ]);
+    }
+    
     public function APIUpdateAbout() {
         $out = [
             'status' => 'success',
@@ -2242,6 +2269,7 @@ class Users {
     }
     
     public function Unsubscribe() {
+        
         $mail_log = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['mail_log_hash']);
         
         if (!APP::Module('DB')->Select(
@@ -2627,20 +2655,13 @@ class UsersActions {
     }
     
     public function tunnel_subscribe($id, $settings){
-        $out = [
-            'status' => 'success'
-        ];
-        
-        $users = APP::Module('DB')->Select(
-            APP::Module('Users')->settings['module_users_db_connection'], 
-            ['fetchAll', PDO::FETCH_ASSOC], 
-            ['id', 'email'], 'users',
+        foreach (APP::Module('DB')->Select(
+            APP::Module('Users')->settings['module_users_db_connection'], ['fetchAll', PDO::FETCH_COLUMN], 
+            ['email'], 'users',
             [['id', 'IN', $id, PDO::PARAM_INT]]
-        );
-
-        foreach($users as $user){
-            APP::Module('Tunnels')->Subscribe([
-                'email'             => $user['email'],
+        ) as $email) {
+            $out = APP::Module('Tunnels')->Subscribe([
+                'email'             => $email,
                 'tunnel'            => $settings['tunnel'],
                 'activation'        => $settings['activation'],
                 'source'            => isset($settings['source']) && $settings['source'] ? substr($settings['source'], 0, 100) : 'APISubscribe',
@@ -2655,7 +2676,7 @@ class UsersActions {
                 'save_utm'          => isset($settings['save_utm']) ? $settings['save_utm'] : false
             ]);
             
-            if(isset($result['status']) && $result['status'] == 'error'){
+            if (isset($result['status']) && $result['status'] == 'error') {
                 $out['status'] = 'error';
                 $out['code'][] = $result['code'];
             }
