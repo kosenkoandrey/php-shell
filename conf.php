@@ -1,7 +1,6 @@
 <?
 return [
-    'location'          => ['http', 'dev1.sendthis.ru', '/'],
-    //'location'          => ['https', 'domain.com', '/'],
+    'location'          => ['http', 'pult2.glamurnenko.ru', '/'],
     'encoding'          => 'UTF-8',
     'locale'            => 'en_US',
     'timezone'          => 'Etc/GMT-3',

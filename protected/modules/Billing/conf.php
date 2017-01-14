@@ -11,7 +11,7 @@ return [
         ['admin\/billing\/invoices\/edit\/(?P<invoice_id_hash>.*)',     'Billing', 'EditInvoice'],
         
         ['admin\/billing\/payments(\?.*)?',                             'Billing', 'ManagePayments'],
-        ['billing\/payments\/make\/(?P<invoice_id_hash>.*)',                 'Billing', 'PaymentMake'],
+        ['billing\/payments\/make\/(?P<invoice_id_hash>.*)',            'Billing', 'PaymentMake'],
         ['admin\/billing\/settings(\?.*)?',                             'Billing', 'Settings'],
         // API
         ['admin\/billing\/products\/api\/search\.json(\?.*)?',          'Billing', 'APISearchProducts'],
