@@ -175,21 +175,21 @@ foreach ($data['path'] as $key => $value) {
                                 case 'error':
                                     $.each(result.errors, function(i, error) {
                                         switch(error) {
-																																												case 1 :
+                                            case 1 :
 
-																																																break;
-																																												case 2 :
-																																																swal({
-																																																				title: 'Error!',
-																																																				text: 'The wrong type of file "' + $('.fileinput-filename').text() + '"',
-																																																				type: 'error',
-																																																				showCancelButton: false,
-																																																				confirmButtonText: 'Ok',
-																																																				closeOnConfirm: false
-																																																});
-																																																return false;
-																																																break;
-																																								}
+                                                break;
+                                            case 2 :
+                                                swal({
+                                                    title: 'Error!',
+                                                    text: 'The wrong type of file "' + $('.fileinput-filename').text() + '"',
+                                                    type: 'error',
+                                                    showCancelButton: false,
+                                                    confirmButtonText: 'Ok',
+                                                    closeOnConfirm: false
+                                                });
+                                                return false;
+                                                break;
+                                        }
                                     });
                                     break;
                             }

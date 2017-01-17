@@ -96,7 +96,8 @@ $extension = explode('/', $data['file']['type']);
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.min.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/autosize/dist/autosize.min.js"></script>
-
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/fileinput/fileinput.min.js"></script>
+        
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/codemirror/lib/codemirror.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/codemirror/addon/edit/matchbrackets.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/codemirror/addon/display/fullscreen.js"></script>
