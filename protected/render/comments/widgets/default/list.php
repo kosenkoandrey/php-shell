@@ -46,6 +46,26 @@ if ($comments['total']) {
                             <p class="m-b-5 m-t-10 f-12 c-gray"><i class="zmdi zmdi-calendar"></i> <?= date('Y-m-d H:i:s', $comment['up_date']) ?></p>
                         </h4>
                         <p style="white-space: pre-wrap;" class="m-b-10"><?= $comment['message'] ?></p>
+                        <? if(APP::Module('Comments')->settings['module_comments_files']){ 
+                            foreach($comment['files'] as $file){
+                                switch ($file['file_type']) {
+                                    case 'video/mp4':
+                                        ?>
+                                        <p><video width="640" height="480" controls>
+                                            <source src="<?= APP::Module('Routing')->root ?>comments/download/<?= APP::Module('Crypt')->Encode($file['file_id']) ?>" type="video/mp4">
+                                            </video><p><a href="<?= APP::Module('Routing')->root ?>comments/download/<?= APP::Module('Crypt')->Encode($file['file_id']) ?>">Download</a></p></p>
+                                        <?
+                                        break;
+                                    case 'application/pdf':
+                                        ?><p><span class="pdf-block" ><span style="display: inline-block" class="avatar-char palette-Orange-400 bg m-r-5"><i class="zmdi zmdi-file"></i></span></span><a href="<?= APP::Module('Routing')->root ?>comments/download/<?= APP::Module('Crypt')->Encode($file['file_id']) ?>">Download</a></p><?
+                                        break;
+                                    case 'image/jpeg':
+                                    case 'image/png':
+                                        ?><p><img style="height:200px;" src="<?= APP::Module('Routing')->root ?>comments/download/<?= APP::Module('Crypt')->Encode($file['file_id']) ?>"><p><a href="<?= APP::Module('Routing')->root ?>comments/download/<?= APP::Module('Crypt')->Encode($file['file_id']) ?>">Download</a></p></p><?
+                                        break;
+                                }
+                            }
+                        }?>
                         <div class="btn-group btn-group-xs m-b-10" role="group">
                             <button type="button" class="reply btn palette-Teal bg waves-effect btn-xs" data-token="<?= $comment_hash ?>"><i class="zmdi zmdi-mail-reply"></i> Reply</button>
                             <?

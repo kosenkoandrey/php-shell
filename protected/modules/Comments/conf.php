@@ -7,6 +7,7 @@ return [
         ['admin\/comments\/objects\/add',                           'Comments', 'AddCommentObject'],        // Add comment object
         ['admin\/comments\/objects\/edit\/(?P<object_id_hash>.*)',  'Comments', 'EditCommentObject'],       // Edit comment object
         ['admin\/comments\/settings(\?.*)?',                        'Comments', 'Settings'],                // Settings
+        ['comments\/download\/(?P<file_id_hash>.*)',                'Comments', 'DownloadFile'],            // Download file
         
         ['comments\/api\/add\.json(\?.*)?',                         'Comments', 'APIAddComment'],           // [API] Add comment
 
@@ -19,5 +20,6 @@ return [
         ['admin\/comments\/api\/objects\/update\.json(\?.*)?',      'Comments', 'APIUpdateCommentObject'],  // [API] Update comment object
         ['admin\/comments\/api\/objects\/remove\.json(\?.*)?',      'Comments', 'APIRemoveCommentObject'],  // [API] Remove comment object
         ['admin\/comments\/api\/settings\/update\.json(\?.*)?',     'Comments', 'APIUpdateSettings'],       // [API] Update settings
+        ['admin\/comments\/api\/file\/remove.json(\?.*)?',          'Comments', 'APIFileRemove'],           // [API] File Remove
     ]
 ];
