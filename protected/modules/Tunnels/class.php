@@ -568,6 +568,35 @@ class Tunnels {
             )
         ]);
     }
+    
+    
+    public function APIAddTag() {
+        $id = APP::Module('DB')->Insert(
+            $this->settings['module_tunnels_db_connection'], 'tunnels_tags',
+            [
+                'id' => 'NULL',
+                'user_tunnel_id' => [$_POST['user_tunnel_id'], PDO::PARAM_INT],
+                'label_id' => [$_POST['label_id'], PDO::PARAM_STR],
+                'token' => [$_POST['token'], PDO::PARAM_STR],
+                'info' => [$_POST['info'], PDO::PARAM_STR],
+                'cr_date' => 'NOW()'
+            ]
+        );
+
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode($id ? [
+            'result' => 'success',
+            'action' => [
+                'id' => $id,
+                'id_hash' => APP::Module('Crypt')->Encode($id)
+            ]
+        ] : [
+            'result' => 'error',
+        ]);
+    }
 
     
     public function APISubscribe() {

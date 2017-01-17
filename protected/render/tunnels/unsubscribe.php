@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>PHP-shell - Unsubscribe</title>
+        <title>Отписка от темы</title>
 
         <!-- Vendor CSS -->
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
@@ -19,7 +19,7 @@
     </head>
     <body data-ma-header="teal">
         <? APP::Render('admin/widgets/header', 'include', [
-            'Unsubscribe' => 'tunnels/unsubscribe/' . APP::Module('Routing')->get['user_tunnel_hash']
+            'Отписка от темы' => 'tunnels/unsubscribe/' . APP::Module('Routing')->get['user_tunnel_hash']
         ]) ?>
         <section id="main" class="center">
             <section id="content">

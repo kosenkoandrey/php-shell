@@ -21,6 +21,7 @@ return [
         ['users\/api\/subscribe\.json(\?.*)?',                                  'Users', 'APISubscribe'],               // [API] Subscribe
         ['users\/api\/reset\-password\.json(\?.*)?',                            'Users', 'APIResetPassword'],           // [API] Reset password
         ['users\/api\/change\-password\.json(\?.*)?',                           'Users', 'APIChangePassword'],          // [API] Change password
+        ['users\/api\/about\/add\.json(\?.*)?',                                 'Users', 'APIAddAbout'],                // [API] Add about user
         ['users\/api\/about\/update\.json(\?.*)?',                              'Users', 'APIUpdateAbout'],             // [API] Update about current user
         ['users\/api\/unsubscribe\.json(\?.*)?',                                'Users', 'APIUnsubscribe'],             // [API] Unsubscribe
         ['users\/api\/pause\.json(\?.*)?',                                      'Users', 'APIPause'],                   // [API] Pause

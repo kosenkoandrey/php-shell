@@ -1,0 +1,36 @@
+.switchcontent {
+}
+
+.switchcontent_first {
+	position: relative;
+	margin: 5px 5px 5px 5px;
+	border: 1px solid #cccbcb;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	-khtml-border-radius: 8px;
+	border-radius: 8px;
+	-moz-box-shadow: 2px 2px 2px #ccc;
+	-webkit-box-shadow: 2px 2px 2px #ccc;
+	box-shadow: 2px 2px 2px #ccc;
+}
+
+.text_answer{
+	position: relative;
+	margin: 10px 10px 10px 10px;
+	font-size:15px;
+}
+
+.question{
+	cursor:hand; 
+	cursor:pointer; 
+	color:#0000FF;
+}
+
+.questionSpan {
+	border-bottom: 1px dashed blue;
+	font-size:18px;
+}
+
+.arrow {
+	margin:0 px 0 px 0 px 0 px;
+}
