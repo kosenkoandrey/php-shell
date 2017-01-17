@@ -9,6 +9,7 @@ return [
             'password'  => 'DvRAUh4KGC9Jf8Fc',
             'charset'   => 'utf8'
         ],
+        
         'auto' => [
             'type'      => 'mysql',
             'host'      => 'localhost',
