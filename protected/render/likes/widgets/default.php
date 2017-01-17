@@ -29,8 +29,8 @@ ob_start();
             } else {
                 ?>
                 swal({
-                    title: 'Oops!',
-                    text: 'You must be logged to like this',
+                    title: 'Ошибка',
+                    text: 'Вы должны войти для оценки',
                     type: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#DD6B55',
@@ -49,7 +49,7 @@ ob_start();
         });
         
         $(document).on('click', '.likes-modal', function() {
-            $('#likes-modal .modal-title').html($(this).data('count') + ' people like this');
+            $('#likes-modal .modal-title').html($(this).data('count') + ' людям это нравится');
             $('#likes-modal .modal-body').html('<center><div class="preloader pl-xxl"><svg class="pl-circular" viewBox="25 25 50 50"><circle class="plc-path" cx="50" cy="50" r="20" /></svg></div></center>');
             $('#likes-modal').modal('show');
             
@@ -83,7 +83,7 @@ ob_start();
                                 ].join(''));
                             });
                             break;
-                        case 'error': alert('Oops! Error :('); break;
+                        case 'error': alert('Ошибка :('); break;
                     }
                 }
             });
@@ -101,7 +101,7 @@ if (($like['count']) && ($data['details'])) {
             $('#<?= $like_uniqid ?>').popover({
                 content: '<? foreach ($like['users'] as $value) { ?><a title="<?= $value['username'] ? $value['username'] : 'user' . $value['user'] ?>" href="<?= APP::Module('Routing')->root ?>users/profile/<?= APP::Module('Crypt')->Encode($value['user']) ?>" target="_blank" style="display: inline-block"><img class="media-object avatar-img z-depth-1-bottom" src="<?= APP::$conf['location'][0] ?>://www.gravatar.com/avatar/<?= md5($value['email']) ?>?s=38&d=<?= urlencode(APP::Module('Routing')->root . APP::Module('Users')->settings['module_users_profile_picture']) ?>&t=<?= time() ?>" style="width: 38px"></a><? } ?>',
                 placement: 'top',
-                title: '<a class="likes-modal" href="javascript:void(0)" class="c-teal" data-token="<?= APP::Module('Crypt')->Encode(json_encode(['type' => $data['type'], 'id' => $data['id']])) ?>" data-count="<?= $like['count'] ?>"><b><?= $like['count'] ?></b> people like this</a>',
+                title: '<a class="likes-modal" href="javascript:void(0)" class="c-teal" data-token="<?= APP::Module('Crypt')->Encode(json_encode(['type' => $data['type'], 'id' => $data['id']])) ?>" data-count="<?= $like['count'] ?>"><b><?= $like['count'] ?></b> людям это нравится</a>',
                 trigger: 'manual',
                 animation: false,
                 html: true,
@@ -136,7 +136,7 @@ ob_start();
             </div>
             <div class="modal-body"></div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-link" data-dismiss="modal">Закрыть</button>
             </div>
         </div>
     </div>

@@ -47,7 +47,7 @@
                                     APP::Render('likes/widgets/default', 'include', [
                                         'type' => APP::Module('DB')->Select(APP::Module('Likes')->settings['module_likes_db_connection'], ['fetchColumn', 0], ['id'], 'likes_objects', [['name', '=', "User", PDO::PARAM_STR]]),
                                         'id' => $data['user']['id'],
-                                        'text' => 'Like',
+                                        'text' => 'Мне нравится',
                                         'class' => ['btn-lg', 'btn-block', 'f-700'],
                                         'details' => true
                                     ]);

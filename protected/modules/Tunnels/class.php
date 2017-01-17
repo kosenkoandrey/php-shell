@@ -377,6 +377,17 @@ class Tunnels {
         ]);
     }
     
+    public function APIManage() {
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode(APP::Module('DB')->Select(
+            $this->settings['module_tunnels_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            ['id', 'type', 'state', 'name'], 'tunnels'
+        ));
+    }
+    
     
     public function APICreateAction() {
         $id = APP::Module('DB')->Insert(

@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>PHP-shell - View page</title>
+        <title>Платные материалы</title>
 
         <!-- Vendor CSS -->
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
@@ -14,11 +14,27 @@
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bootgrid/jquery.bootgrid.min.css" rel="stylesheet">
         
+        <link href='https://fonts.googleapis.com/css?family=Oranienbaum&subset=latin,cyrillic' rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Roboto:300&subset=latin,cyrillic" rel="stylesheet" type="text/css">
+        
+        <style>
+            .card-header h2 {
+                font-family: Oranienbaum, serif;
+                text-transform: uppercase;
+                font-size: 25px !important;
+            }
+            
+            .card-body {
+                font-family: 'Roboto', sans-serif;
+                font-size: 16px;
+            }
+        </style>
+        
         <? APP::Render('core/widgets/css') ?>
         <? APP::Render('core/widgets/template/css') ?>
     </head>
     <body data-ma-header="teal">
-        <? APP::Render('admin/widgets/header', 'include', [
+        <? APP::Render('core/widgets/template/header', 'include', [
             $data['page']['title'] => 'members/page/' . APP::Module('Routing')->get['page_id_hash']
         ]) ?>
         <section id="main" class="center">

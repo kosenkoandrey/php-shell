@@ -96,7 +96,7 @@
                     },
                     formatters: {
                         actions: function(column, row) {
-                            return  '<a href="<?= APP::Module('Routing')->root ?>admin/mail/shortcodes/preview/' + row.token + '" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-eye"></span></a> ' +
+                            return  '<a href="<?= APP::Module('Routing')->root ?>admin/mail/shortcodes/preview/' + row.token + '" class="btn btn-sm btn-default btn-icon waves-effect waves-circle" target="_blank"><span class="zmdi zmdi-eye"></span></a> ' +
                                     '<a href="<?= APP::Module('Routing')->root ?>admin/mail/shortcodes/edit/' + row.token + '" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-edit"></span></a> ' +
                                     '<a href="javascript:void(0)" class="btn btn-sm btn-default btn-icon waves-effect waves-circle remove-shortcode" data-shortcode-id="' + row.id + '"><span class="zmdi zmdi-delete"></span></a>';
                         }

@@ -1,7 +1,7 @@
 <?
 return [
     'routes' => [
-        ['admin\/mail\/letters\/preview\/(?P<letter_id_hash>.*)',                                   'Mail', 'PreviewLetter'],       // Preview letter
+        ['admin\/mail\/letters\/preview\/(?P<letter_id_hash>.*)(\?.*)?',                            'Mail', 'PreviewLetter'],       // Preview letter
         ['admin\/mail\/letters\/(?P<group_sub_id_hash>.*)\/groups\/add',                            'Mail', 'AddLettersGroup'],     // Add letters group
         ['admin\/mail\/letters\/(?P<group_sub_id_hash>.*)\/groups\/(?P<group_id_hash>.*)\/edit',    'Mail', 'EditLettersGroup'],    // Edit letters group
         ['admin\/mail\/letters\/(?P<group_sub_id_hash>.*)\/add(\?.*)?',                             'Mail', 'AddLetter'],           // Add letter
@@ -44,6 +44,7 @@ return [
         ['admin\/mail\/api\/letters\/groups\/add\.json(\?.*)?',         'Mail', 'APIAddLettersGroup'],      // [API] Add letters group
         ['admin\/mail\/api\/letters\/groups\/remove\.json(\?.*)?',      'Mail', 'APIRemoveLettersGroup'],   // [API] Remove letters group
         ['admin\/mail\/api\/letters\/groups\/update\.json(\?.*)?',      'Mail', 'APIUpdateLettersGroup'],   // [API] Update letters group
+        ['admin\/mail\/api\/letters\/manage\.json(\?.*)?',              'Mail', 'APIManageLetters'],        // [API] Manage letters
         ['admin\/mail\/api\/letters\/get\.json(\?.*)?',                 'Mail', 'APIGetLetters'],           // [API] Get letter
         
         ['admin\/mail\/api\/senders\/add\.json(\?.*)?',                 'Mail', 'APIAddSender'],            // [API] Add sender

@@ -425,6 +425,7 @@
         <script src="<?= APP::Module('Routing')->root ?>public/modules/tunnels/scheme/letter-selector/script.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/modules/tunnels/scheme/letter-sender/script.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/modules/tunnels/scheme/rules-editor/script.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>public/modules/tunnels/scheme/tunnel-selector/script.js"></script>
         
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
         
@@ -1306,91 +1307,11 @@
                                                 })
                                                 .append(
                                                     $('<input/>', {
-                                                        type: 'text',
+                                                        type: 'hidden',
                                                         class: 'form-control',
                                                         id: 'in_letter'
                                                     })
                                                     .val(TunnelEditor.Objects.Actions[id].settings.letter)
-                                                )
-                                            )
-                                        )
-                                        .append(
-                                            $('<div/>', {
-                                                class: 'form-group'
-                                            })
-                                            .append(
-                                                $('<label/>', {
-                                                    for: 'in_sender',
-                                                    class: 'col-sm-2 control-label'
-                                                })
-                                                .append('Отправитель')
-                                            )
-                                            .append(
-                                                $('<div/>', {
-                                                    class: 'col-sm-10'
-                                                })
-                                                .append(
-                                                    $('<input/>', {
-                                                        type: 'text',
-                                                        class: 'form-control',
-                                                        id: 'in_sender'
-                                                    })
-                                                    .val(TunnelEditor.Objects.Actions[id].settings.sender)
-                                                )
-                                            )
-                                        )
-                                        .append(
-                                            $('<div/>', {
-                                                class: 'form-group'
-                                            })
-                                            .append(
-                                                $('<label/>', {
-                                                    for: 'in_mailing',
-                                                    class: 'col-sm-2 control-label'
-                                                })
-                                                .append('Рассылка')
-                                            )
-                                            .append(
-                                                $('<div/>', {
-                                                    class: 'col-sm-10'
-                                                })
-                                                .append(
-                                                    $('<input/>', {
-                                                        type: 'text',
-                                                        class: 'form-control',
-                                                        id: 'in_mailing'
-                                                    })
-                                                    .val(TunnelEditor.Objects.Actions[id].settings.mailing)
-                                                )
-                                            )
-                                        )
-                                        .append(
-                                            $('<div/>', {
-                                                class: 'form-group'
-                                            })
-                                            .append(
-                                                $('<label/>', {
-                                                    for: 'in_transport',
-                                                    class: 'col-sm-2 control-label'
-                                                })
-                                                .append('Транспорт')
-                                            )
-                                            .append(
-                                                $('<div/>', {
-                                                    class: 'col-sm-10'
-                                                })
-                                                .append(
-                                                    $('<select/>', {
-                                                        class: 'form-control',
-                                                        id: 'in_transport'
-                                                    })
-                                                    .append(
-                                                        $('<option/>', {
-                                                            value: ''
-                                                        })
-                                                        .append('SendThis')
-                                                    )
-                                                    .val(TunnelEditor.Objects.Actions[id].settings.transport)
                                                 )
                                             )
                                         )
@@ -1450,24 +1371,6 @@
                                                 delete TunnelEditor.Objects.Actions[id].settings.letter;
                                             }
                                             
-                                            if ($('#in_sender').val()) {
-                                                TunnelEditor.Objects.Actions[id].settings.sender = parseInt($('#in_sender').val());
-                                            } else {
-                                                delete TunnelEditor.Objects.Actions[id].settings.sender;
-                                            }
-                                            
-                                            if ($('#in_mailing').val()) {
-                                                TunnelEditor.Objects.Actions[id].settings.mailing = $('#in_mailing').val();
-                                            } else {
-                                                delete TunnelEditor.Objects.Actions[id].settings.mailing;
-                                            }
-                                            
-                                            if ($('#in_transport').val()) {
-                                                TunnelEditor.Objects.Actions[id].settings.transport = $('#in_transport').val();
-                                            } else {
-                                                delete TunnelEditor.Objects.Actions[id].settings.transport;
-                                            }
-
                                             if ($('#in_comment').val()) {
                                                 TunnelEditor.Objects.Actions[id].comment = $('#in_comment').val();
                                             } else {
@@ -2951,8 +2854,10 @@
                             case 'action':
                                 switch (TunnelEditor.Objects.Actions[id].action) {
                                     case 'send_mail':
-                                        //$('#in_letter').MailingLetterSelector();
-                                        //$('#in_sender').MailingSenderSelector();
+                                        $('#in_letter').MailingLetterSelector();
+                                        break;
+                                    case 'auto_complete':
+                                        $('#tunnel_id').TunnelSelector();
                                         break;
                                     case 'subscribe':
                                         $('#in_process_0').TunnelSelector();

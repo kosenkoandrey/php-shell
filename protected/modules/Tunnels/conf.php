@@ -16,6 +16,7 @@ return [
         ['admin\/tunnels\/api\/settings\/update\.json(\?.*)?',      'Tunnels', 'APIUpdateSettings'],
         
         ['admin\/tunnels\/api\/scheme\.json(\?.*)?',                'Tunnels', 'APIScheme'],
+        ['admin\/tunnels\/api\/manage\.json(\?.*)?',                'Tunnels', 'APIManage'],
         
         ['admin\/tunnels\/api\/actions\/create\.json(\?.*)?',       'Tunnels', 'APICreateAction'],
         ['admin\/tunnels\/api\/actions\/update\.json(\?.*)?',       'Tunnels', 'APIUpdateAction'],

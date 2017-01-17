@@ -13,7 +13,7 @@
 
             settings = $.extend( {
                 'debug': false,
-                'url' : 'https://pult.glamurnenko.ru',
+                'url' : 'http://pult2.glamurnenko.ru',
                  callback: function() {}
             }, options);
 
@@ -31,7 +31,7 @@
                 
                 $.ajax({
                     type: 'post',
-                    url: settings.url + '/mailing/admin/letters/api/list.json',
+                    url: settings.url + '/admin/mail/api/letters/get.json',
                     data: {
                         select: ['id', 'subject'],
                         where: [
@@ -39,7 +39,7 @@
                         ]
                     },
                     success: function(letters) {
-                        $('> .btn-group > .letter-preview', letters_manager.next()).attr('href', settings.url + '/mailing/admin/letters/html/' + letters[0].id).removeClass('disabled');
+                        $('> .btn-group > .letter-preview', letters_manager.next()).attr('href', settings.url + '/admin/mail/letters/preview/' + letters[0].token).removeClass('disabled');
                         $('> .btn-group > .letter-subject', letters_manager.next()).html('<span class="label label-warning">' + letters[0].id + '</span> ' + letters[0].subject);
                     }
                 });
@@ -89,10 +89,11 @@
             $('#letters-manager').remove();
         },
         select_letter: function() { 
+            var token = $(this).parent().data('token');
             var letter_id = $(this).parent().data('letter');
 
             letter_obj.parent().parent().prev().val(letter_id).trigger('paste');
-            letter_obj.prev().attr('href', settings.url + '/mailing/admin/letters/html/' + letter_id).removeClass('disabled');
+            letter_obj.prev().attr('href', settings.url + '/admin/mail/letters/preview/' + token).removeClass('disabled');
             letter_obj.html('<span class="label label-warning">' + letter_id + '</span> ' + $(this).html());
             methods.close_manager();
         },
@@ -105,76 +106,48 @@
         get_tree: function(group) { 
             active_group = group;
 
-            // Get group path
             $.ajax({
                 type: 'post',
-                url: settings.url +'/mailing/admin/letters/api/groups/path.json',
+                url: settings.url +'/admin/mail/api/letters/manage.json',
                 data: {
                     group: group
                 },
-                success: function(group_path) {
+                success: function(data) {
                     $('#groups-tree').empty();
                     $('#letters-list > tbody').empty();
 
-                    $.each(group_path, function(group_id, group_name) {
-                        if (group_id == group) {
-                            $('#groups-tree').append('<a href="#" class="btn btn-default btn-sm active disabled">' + group_name + '</a>');
+                    $.each(data.path, function(index, item) {
+                        if (item[0] == group) {
+                            $('#groups-tree').append('<a href="#" class="btn btn-default btn-sm active disabled">' + item[1] + '</a>');
                         } else {
-                            $('#groups-tree').append('<a href="#" data-group="' + group_id + '" class="btn btn-default btn-sm">' + group_name + '</a>');
-                        }
-
-                    });
-
-                    // Get groups
-                    $.ajax({
-                        type: 'post',
-                        url: settings.url + '/mailing/admin/letters/api/groups/list.json',
-                        data: {
-                            select: ['id', 'name'],
-                            where: [
-                                ['sub_id', '=', group],
-                                ['state', '=', 'active']
-                            ]
-                        },
-                        success: function(groups) {
-                            $.each(groups, function(group_index, group) {
-                                $('#letters-list > tbody').append([
-                                    '<tr data-group="' + group.id + '">',
-                                        '<td class="item-icon"><span class="glyphicon glyphicon-folder-open"></span></td>',
-                                        '<td class="item-group-name">' + group.name + '</td>',
-                                    '</tr>'
-                                ].join(''));
-                                
-                                $('#letters-list > tbody > tr[data-group="' + group.id + '"] > .item-group-name').on('click', methods.get_group);
-                            });
-
-                            // Get letters
-                            $.ajax({
-                                type: 'post',
-                                url: settings.url + '/mailing/admin/letters/api/list.json',
-                                data: {
-                                    select: ['id', 'subject', 'mailing_id'],
-                                    where: [
-                                        ['group_id', '=', group],
-                                        ['state', '=', 'active']
-                                    ]
-                                },
-                                success: function(groups) {
-                                    $.each(groups, function(letter_index, letter) {
-                                        $('#letters-list > tbody').append([
-                                            '<tr data-letter="' + letter.id + '">',
-                                                '<td class="item-icon"><span class="glyphicon glyphicon-envelope"></span></td>',
-                                                '<td class="item-letter-subject">' + letter.subject + '</td>',
-                                            '</tr>'
-                                        ].join(''));
-                                        
-                                        $('#letters-list > tbody > tr[data-letter="' + letter.id + '"] > .item-letter-subject').on('click', methods.select_letter);
-                                    });
-                                }
-                            });
+                            $('#groups-tree').append('<a href="#" data-group="' + item[0] + '" class="btn btn-default btn-sm">' + item[1] + '</a>');
                         }
                     });
                     
+                    $.each(data.list, function(index, item) {
+                        switch(item[0]) {
+                            case 'group':
+                                $('#letters-list > tbody').append([
+                                    '<tr data-group="' + item[1] + '">',
+                                        '<td class="item-icon"><span class="glyphicon glyphicon-folder-open"></span></td>',
+                                        '<td class="item-group-name">' + item[2] + '</td>',
+                                    '</tr>'
+                                ].join(''));
+
+                                $('#letters-list > tbody > tr[data-group="' + item[1] + '"] > .item-group-name').on('click', methods.get_group);
+                                break;
+                            case 'letter':
+                                $('#letters-list > tbody').append([
+                                    '<tr data-token="' + item[1] + '" data-letter="' + item[2] + '">',
+                                        '<td class="item-icon"><span class="glyphicon glyphicon-envelope"></span></td>',
+                                        '<td class="item-letter-subject">' + item[3] + '</td>',
+                                    '</tr>'
+                                ].join(''));
+
+                                $('#letters-list > tbody > tr[data-letter="' + item[2] + '"] > .item-letter-subject').on('click', methods.select_letter);
+                                break;
+                        }
+                    });
                 }
             });
         }

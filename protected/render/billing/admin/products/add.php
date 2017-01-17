@@ -65,19 +65,18 @@
                                     </div>
                                 </div>
                             </div>
-                                                                                                                                                                                                                                                            <div class="form-group">
+                            <div class="form-group">
                                 <label for="members_access" class="col-sm-2 control-label">Access members</label>
-                                <div class="col-sm-3">
-                                    <div class="fg-line">
-                                        <input type="text" class="form-control" name="members_access" id="members_access">
-                                    </div>
+                                <div class="col-md-5">
+                                    <div id="members-access"></div>
+                                    <button id="add-members-access" type="button" class="btn btn-default">Add object</button>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-md-2 control-label">Secondary products</label>
                                 <div class="col-md-5">
                                     <div id="secondary-products"></div>
-                                    <button id="add-secondary-product" type="button" class="btn btn-default btn-labeled fa fa-plus">Add product</button>
+                                    <button id="add-secondary-product" type="button" class="btn btn-default">Add product</button>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -110,20 +109,39 @@
 
     <script>
         $(document).ready(function() {
+            var members_access_counter = 0;
             var secondary_products_counter = 0;
 
+            $('#add-members-access').click(function() {
+                members_access_counter ++;
+
+                $('#members-access').append([
+                    '<div class="row m-b-10">',
+                        '<div class="col-md-6">',
+                            '<input class="form-control" id="members-access-id-' + members_access_counter + '" name="members_access[' + members_access_counter + '][id]" placeholder="Object" type="text">',
+                        '</div>',
+                        '<div class="col-md-5">',
+                            '<input class="form-control" id="members-access-time-' + members_access_counter + '" name="members_access[' + members_access_counter + '][timeout]" placeholder="Timeout" type="text" value="+0 days">',
+                        '</div>',
+                        '<div class="col-md-1">',
+                            '<button type="button" class="remove-members-access btn palette-Teal btn-icon bg waves-effect waves-circle waves-float zmdi zmdi-close"></button>',
+                        '</div>',
+                    '</div>'
+                ].join(''));
+            });
+            
             $('#add-secondary-product').click(function() {
                 secondary_products_counter ++;
 
                 $('#secondary-products').append([
                     '<div class="row m-b-10">',
-                        '<div class="col-md-6 mar-btm">',
-                            '<select class="form-control selectpicker" id="secondary-products-' + secondary_products_counter + '" name="secondary_products[' + secondary_products_counter + '][id]" data-placeholder="product"></select>',
+                        '<div class="col-md-6">',
+                            '<select class="form-control selectpicker" id="secondary-products-' + secondary_products_counter + '" name="secondary_products[' + secondary_products_counter + '][id]" placeholder="product"></select>',
                         '</div>',
-                        '<div class="col-md-5 mar-btm">',
-                            '<input class="form-control" id="secondary-products-time-' + secondary_products_counter + '" name="secondary_products[' + secondary_products_counter + '][timeout]" data-placeholder="timeout" type="text">',
+                        '<div class="col-md-5">',
+                            '<input class="form-control" id="secondary-products-time-' + secondary_products_counter + '" name="secondary_products[' + secondary_products_counter + '][timeout]" placeholder="timeout" type="text" value="+0 days">',
                         '</div>',
-                        '<div class="col-md-1 mar-btm">',
+                        '<div class="col-md-1">',
                             '<button type="button" class="remove-secondary-products btn palette-Teal btn-icon bg waves-effect waves-circle waves-float zmdi zmdi-close"></button>',
                         '</div>',
                     '</div>'
@@ -139,7 +157,10 @@
                 $('#secondary-products-' + secondary_products_counter).selectpicker('render');
             });
 
-            // remove-secondary-products
+            $(document).on('click', '.remove-members-access', function () {
+                $(this).closest('.row').remove();
+            });
+            
             $(document).on('click', '.remove-secondary-products', function () {
                 $(this).closest('.row').remove();
             });
