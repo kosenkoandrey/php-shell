@@ -688,9 +688,47 @@ class Mail {
     }
     
     public function PreviewLetter() {
+        $user_id = isset(APP::Module('Routing')->get['user_id']) ? (int) APP::Module('Routing')->get['user_id'] : 0;
+        $user_tunnel_id = 0;
+        $tunnel_id = 0;
+        $tunnels = [];
+        
+        if ((isset(APP::Module('Routing')->get['user_tunnel_id'])) && ($user_id)) {
+            $user_tunnel_id = APP::Module('Routing')->get['user_tunnel_id'];
+            $tunnel_id = APP::Module('DB')->Select(
+                APP::Module('Tunnels')->settings['module_tunnels_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                ['tunnel_id'], 'tunnels_users',
+                [['id', '=', $user_tunnel_id, PDO::PARAM_INT]]
+            );
+        }
+        
+        foreach (APP::Module('DB')->Select(
+            APP::Module('Tunnels')->settings['module_tunnels_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            ['id', 'type', 'name'], 'tunnels'
+        ) as $tunnel) {
+            $tunnels[$tunnel['id']] = $tunnel;
+        }
+        
         APP::Render(
             'mail/admin/letters/preview', 'include', 
-            $this->PrepareSend(0, (int) APP::Module('Crypt')->Decode(APP::Module('Routing')->get['letter_id_hash']))
+            [
+                'letter' => $this->PrepareSend(
+                    $user_id, 
+                    APP::Module('Crypt')->Decode(APP::Module('Routing')->get['letter_id_hash']), 
+                    [
+                        'user_tunnel_id' => $user_tunnel_id,
+                        'tunnel_id' => $tunnel_id,
+                    ]
+                ),
+                'user_id' => $user_id,
+                'user_tunnel_id' => $user_tunnel_id,
+                'tunnels' => $tunnels,
+                'user_tunnels' => APP::Module('DB')->Select(
+                    APP::Module('Tunnels')->settings['module_tunnels_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+                    ['id', 'tunnel_id', 'state'], 'tunnels_users',
+                    [['user_id', '=', $user_id, PDO::PARAM_INT]]
+                )
+            ]
         );
     }
     
@@ -1497,6 +1535,42 @@ class Mail {
         exit;
     }
     
+    public function APIManageLetters() {
+        $group_sub_id = $_POST['group'] ? APP::Module('Crypt')->Decode($_POST['group']) : 0;
+        $path = [];
+        $list = [];
+
+        foreach ($this->RenderLettersGroupsPath($group_sub_id) as $key => $value) {
+            $path[] = [$key ? APP::Module('Crypt')->Encode($key) : 0, $value];
+        }
+        
+        foreach (APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            ['id', 'name'], 'mail_letters_groups',
+            [['sub_id', '=', $group_sub_id, PDO::PARAM_INT],['id', '!=', 0, PDO::PARAM_INT]]
+        ) as $value) {
+            $list[] = ['group', APP::Module('Crypt')->Encode($value['id']), $value['name']];
+        }
+        
+        foreach (APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            ['id', 'subject'], 'mail_letters',
+            [['group_id', '=', $group_sub_id, PDO::PARAM_INT]]
+        ) as $value) {
+            $list[] = ['letter', APP::Module('Crypt')->Encode($value['id']), $value['id'], $value['subject']];
+        }
+
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode([
+            'group_sub_id' => $group_sub_id,
+            'path' => $path,
+            'list' => $list
+        ]);
+    }
+    
     public function APIUpdateSendersGroup() {
         $out = [
             'status' => 'success',
@@ -2082,15 +2156,26 @@ class Mail {
     }
     
     public function APIGetLetters() {
-        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
-        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
-        header('Content-Type: application/json');
-        
+        $out = [];
+
         foreach ((array) $_POST['where'] as $key => $value) {
             $_POST['where'][$key][] = PDO::PARAM_STR;
         }
         
-        echo json_encode(APP::Module('DB')->Select($this->settings['module_mail_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], $_POST['select'], 'mail_letters', $_POST['where']));
+        foreach (APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            $_POST['select'], 'mail_letters', 
+            $_POST['where']
+        ) as $value) {
+            $value['token'] = APP::Module('Crypt')->Encode($value['id']);
+            $out[] = $value;
+        }
+        
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode($out);
     }
 
     public function APIAddIPSpamLists() {

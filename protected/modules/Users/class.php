@@ -2454,7 +2454,7 @@ class Users {
             'Users', 'ActivateUserTask', 
             date('Y-m-d H:i:s', strtotime($_POST['timeout'])), 
             json_encode([$mail['user']]), 
-            'activate_user_' . $mail['user'], 
+            'activate_user', 
             'wait'
         );
         

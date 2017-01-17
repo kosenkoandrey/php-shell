@@ -7,7 +7,7 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>PHP-shell - Users</title>
+        <title>Личный кабинет</title>
 
         <!-- Vendor CSS -->
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
@@ -31,12 +31,12 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
             <div class="l-block" id="l-login">
                 <div class="lb-header palette-Teal bg">
                     <i class="zmdi zmdi-account-circle"></i>
-                    Hi there! Please Sign in
+                    Пожалуйста, войдите
                 </div>
                 <div class="lb-body">
                     <?
                     if ($data['return']) {
-                        ?><div class="alert alert-warning" role="alert"><i class="zmdi zmdi-lock zmdi-hc-fw"></i><b>Access forbidden</b></div><?
+                        ?><div class="alert alert-warning" role="alert"><b>Вы пытаетесь получить доступ к защищенной странице</b></div><?
                     }
 
                     if ((int) APP::Module('Users')->settings['module_users_login_service']) {
@@ -50,14 +50,14 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                             <div class="form-group fg-float">
                                 <div class="fg-line">
                                     <input type="email" name="email" id="email" class="input-sm form-control fg-input">
-                                    <label class="fg-label">Email Address</label>
+                                    <label class="fg-label">Email</label>
                                 </div>
                             </div>
 
                             <div class="form-group fg-float">
                                 <div class="fg-line">
                                     <input type="password" name="password" id="password" class="input-sm form-control fg-input">
-                                    <label class="fg-label">Password</label>
+                                    <label class="fg-label">Пароль</label>
                                 </div>
                             </div>
 
@@ -65,21 +65,21 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                                 <label>
                                     <input type="checkbox" name="remember-me" checked="checked">
                                     <i class="input-helper"></i>
-                                    Remember me
+                                    Запомнить меня
                                 </label>
                             </div>
 
-                            <button type="submit" class="btn palette-Teal bg">Sign in</button>
+                            <button type="submit" class="btn palette-Teal bg">Войти</button>
                         </form>
                         <?
                     } else {
-                        ?><div class="alert alert-danger" role="alert"><i class="zmdi zmdi-close-circle zmdi-hc-fw"></i><b>Sign in turned off</b></div><?
+                        ?><div class="alert alert-danger" role="alert"><i class="zmdi zmdi-close-circle zmdi-hc-fw"></i><b>Функция входа отключена</b></div><?
                     }
                     ?>
 
                     <div class="m-t-20">
-                        <a data-block="#l-register" data-bg="blue" class="palette-Teal text d-block m-b-5" href="">Create an account</a>
-                        <a data-block="#l-forgot-password" data-bg="purple" href="" class="palette-Teal text">Forgot password?</a>
+                        <a data-block="#l-forgot-password" data-bg="purple" href="" class="palette-Teal text">Забыли пароль?</a>
+                        <a data-block="#l-register" data-bg="blue" class="palette-Teal text d-block m-b-5" href="">Пройти регистрацию</a>
                     </div>
                 </div>
             </div>
@@ -88,7 +88,7 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
             <div class="l-block" id="l-register">
                 <div class="lb-header palette-Blue bg">
                     <i class="zmdi zmdi-account-add"></i>
-                    Create an account
+                    Регистрация
                 </div>
 
                 <div class="lb-body">
@@ -104,35 +104,35 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                             <div class="form-group fg-float">
                                 <div class="fg-line">
                                     <input type="email" name="email" id="email" class="input-sm form-control fg-input">
-                                    <label class="fg-label">Email Address</label>
+                                    <label class="fg-label">Email</label>
                                 </div>
                             </div>
 
                             <div class="form-group fg-float">
                                 <div class="fg-line">
                                     <input type="password" name="password" id="password" class="input-sm form-control fg-input">
-                                    <label class="fg-label">Password</label>
+                                    <label class="fg-label">Пароль</label>
                                 </div>
                             </div>
 
                             <div class="form-group fg-float">
                                 <div class="fg-line">
                                     <input type="password" name="re-password" id="re-password" class="input-sm form-control fg-input">
-                                    <label class="fg-label">Retype password</label>
+                                    <label class="fg-label">Повторите пароль</label>
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn palette-Blue bg">Create Account</button>
+                            <button type="submit" class="btn palette-Blue bg">Пройти регистрацию</button>
                         </form>
                         <?
                     } else {
-                        ?><div class="alert alert-danger" role="alert"><i class="zmdi zmdi-close-circle zmdi-hc-fw"></i><b>Create account turned off</b></div><?
+                        ?><div class="alert alert-danger" role="alert"><i class="zmdi zmdi-close-circle zmdi-hc-fw"></i><b>Регистрация пользователей отключена</b></div><?
                     }
                     ?>
 
                     <div class="m-t-30">
-                        <a data-block="#l-login" data-bg="teal" class="palette-Blue text d-block m-b-5" href="">Already have an account?</a>
-                        <a data-block="#l-forgot-password" data-bg="purple" href="" class="palette-Blue text">Forgot password?</a>
+                        <a data-block="#l-login" data-bg="teal" class="palette-Blue text d-block m-b-5" href="">Уже зарегистрированы?</a>
+                        <a data-block="#l-forgot-password" data-bg="purple" href="" class="palette-Blue text">Забыли пароль?</a>
                     </div>
                 </div>
             </div>
@@ -141,7 +141,7 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
             <div class="l-block" id="l-forgot-password">
                 <div class="lb-header palette-Purple bg">
                     <i class="zmdi zmdi-mood-bad"></i>
-                    Forgot Password?
+                    Забыли пароль?
                 </div>
 
                 <div class="lb-body">
@@ -149,26 +149,26 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                     if ((int) APP::Module('Users')->settings['module_users_reset_password_service']) {
                         ?>
                         <form id="reset-password">
-                            <p class="m-b-30">If you need help resetting you password, we can help by sending you a link to rest it.</p>
+                            <p class="m-b-30">Мы отправим вам ссылку для установки нового пароля.</p>
 
                             <div class="form-group fg-float">
                                 <div class="fg-line">
                                     <input type="text" name="email" id="email" class="input-sm form-control fg-input">
-                                    <label class="fg-label">Email Address</label>
+                                    <label class="fg-label">Email</label>
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn palette-Purple bg">Reset Password</button>
+                            <button type="submit" class="btn palette-Purple bg">Восстановить пароль</button>
                         </form>
                         <?
                     } else {
-                        ?><div class="alert alert-danger" role="alert"><i class="zmdi zmdi-close-circle zmdi-hc-fw"></i><b>Reset password turned off</b></div><?
+                        ?><div class="alert alert-danger" role="alert"><i class="zmdi zmdi-close-circle zmdi-hc-fw"></i><b>Восстановление пароля отключено</b></div><?
                     }
                     ?>
 
                     <div class="m-t-30">
-                        <a data-block="#l-login" data-bg="teal" class="palette-Purple text d-block m-b-5" href="">Already have an account?</a>
-                        <a data-block="#l-register" data-bg="blue" href="" class="palette-Purple text">Create an account</a>
+                        <a data-block="#l-login" data-bg="teal" class="palette-Purple text d-block m-b-5" href="">Уже зарегистрированы?</a>
+                        <a data-block="#l-register" data-bg="blue" href="" class="palette-Purple text">Пройти регистрацию</a>
                     </div>
                 </div>
             </div>
@@ -180,7 +180,7 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                 <div class="l-block" id="l-change-password">
                     <div class="lb-header palette-Blue bg">
                         <img src="<?= APP::$conf['location'][0] ?>://www.gravatar.com/avatar/<?= md5(APP::Module('Users')->user['email']) ?>?s=40&d=<?= urlencode(APP::Module('Routing')->root . APP::Module('Users')->settings['module_users_profile_picture']) ?>&t=<?= time() ?>" class="avatar-img">
-                        Change Password
+                        Изменение пароля
                     </div>
 
                     <div class="lb-body">
@@ -191,22 +191,22 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                                 <div class="form-group fg-float">
                                     <div class="fg-line">
                                         <input type="password" name="password" id="password" class="input-sm form-control fg-input">
-                                        <label class="fg-label">New password</label>
+                                        <label class="fg-label">Новый пароль</label>
                                     </div>
                                 </div>
 
                                 <div class="form-group fg-float">
                                     <div class="fg-line">
                                         <input type="password" name="re-password" id="re-password" class="input-sm form-control fg-input">
-                                        <label class="fg-label">Retype password</label>
+                                        <label class="fg-label">Повторите пароль</label>
                                     </div>
                                 </div>
 
-                                <button type="submit" class="btn palette-Blue bg">Change Password</button>
+                                <button type="submit" class="btn palette-Blue bg">Изменить пароль</button>
                             </form>
                             <?
                         } else {
-                            ?><div class="alert alert-danger" role="alert"><i class="zmdi zmdi-close-circle zmdi-hc-fw"></i><b>Change password turned off</b></div><?
+                            ?><div class="alert alert-danger" role="alert"><i class="zmdi zmdi-close-circle zmdi-hc-fw"></i><b>Изменение паролей отключено</b></div><?
                         }
                         ?>
                     </div>
@@ -258,10 +258,10 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                     email.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
                     password.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
 
-                    if (email.val() === '') { email.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
-                    if (password.val() === '') { password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    if (email.val() === '') { email.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Не указан</small>'); return false; }
+                    if (password.val() === '') { password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Не указан</small>'); return false; }
 
-                    $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
+                    $(this).find('[type="submit"]').html('Вход...').attr('disabled', true);
 
                     $.ajax({
                         type: 'post',
@@ -269,11 +269,19 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                         data: $(this).serialize(),
                         success: function(result) {
                             switch (result.status) {
-                                case 'error': swal('Error', 'Login failed', 'error'); break;
+                                case 'error': 
+                                    swal({
+                                        title: 'Ошибка',
+                                        text: 'Неверные данные для входа',
+                                        type: 'error',
+                                        timer: 2500,
+                                        showConfirmButton: false
+                                    });
+                                    break;
                                 case 'success': window.location.href = '<?= $return ?>'; break;
                             }
 
-                            $('#login').find('[type="submit"]').html('Sign in').attr('disabled', false);
+                            $('#login').find('[type="submit"]').html('Войти').attr('disabled', false);
                         }
                     });
                 });
@@ -289,11 +297,11 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                     password.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
                     re_password.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
 
-                    if (email.val() === '') { email.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
-                    if (password.val() === '') { password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
-                    if (password.val() !== re_password.val()) { re_password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Passwords do not match</small>'); return false; }
+                    if (email.val() === '') { email.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Не указан</small>'); return false; }
+                    if (password.val() === '') { password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Не указан</small>'); return false; }
+                    if (password.val() !== re_password.val()) { re_password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Пароли не совпадают</small>'); return false; }
 
-                    $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
+                    $(this).find('[type="submit"]').html('Регистрация...').attr('disabled', true);
 
                     $.ajax({
                         type: 'post',
@@ -303,8 +311,8 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                             switch(result.status) {
                                 case 'success':
                                     swal({
-                                        title: 'Done!',
-                                        text: 'Your account has been successfully created',
+                                        title: 'Готово!',
+                                        text: 'Вы успешно прошли регистрацию',
                                         type: 'success',
                                         showCancelButton: false,
                                         confirmButtonText: 'Ok',
@@ -316,18 +324,18 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                                 case 'error':
                                     $.each(result.errors, function(i, error) {
                                         switch(error) {
-                                            case 1: email.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Invalid email</small>'); break;
-                                            case 2: email.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">E-Mail already exist</small>'); break;
+                                            case 1: email.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Неверный Email</small>'); break;
+                                            case 2: email.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">E-Mail уже зарегистрирован</small>'); break;
                                             case 3: password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); break;
-                                            case 4: password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Password too short</small>'); break;
-                                            case 5: password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Passwords do not match</small>'); break;
+                                            case 4: password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Пароль слишком короткий</small>'); break;
+                                            case 5: password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Пароли не совпадают</small>'); break;
                                             case 6: alert('Service turned off'); break;
                                         }
                                     });
                                     break;
                             }
 
-                            $('#register').find('[type="submit"]').html('Create Account').attr('disabled', false);
+                            $('#register').find('[type="submit"]').html('Пройти регистрацию').attr('disabled', false);
                         }
                     });
                   });

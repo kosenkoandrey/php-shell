@@ -4,13 +4,15 @@ $nav_cnt = 0;
 
 foreach ($data['path'] as $key => $value) {
     ++ $nav_cnt;
-    $title = $key ? $value : 'Premium pages';
     
-    if (count($data['path']) !== $nav_cnt) {
-        $nav[$title] = 'members/pages/' . APP::Module('Crypt')->Encode($key);
-    } else {
-        $nav[$title] = mb_substr(APP::Module('Routing')->RequestURI(), 1);
+    if ($key) {
+        if (count($data['path']) !== $nav_cnt) {
+            $nav[$value] = 'members/pages/' . APP::Module('Crypt')->Encode($key);
+        } else {
+            $nav[$value] = mb_substr(APP::Module('Routing')->RequestURI(), 1);
+        }
     }
+    
 }
 ?>
 <!DOCTYPE html>
@@ -19,7 +21,7 @@ foreach ($data['path'] as $key => $value) {
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>PHP-shell - Premium pages</title>
+        <title>Платные материалы</title>
 
         <!-- Vendor CSS -->
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
@@ -33,7 +35,7 @@ foreach ($data['path'] as $key => $value) {
         <? APP::Render('core/widgets/template/css') ?>
     </head>
     <body data-ma-header="teal">
-        <? APP::Render('admin/widgets/header', 'include', $nav) ?>
+        <? APP::Render('core/widgets/template/header', 'include', $nav) ?>
         <section id="main" class="center">
             <section id="content">
                 <div class="container">

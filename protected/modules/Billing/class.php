@@ -177,7 +177,7 @@ class Billing {
         
         switch ($state) {
             case 'success':
-                $this->OpenMemberAccess($invoice_id);
+                $this->AddMembersAccessTask($invoice_id);
                 $this->AddSecondaryProductsTask($invoice_id);
                 break;
         }
@@ -186,8 +186,9 @@ class Billing {
 
         return $invoice_data;
     }
+
     
-    public function OpenMemberAccess($invoice_id) {
+    public function AddMembersAccessTask($invoice_id) {
         $out = [];
         
         $user_id = APP::Module('DB')->Select(
@@ -195,27 +196,22 @@ class Billing {
             ['user_id'], 'billing_invoices',
             [['id', '=', $invoice_id, PDO::PARAM_INT]]
         );
-
+        
         foreach (APP::Module('DB')->Select(
-            $this->settings['module_billing_db_connection'], ['fetchAll', PDO::FETCH_COLUMN],
-            ['members_access'], 'billing_products',
-            [
-                ['members_access', 'IS NOT', 'NULL', PDO::PARAM_INT],
-                ['id', 'IN', APP::Module('DB')->Select(
-                    $this->settings['module_billing_db_connection'], ['fetchAll', PDO::FETCH_COLUMN],
-                    ['product'], 'billing_invoices_products',
-                    [['invoice', '=', $invoice_id, PDO::PARAM_INT]]
-                )]
-            ]
+            $this->settings['module_billing_db_connection'], ['fetchAll', PDO::FETCH_COLUMN], 
+            ['members_access'], 'billing_products', 
+            [['id', 'IN', APP::Module('DB')->Select(
+                $this->settings['module_billing_db_connection'], ['fetchAll', PDO::FETCH_COLUMN], 
+                ['product'], 'billing_invoices_products', 
+                [['invoice', '=', $invoice_id, PDO::PARAM_INT]]
+            ), PDO::PARAM_STR]]
         ) as $members_access) {
-            $items = explode(',', $members_access);
-
-            foreach ($items as $item) {
+            foreach ((array) json_decode($members_access, true) as $item) {
                 $item_data = [
-                    'type' => substr($item, 0, 1),
-                    'id' => substr($item, 1)
+                    'type' => substr($item['id'], 0, 1),
+                    'id' => substr($item['id'], 1)
                 ];
-                
+
                 switch ($item_data['type']) {
                     case 'p': $table = 'members_pages'; break;
                     case 'g': $table = 'members_pages_groups'; break;
@@ -234,25 +230,13 @@ class Billing {
                             ['item', '=', $item_data['type'], PDO::PARAM_STR],
                             ['item_id', '=', $item_data['id'], PDO::PARAM_INT]
                         ]
-                    )){  
-                        $out[] = APP::Module('DB')->Insert(
-                            APP::Module('Members')->settings['module_members_db_connection'], 'members_access', [
-                                'id' => 'NULL',
-                                'user_id' => [$user_id, PDO::PARAM_INT],
-                                'item' => [$item_data['type'], PDO::PARAM_STR],
-                                'item_id' => [$item_data['id'], PDO::PARAM_INT],
-                                'cr_date' => 'NOW()'
-                            ]
-                        );
-                        
-                        APP::Module('DB')->Insert(
-                            $this->settings['module_billing_db_connection'], 'billing_invoices_tag', [
-                                'id' => 'NULL',
-                                'invoice_id' => [$invoice_id, PDO::PARAM_INT],
-                                'action' => ['success_open_access', PDO::PARAM_STR],
-                                'action_data' => [json_encode($item_data), PDO::PARAM_STR],
-                                'cr_date' => 'NOW()'
-                            ]
+                    )) {  
+                        $out[] = APP::Module('TaskManager')->Add(
+                            'Billing', 'ExecMembersAccessTask', 
+                            date('Y-m-d H:i:s', strtotime($item['timeout'])), 
+                            json_encode([$invoice_id, $user_id, $item_data['type'], $item_data['id']]), 
+                            'members_access', 
+                            'wait'
                         );
                     }
                 } else {
@@ -269,7 +253,7 @@ class Billing {
             }
         }
 
-        APP::Module('Triggers')->Exec('open_members_access', [
+        APP::Module('Triggers')->Exec('add_members_access_task', [
             'invoice_id' => $invoice_id,
             'out' => $out
         ]);
@@ -308,8 +292,38 @@ class Billing {
         return $out;
     }
     
-    public function ExecSecondaryProductsTask($invoice_id, $product_id) {
+    
+    public function ExecMembersAccessTask($invoice_id, $user_id, $object_type, $object_id) {
+        $access_id = APP::Module('DB')->Insert(
+            APP::Module('Members')->settings['module_members_db_connection'], 'members_access', [
+                'id' => 'NULL',
+                'user_id' => [$user_id, PDO::PARAM_INT],
+                'item' => [$object_type, PDO::PARAM_STR],
+                'item_id' => [$object_id, PDO::PARAM_INT],
+                'cr_date' => 'NOW()'
+            ]
+        );
+
         APP::Module('DB')->Insert(
+            $this->settings['module_billing_db_connection'], 'billing_invoices_tag', [
+                'id' => 'NULL',
+                'invoice_id' => [$invoice_id, PDO::PARAM_INT],
+                'action' => ['success_open_access', PDO::PARAM_STR],
+                'action_data' => [json_encode([$object_type, $object_id]), PDO::PARAM_STR],
+                'cr_date' => 'NOW()'
+            ]
+        );
+
+        APP::Module('Triggers')->Exec('open_members_access', [
+            'invoice_id' => $invoice_id,
+            'access_id' => $access_id
+        ]);
+
+        return $access_id;
+    }
+    
+    public function ExecSecondaryProductsTask($invoice_id, $product_id) {
+        $invoice_product_id = APP::Module('DB')->Insert(
             $this->settings['module_billing_db_connection'], 'billing_invoices_products', [
                 'id' => 'NULL',
                 'invoice' => [$invoice_id, PDO::PARAM_INT],
@@ -320,7 +334,7 @@ class Billing {
             ]
         );
         
-        $this->OpenMemberAccess($invoice_id);
+        $this->AddMembersAccessTask($invoice_id);
 
         APP::Module('DB')->Insert(
             $this->settings['module_billing_db_connection'], 'billing_invoices_tag', [
@@ -331,6 +345,13 @@ class Billing {
                 'cr_date' => 'NOW()'
             ]
         );
+        
+        APP::Module('Triggers')->Exec('add_secondary_product', [
+            'invoice_id' => $invoice_id,
+            'invoice_product_id' => $invoice_product_id
+        ]);
+
+        return $invoice_product_id;
     }
     
 
@@ -374,6 +395,7 @@ class Billing {
             [['id', '=', $product_id, PDO::PARAM_INT]]
         );
         
+        $product['members_access'] = json_decode($product['members_access'], true);
         $product['secondary_products'] = json_decode($product['secondary_products'], true);
 
         $products = [];
@@ -508,7 +530,16 @@ class Billing {
         ];
 
         if ($out['status'] == 'success') {
+            $members_access = [];
             $secondary_products = [];
+
+            if (isset($_POST['members_access'])) {
+                foreach ((array) $_POST['members_access'] as $item) {
+                    if ($item['id']) {
+                        $members_access[] = $item;
+                    }
+                }
+            }
             
             if (isset($_POST['secondary_products'])) {
                 foreach ((array) $_POST['secondary_products'] as $product) {
@@ -523,7 +554,7 @@ class Billing {
                     'id' => 'NULL',
                     'name' => [$_POST['name'], PDO::PARAM_STR],
                     'amount' => [$_POST['amount'], PDO::PARAM_INT],
-                    'members_access' => [$_POST['members_access'], PDO::PARAM_STR],
+                    'members_access' => [json_encode($members_access), PDO::PARAM_STR],
                     'secondary_products' => [json_encode($secondary_products), PDO::PARAM_STR],
                     'access_link' => [$_POST['access_link'], PDO::PARAM_STR],
                     'descr_link' => [$_POST['descr_link'], PDO::PARAM_STR],
@@ -617,8 +648,8 @@ class Billing {
                 [
                     'name' => $_POST['name'],
                     'amount' => $_POST['amount'],
-                    'members_access' => $_POST['members_access'],
-                    'secondary_products' => json_encode($_POST['secondary_products']),
+                    'members_access' => isset($_POST['members_access']) ? json_encode(array_values($_POST['members_access'])) : NULL,
+                    'secondary_products' => isset($_POST['secondary_products']) ? json_encode(array_values($_POST['secondary_products'])) : NULL,
                     'access_link' => $_POST['access_link'],
                     'descr_link' => $_POST['descr_link']
                 ],
@@ -629,8 +660,8 @@ class Billing {
                 'id'  => $product_id,
                 'name' => $_POST['name'],
                 'amount' => $_POST['amount'],
-                'members_access' => $_POST['members_access'],
-                'secondary_products' => json_encode($_POST['secondary_products']),
+                'members_access' => isset($_POST['members_access']) ? json_encode(array_values($_POST['members_access'])) : NULL,
+                'secondary_products' => isset($_POST['secondary_products']) ? json_encode(array_values($_POST['secondary_products'])) : NULL,
                 'access_link' => $_POST['access_link'],
                 'descr_link' => $_POST['descr_link']
             ]);
@@ -947,6 +978,7 @@ class Billing {
 
         APP::Render('billing/payments/make', 'include', $data);
     }
+    
 }
 
 

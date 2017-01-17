@@ -3,36 +3,39 @@
         cursor: pointer;
         vertical-align: top;
     }
+    #new-files {
+        margin-top: 20px;
+    }
 </style>
 <div class="<?= isset($data['class']['holder']) ? $data['class']['holder'] : 'card' ?>">
     <div class="card-header">
-        <h2>Write comment</h2>
+        <h2>Написать комментарий</h2>
     </div>
     <div id="comment-form-holder" class="card-body card-padding">
         <?
         if (array_search(APP::Module('Users')->user['role'], $data['login']) === false) {
             switch (APP::Module('Users')->user['role']) {
-                case 'default': ?><div class="alert alert-warning"><a class="alert-link" href="<?= APP::Module('Routing')->root ?>users/actions/login?return=<?= APP::Module('Crypt')->SafeB64Encode(APP::Module('Routing')->SelfUrl() . '#comment-form-holder') ?>">Log in</a> to post comments on his own behalf</div><? break;
-                case 'new': ?><div class="alert alert-warning">Activate your account to post comments on his own behalf</div><? break;
+                case 'default': ?><div class="alert alert-warning"><a class="alert-link" href="<?= APP::Module('Routing')->root ?>users/actions/login?return=<?= APP::Module('Crypt')->SafeB64Encode(APP::Module('Routing')->SelfUrl() . '#comment-form-holder') ?>">Войдите</a> для публикации комментариев от вашего имени</div><? break;
+                case 'new': ?><div class="alert alert-warning">Активируйте вашу учетную запись для публикации комментариев от вашего имени</div><? break;
             }
             ?>
             <form enctype="multipart/form-data" id="post-comment" class="form-horizontal" role="form">
                 <input type="hidden" name="token" value="<?= APP::Module('Crypt')->Encode(json_encode($data)) ?>">
                 <input type="hidden" name="reply" value="<?= APP::Module('Crypt')->Encode(0) ?>">
                 <? if (APP::Module('Comments')->settings['module_comments_files']) { ?>
-                <div class="fg-line m-b-10"><textarea name="message" class="form-control" placeholder="Write you message here..."></textarea></div>
+                <div class="fg-line m-b-10"><textarea name="message" class="form-control" placeholder="Начните писать ваш комментарий..."></textarea></div>
                 <div class="fg-line m-b-15">
                     <div id="new-files"></div>
-                    <a href="javascript:void(0)" id="add-file" class="btn btn-default btn-sm">Add file</a>
+                    <a href="javascript:void(0)" id="add-file" class="btn btn-default btn-sm m-b-20"><i class="zmdi zmdi-plus"></i> Добавить файл</a>
                 </div>
                 <? }else{ ?>
-                <div class="fg-line m-b-15"><textarea name="message" class="form-control" placeholder="Write you message here..."></textarea></div>
+                <div class="fg-line m-b-15"><textarea name="message" class="form-control" placeholder="Начните писать ваш комментарий..."></textarea></div>
                 <? } ?>
-                <button type="submit" class="btn palette-Teal bg waves-effect btn-lg">Post</button>
+                <button type="submit" class="btn palette-Teal bg waves-effect btn-lg"><i class="zmdi zmdi-mail-send"></i> Отправить</button>
             </form>
             <?
         } else {
-            ?><div class="alert alert-warning"><a class="alert-link" href="<?= APP::Module('Routing')->root ?>users/actions/login?return=<?= APP::Module('Crypt')->SafeB64Encode(APP::Module('Routing')->SelfUrl() . '#comment-form-holder') ?>">Log in</a> to post comments on his own behalf</div><?
+            ?><div class="alert alert-warning"><a class="alert-link" href="<?= APP::Module('Routing')->root ?>users/actions/login?return=<?= APP::Module('Crypt')->SafeB64Encode(APP::Module('Routing')->SelfUrl() . '#comment-form-holder') ?>">Войдите</a> для публикации комментариев от вашего имени</div><?
         }
         ?>
     </div>
@@ -49,7 +52,7 @@ ob_start();
         autosize($('#post-comment [name="message"]'));
         
         $('#post-comment #add-file').on('click', function() {
-            $('#new-files').append('<div class="form-group"><div class="file"><div class="col-sm-12"><div class="fileinput fileinput-new" data-provides="fileinput"><span class="btn btn-default btn-sm waves-effect btn-file m-r-10"><span class="fileinput-new">Select file</span><span class="fileinput-exists">Change</span><input type="file" name="file[]"></span><span class="fileinput-filename"></span><a href="#" class="close remove" data-dismiss="fileinput">&times;</a></div></div></div></div>');
+            $('#new-files').append('<div class="form-group"><div class="file"><div class="col-sm-12"><div class="fileinput fileinput-new" data-provides="fileinput"><span class="btn btn-default btn-sm waves-effect btn-file m-r-10"><span class="fileinput-new">Выбрать файл</span><span class="fileinput-exists">Выбрать другой файл</span><input type="file" name="file[]"></span><span class="fileinput-filename"></span><a href="#" class="close remove" data-dismiss="fileinput">&times;</a></div></div></div></div>');
         });
 
         $(document).on('click', '#post-comment .file .remove', function(event) {
@@ -81,19 +84,19 @@ ob_start();
             });
 
             <? if (isset(APP::$modules['Likes'])) { ?>comment.find('.btn-like').remove();<? } ?>
-            comment.find('.reply').replaceWith('<a href="javascript:void(0);" id="cancel-reply" class="btn palette-Red bg waves-effect btn-xs"><i class="zmdi zmdi-close-circle"></i> Cancel</a>');
-            comment.find('.media-heading').prepend('<span class="label label-warning"><i class="zmdi zmdi-mail-reply"></i> Reply</span>');
+            comment.find('.reply').replaceWith('<a href="javascript:void(0);" id="cancel-reply" class="btn palette-Red bg waves-effect btn-xs"><i class="zmdi zmdi-close-circle"></i> Не отвечать</a>');
+            comment.find('.media-heading').prepend('<span class="label label-warning"><i class="zmdi zmdi-mail-reply"></i> Ответ</span>');
  
             $('#comment-form-holder').prepend(comment.get(0).outerHTML);
             $('#post-comment input[name="reply"]').val(token);
-            $('#post-comment [name="message"]').attr('placeholder', 'Write you reply here...').focus();
+            $('#post-comment [name="message"]').attr('placeholder', 'Начните писать ваш комментарий...').focus();
             $('html, body').animate({scrollTop: $("#comment-form-holder").offset().top - 200}, 500);
         });
         
         $(document).on('click', '#cancel-reply', function() {
             $(this).closest('.reply-comment').remove();
             $('#post-comment input[name="reply"]').val('');
-            $('#post-comment [name="message"]').attr('placeholder', 'Write you message here...');
+            $('#post-comment [name="message"]').attr('placeholder', 'Начните писать ваш комментарий...');
         });
 
         $('#post-comment').submit(function(event) {
@@ -101,8 +104,8 @@ ob_start();
 
             if ($(this).find('[name="message"]').val() === '') { 
                 swal({
-                    title: 'Error',
-                    text: 'Write you comment',
+                    title: 'Ошибка',
+                    text: 'Во время отправки комментария произошла ошибка',
                     type: 'error',
                     timer: 1500,
                     showConfirmButton: false
@@ -111,7 +114,7 @@ ob_start();
                 return false; 
             }
 
-            $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
+            $(this).find('[type="submit"]').html('Отправка...').attr('disabled', true);
             var data = new FormData($(this).get(0));
             
             $.ajax({
@@ -156,8 +159,8 @@ ob_start();
                             '</div>',
                             '<div class="media-body">',
                                 '<h4 class="media-heading">',
-                                    'I am',
-                                    '<p class="m-b-5 m-t-10 f-12 c-gray"><i class="zmdi zmdi-calendar"></i> Recently added</p>',
+                                    'Я',
+                                    '<p class="m-b-5 m-t-10 f-12 c-gray"><i class="zmdi zmdi-calendar"></i> только что</p>',
                                 '</h4>',
                                 '<p style="white-space: pre-wrap; margin-bottom: 10px;">' + result.message + '</p>',
                                 file.join(''),
@@ -171,7 +174,7 @@ ob_start();
                         .addClass('<?= isset($data['class']['list']) ? $data['class']['list'] : 'card' ?>')
                         .html([
                             '<div class="card-header">',
-                                '<h2><span class="label label-warning"><i class="zmdi zmdi-comments"></i> <span id="total-comments">0</span></span> comments </h2>',
+                                '<h2><span class="label label-warning"><i class="zmdi zmdi-comments"></i> <span id="total-comments">0</span></span> комментариев</h2>',
                             '</div>',
                             '<div id="comments-holder" class="card-body card-padding"></div>'
                         ].join(''));
@@ -180,7 +183,7 @@ ob_start();
                     var holder = token ? $('#comments-holder .' + token).next('.children') : $('#comments-holder');
                     holder.append(comment).append('<div class="children"></div>');
   
-                    $('#post-comment > [type="submit"]').html('Post').attr('disabled', false);
+                    $('#post-comment > [type="submit"]').html('Отправить').attr('disabled', false);
                     $('#cancel-reply').trigger('click');
                     $('#post-comment [name="message"]').val('');
                     $('#total-comments').html(parseInt($('#total-comments').text()) + 1);
@@ -190,8 +193,8 @@ ob_start();
                     }, 500);
                     
                     swal({
-                        title: 'Done',
-                        text: 'You comment has been saved',
+                        title: 'Готово',
+                        text: 'Ваш комментарий был успешно отправлен',
                         type: 'success',
                         timer: 1500,
                         showConfirmButton: false

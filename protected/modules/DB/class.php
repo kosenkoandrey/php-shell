@@ -105,7 +105,16 @@ class DB {
     public function Update($connection, $table, $fields, $where = false) {
         $set = 'SET ' . implode(', ', array_map(function($item) { return $item . ' = :' . $item; }, array_keys((array) $fields)));
         $sql = $this->Open($connection)->prepare('UPDATE ' . $table . ' ' . $set . ' ' . $this->WhereStatement($where));
-        foreach ((array) $fields as $key => &$value) $sql->bindParam(':' . $key, $value, PDO::PARAM_STR);
+        
+        foreach ((array) $fields as $key => &$value) {
+            if ($value) {
+                $sql->bindParam(':' . $key, $value, PDO::PARAM_STR);
+            } else {
+                $null = null;
+                $sql->bindParam(':' . $key, $null, PDO::PARAM_NULL);
+            }
+        }
+        
         $this->BindWhere($where, $sql);
         $sql->execute();
 

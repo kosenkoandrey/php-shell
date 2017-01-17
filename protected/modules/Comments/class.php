@@ -361,36 +361,43 @@ class Comments {
                     'up_date' => 'NOW()'
                 ]
             );
-            
             $out['file'] = [];
-            if($this->settings['module_comments_files']){
-                $file = $_FILES['file'];
-                
-                foreach ($file['name'] as $key => $name){
-                    if($file['tmp_name'][$key]){
-                        $pathinfo = pathinfo($file['tmp_name'][$key] . '/' . $file['name'][$key]);
-                        if(isset($pathinfo['extension'])){
-                            $file_name = $out['id'].'_'.APP::Module('Crypt')->Encode(time().$key).'.'.$pathinfo['extension'];
+            
+            if ($this->settings['module_comments_files']){
+                if (isset($_FILES['file']['name'])) {
+                    foreach ($_FILES['file']['name'] as $key => $name){
+                        if($_FILES['file']['tmp_name'][$key]){
+                            $pathinfo = pathinfo($_FILES['file']['tmp_name'][$key] . '/' . $_FILES['file']['name'][$key]);
+                            if(isset($pathinfo['extension'])){
+                                $file_name = $out['id'] . '_' . APP::Module('Crypt')->Encode(time() . $key) . '.' . $pathinfo['extension'];
 
-                            $out['file'][$key]['id'] = APP::Module('DB')->Insert(
-                                $this->settings['module_comments_db_connection'], 'comments_files', [
-                                    'id'         => 'NULL',
-                                    'comment_id' => [$out['id'], PDO::PARAM_INT],
-                                    'title'       => [$file_name, PDO::PARAM_STR],
-                                    'type'      => [$file['type'][$key], PDO::PARAM_STR],
-                                    'cr_date'    => 'NOW()'
-                                ]
-                            );
-                            $out['file'][$key]['url'] = APP::Module('Routing')->root.'comments/download/'.APP::Module('Crypt')->Encode($out['file'][$key]['id']);
-                            $out['file'][$key]['type'] = $file['type'][$key];
-
-                            if (!$this->FileUpload(['type' => $file['type'][$key], 'size' => $file['size'][$key],'tmp_name' => $file['tmp_name'][$key]], $this->settings['module_comments_path'] . $file_name)) {
-                                APP::Module('DB')->Delete(
-                                    $this->settings['module_comments_db_connection'], 'comments_files', [['id', '=', $out['file'][$key]['id'], PDO::PARAM_INT]]
+                                $out['file'][$key]['id'] = APP::Module('DB')->Insert(
+                                    $this->settings['module_comments_db_connection'], 'comments_files', [
+                                        'id' => 'NULL',
+                                        'comment_id' => [$out['id'], PDO::PARAM_INT],
+                                        'title' => [$file_name, PDO::PARAM_STR],
+                                        'type' => [$_FILES['file']['type'][$key], PDO::PARAM_STR],
+                                        'cr_date' => 'NOW()'
+                                    ]
                                 );
-                                $out['file'][$key]['id'] = 0;
-                                $out['file'][$key]['url'] = '';
-                                $out['file'][$key]['type'] = '';
+                                $out['file'][$key]['url'] = APP::Module('Routing')->root.'comments/download/'.APP::Module('Crypt')->Encode($out['file'][$key]['id']);
+                                $out['file'][$key]['type'] = $_FILES['file']['type'][$key];
+
+                                if (!$this->FileUpload([
+                                    'type' => $_FILES['file']['type'][$key], 
+                                    'size' => $_FILES['file']['size'][$key],
+                                    'tmp_name' => $_FILES['file']['tmp_name'][$key]], 
+                                    $this->settings['module_comments_path'] . $file_name
+                                )) {
+                                    APP::Module('DB')->Delete(
+                                        $this->settings['module_comments_db_connection'], 'comments_files', 
+                                        [['id', '=', $out['file'][$key]['id'], PDO::PARAM_INT]]
+                                    );
+                                    
+                                    $out['file'][$key]['id'] = 0;
+                                    $out['file'][$key]['url'] = '';
+                                    $out['file'][$key]['type'] = '';
+                                }
                             }
                         }
                     }
