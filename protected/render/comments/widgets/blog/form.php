@@ -8,10 +8,18 @@
                 case 'new': ?><div class="alert alert-warning">Activate your account to post comments on his own behalf</div><? break;
             }
             ?>
-            <form id="post-comment" class="form-horizontal" role="form">
+            <form id="post-comment" class="form-horizontal" role="form" enctype="multipart/form-data">
                 <input type="hidden" name="token" value="<?= APP::Module('Crypt')->Encode(json_encode($data)) ?>">
                 <input type="hidden" name="reply" value="<?= APP::Module('Crypt')->Encode(0) ?>">
+                <? if (APP::Module('Comments')->settings['module_comments_files']) { ?>
+                <div class="fg-line m-b-10"><textarea name="message" class="form-control" placeholder="Write you message here..."></textarea></div>
+                <div class="fg-line m-b-15">
+                    <div id="new-files"></div>
+                    <a href="javascript:void(0)" id="add-file" class="btn btn-default btn-sm">Add file</a>
+                </div>
+                <? }else{ ?>
                 <div class="fg-line margin-bottom-20"><textarea name="message" class="form-control" placeholder="Write you message here..."></textarea></div>
+                <? } ?>
                 <button type="submit" class="btn btn-default btn-lg">Post</button>
             </form>
             <?
@@ -30,6 +38,24 @@ ob_start();
 <script>
     $(document).ready(function() {
         autosize($('#post-comment [name="message"]'));
+        
+        $('#post-comment #add-file').on('click', function() {
+            $('#new-files').append('<div class="form-group"><div class="file"><div class="col-sm-12"><div class="fileinput fileinput-new" data-provides="fileinput"><span class="btn btn-default btn-sm waves-effect btn-file m-r-10"><span class="fileinput-new">Select file</span><span class="fileinput-exists">Change</span><input type="file" name="file[]"></span><span class="fileinput-filename"></span><a href="#" class="close remove" data-dismiss="fileinput">&times;</a></div></div></div></div>');
+        });
+
+        $(document).on('click', '#post-comment .file .remove', function(event) {
+            $(this).closest('.form-group').remove();
+        });
+        
+        $('#file').on('change', function() {
+            if (this.files && this.files[0]) {
+                var reader = new FileReader();
+
+                reader.readAsDataURL(this.files[0]);
+            } else {
+                swal('Sorry - you\'re browser doesn\'t support the FileReader API');
+            }
+        });
         
         $(document).on('click', '.reply', function() {
             var token = $(this).data('token');
@@ -76,14 +102,37 @@ ob_start();
             }
 
             $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
-
+            var data = new FormData($(this).get(0));
+            
             $.ajax({
                 type: 'post',
                 url: '<?= APP::Module('Routing')->root ?>comments/api/add.json',
-                data: $(this).serialize(),
+                data: data,
+                processData: false,
+                contentType: false,
                 success: function(result) {
+                    <? if (APP::Module('Comments')->settings['module_comments_files']) { ?>$('#new-files').html('');<? } ?>
                     var token = $('#post-comment > [name="reply"]').val();
                     var offset = token ? (parseInt($('.' + token).css('margin-left'), 10) + 35) : 0;
+                    var file = [];
+                    
+                    if(result.file.length){
+                        $.each(result.file, function(i, j){
+                            switch(j.type){
+                                case 'image/png':
+                                case 'image/jpeg':
+                                    file.push('<p><img style="height:200px;" src="'+j.url+'"><p><a href="'+j.url+'">Download</a></p></p>');
+                                    break;
+                                case 'video/mp4':
+                                    file.push('<p><video width="640" height="480" controls><source src="'+j.url+'" type="video/mp4"></video><p><a href="'+j.url+'">Download</a></p></p>');
+                                    break;
+                                case 'application/pdf':
+                                    file.push('<p><span class="pdf-block" ><span style="display: inline-block" class="avatar-char palette-Orange-400 bg m-r-5"><i class="zmdi zmdi-file"></i><a href="'+j.url+'">Download</a></p>');
+                                    break;
+                            }
+                        });
+                    }
+                    
                     var comment = [
                         '<div class="comment row blog-comments-v2 ' + result.token + '" style="margin-left: ' + offset + 'px">',
                             '<div class="commenter">',
@@ -101,6 +150,7 @@ ob_start();
                                     '<span><i class="fa fa-calendar"></i> Recently added</span>',
                                 '</h4>',
                                 '<p style="white-space: pre-wrap;">' + result.message + '</p>',
+                                file.join(''),
                             '</div>',
                         '</div>'
                     ].join('');

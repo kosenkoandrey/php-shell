@@ -45,6 +45,32 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
+                                    <label for="module_comments_files" class="col-sm-2 control-label">File in comment</label>
+                                    <div class="col-sm-1">
+                                        <div class="toggle-switch m-t-10">
+                                            <input id="module_comments_files" name="module_comments_files" type="checkbox" hidden="hidden">
+                                            <label for="module_comments_files" class="ts-helper"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="module_comments_path" class="col-sm-2 control-label">Path to storage</label>
+                                    <div class="col-sm-10">
+                                        <div class="fg-line">
+                                            <input type="text" class="form-control" name="module_comments_path" id="module_comments_path">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="module_comments_mime" class="col-sm-2 control-label">Allow mime types</label>
+                                    <div class="col-sm-6">
+                                        <div class="fg-line">
+                                            <textarea class="form-control" rows="4" name="module_comments_mime" id="module_comments_mime"><?= APP::Module('Comments')->settings['module_comments_mime'] ?></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
                                     <div class="col-sm-offset-2 col-sm-2">
                                         <button type="submit" class="btn palette-Teal bg waves-effect btn-lg">Save changes</button>
                                     </div>
@@ -74,14 +100,24 @@
         <script>
             $(document).ready(function() {
                 $('#module_comments_db_connection').val('<?= APP::Module('Comments')->settings['module_comments_db_connection'] ?>');
-
+                $('#module_comments_path').val('<?= APP::Module('Comments')->settings['module_comments_path'] ?>');
+                $('#module_comments_files').prop('checked', <?= (int) APP::Module('Comments')->settings['module_comments_files'] ?>);
+                
                 $('#update-settings').submit(function(event) {
                     event.preventDefault();
 
                     var module_comments_db_connection = $(this).find('#module_comments_db_connection');
+                    var module_comments_mime = $(this).find('#module_comments_mime');
+                    var module_comments_path = $(this).find('#module_comments_path');
+                    
                     module_comments_db_connection.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    module_comments_mime.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    module_comments_path.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    
                     if (module_comments_db_connection.val() === '') { module_comments_db_connection.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-2').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
-
+                    if (module_comments_mime.val() === '') { module_comments_mime.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-2').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    if (module_comments_path.val() === '') { module_comments_path.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-2').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    
                     $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
 
                     $.ajax({

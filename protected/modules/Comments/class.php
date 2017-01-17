@@ -9,7 +9,10 @@ class Comments {
     
     function Init() {
         $this->settings = APP::Module('Registry')->Get([
-            'module_comments_db_connection'
+            'module_comments_db_connection',
+            'module_comments_files',
+            'module_comments_path',
+            'module_comments_mime'
         ]);
     }
     
@@ -29,6 +32,27 @@ class Comments {
             'children' => [],
             'total' => 0
         ];
+        
+        $files= [];
+        foreach (APP::Module('DB')->Select(
+            $this->settings['module_comments_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            [
+                'comments_files.comment_id', 
+                'comments_files.type as file_type', 
+                'comments_files.id as file_id', 
+            ], 'comments_files',
+            [
+                ['comments_messages.object_type', '=', $type, PDO::PARAM_INT],
+                ['comments_messages.object_id', '=', $id, PDO::PARAM_INT]
+            ], 
+            [
+                'join/comments_messages' => [['comments_messages.id', '=', 'comments_files.comment_id']],
+                'join/comments_objects' => [['comments_messages.object_type', '=', 'comments_objects.id']]
+                
+            ]
+        ) as $comment) {
+            $files[$comment['comment_id']][] = $comment;
+        }
 
         foreach (APP::Module('DB')->Select(
             $this->settings['module_comments_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
@@ -43,7 +67,9 @@ class Comments {
                 'UNIX_TIMESTAMP(comments_messages.up_date) AS up_date',
                 'users.email',
                 'comments_objects.name AS object_name',
-                'users_about.value AS username'
+                'users_about.value AS username',
+                'comments_files.type as file_type', 
+                'comments_files.id as file_id', 
             ], 'comments_messages',
             [
                 ['comments_messages.object_type', '=', $type, PDO::PARAM_INT],
@@ -55,7 +81,8 @@ class Comments {
                     ['users_about.user', '=', 'users.id'],
                     ['users_about.item', '=', '"username"']
                 ],
-                'join/comments_objects' => [['comments_messages.object_type', '=', 'comments_objects.id']]
+                'join/comments_objects' => [['comments_messages.object_type', '=', 'comments_objects.id']],
+                'left join/comments_files' => [['comments_messages.id', '=', 'comments_files.comment_id']]
             ],
             ['comments_messages.id'], 
             false,
@@ -63,8 +90,10 @@ class Comments {
         ) as $comment) {
             if (!$comment['sub_id']) {
                 $out['root'][$comment['id']] = $comment;
+                $out['root'][$comment['id']]['files'] = isset($files[$comment['id']]) ? $files[$comment['id']] : [];
             } else {
                 $out['children'][$comment['id']] = $comment;
+                $out['children'][$comment['id']]['files'] = isset($files[$comment['id']]) ? $files[$comment['id']] : [];
             }
             
             $out['total'] ++;
@@ -81,11 +110,18 @@ class Comments {
     public function EditComment() {
         $message_id = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['message_id_hash']);
         
-        APP::Render('comments/admin/edit', 'include', APP::Module('DB')->Select(
-            $this->settings['module_comments_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
-            ['message'], 'comments_messages',
-            [['id', '=', $message_id, PDO::PARAM_INT]]
-        ));
+        APP::Render('comments/admin/edit', 'include', 
+            [
+                'comment' => APP::Module('DB')->Select(
+                    $this->settings['module_comments_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
+                    ['message'], 'comments_messages',
+                    [['id', '=', $message_id, PDO::PARAM_INT]]
+                ),
+                'files'   => APP::Module('DB')->Select(
+                    $this->settings['module_comments_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], ['*'], 'comments_files', [['comment_id', '=', $message_id, PDO::PARAM_INT]]
+                )
+            ]
+        );
     }
 
     public function ManageCommentsObjects() {
@@ -104,6 +140,58 @@ class Comments {
             ['name'], 'comments_objects',
             [['id', '=', $object_id, PDO::PARAM_INT]]
         ));
+    }
+    
+    protected function FileUpload($file, $path) {
+        $allowed      = [];
+        $mime_allowed = preg_replace('~\r?\n~', "\n", $this->settings['module_comments_mime']);
+        $filetypes    = explode("\n", $mime_allowed);
+        foreach ($filetypes as $filetype) {
+            $allowed[] = trim($filetype);
+        }
+
+        if (in_array($file['type'], $allowed) && $file['size']) {
+            return move_uploaded_file($file['tmp_name'], $path);
+        } else {
+            return false;
+        }
+    }
+    
+    public function DownloadFile() {
+        $file_id = (int) APP::Module('Crypt')->Decode(APP::Module('Routing')->get['file_id_hash']);
+
+        $file = APP::Module('DB')->Select(
+            $this->settings['module_comments_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
+            ['title', 'type', 'id'], 'comments_files', 
+            [['id', '=', $file_id, PDO::PARAM_INT]]
+        );
+        
+        $file_ext = false;
+        
+        switch ($file['type']) {
+            case 'video/mp4':
+                $file_ext = 'mp4';
+                break;
+            case 'application/pdf':
+                $file_ext = 'pdf';
+                break;
+            case 'image/jpeg':
+                $file_ext = 'jpg';
+                break;
+        }
+        
+        $file_path = $this->settings['module_comments_path'] . '/' . $file['title'];
+        
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename="'. $file['title'] .'"');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($file_path));
+        
+        readfile($file_path);
+        exit;
     }
 
     public function Settings() {
@@ -273,6 +361,48 @@ class Comments {
                     'up_date' => 'NOW()'
                 ]
             );
+            $out['file'] = [];
+            
+            if ($this->settings['module_comments_files']){
+                if (isset($_FILES['file']['name'])) {
+                    foreach ($_FILES['file']['name'] as $key => $name){
+                        if($_FILES['file']['tmp_name'][$key]){
+                            $pathinfo = pathinfo($_FILES['file']['tmp_name'][$key] . '/' . $_FILES['file']['name'][$key]);
+                            if(isset($pathinfo['extension'])){
+                                $file_name = $out['id'] . '_' . APP::Module('Crypt')->Encode(time() . $key) . '.' . $pathinfo['extension'];
+
+                                $out['file'][$key]['id'] = APP::Module('DB')->Insert(
+                                    $this->settings['module_comments_db_connection'], 'comments_files', [
+                                        'id' => 'NULL',
+                                        'comment_id' => [$out['id'], PDO::PARAM_INT],
+                                        'title' => [$file_name, PDO::PARAM_STR],
+                                        'type' => [$_FILES['file']['type'][$key], PDO::PARAM_STR],
+                                        'cr_date' => 'NOW()'
+                                    ]
+                                );
+                                $out['file'][$key]['url'] = APP::Module('Routing')->root.'comments/download/'.APP::Module('Crypt')->Encode($out['file'][$key]['id']);
+                                $out['file'][$key]['type'] = $_FILES['file']['type'][$key];
+
+                                if (!$this->FileUpload([
+                                    'type' => $_FILES['file']['type'][$key], 
+                                    'size' => $_FILES['file']['size'][$key],
+                                    'tmp_name' => $_FILES['file']['tmp_name'][$key]], 
+                                    $this->settings['module_comments_path'] . $file_name
+                                )) {
+                                    APP::Module('DB')->Delete(
+                                        $this->settings['module_comments_db_connection'], 'comments_files', 
+                                        [['id', '=', $out['file'][$key]['id'], PDO::PARAM_INT]]
+                                    );
+                                    
+                                    $out['file'][$key]['id'] = 0;
+                                    $out['file'][$key]['url'] = '';
+                                    $out['file'][$key]['type'] = '';
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             
             $out['token'] = APP::Module('Crypt')->Encode($out['id']);
         
@@ -283,7 +413,8 @@ class Comments {
                 'object_type' => $token['type'],
                 'object_id' => $token['id'],
                 'message' => $message,
-                'url' => [$_SERVER['HTTP_REFERER'], PDO::PARAM_STR]
+                'url' => [$_SERVER['HTTP_REFERER'], PDO::PARAM_STR],
+                'file' => $out['file']
             ]);
         }
 
@@ -295,6 +426,32 @@ class Comments {
         exit;
     }
     
+    public function APIFileRemove(){
+        $out['result'] = 'error';
+        
+        $file_id = (int) APP::Module('Crypt')->Decode($_POST['id']);
+
+        if($file = APP::Module('DB')->Select(
+            $this->settings['module_comments_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
+            ['title', 'type', 'id'], 'comments_files', 
+            [['id', '=', $file_id, PDO::PARAM_INT]]
+        )){
+            APP::Module('DB')->Delete($this->settings['module_comments_db_connection'], 'comments_files', [['id', '=', $file_id, PDO::PARAM_INT]]);
+            if (file_exists($this->settings['module_comments_path'] . $file['title'])) {
+                unlink($this->settings['module_comments_path'] . $file['title']);
+            }
+            $out['result'] = 'success';
+        }
+        
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode($out);
+        exit;
+    }
+
+
     public function APIUpdateComment() {
         $out = [
             'status' => 'success',
@@ -315,6 +472,42 @@ class Comments {
         if (empty($_POST['message'])) {
             $out['status'] = 'error';
             $out['errors'][] = 2;
+        }
+        
+        $out['file'] = [];
+        if(isset($_FILES['file']) && $this->settings['module_comments_files']){
+            $file = $_FILES['file'];
+            foreach ($file['name'] as $key => $name){
+                if($file['tmp_name'][$key]){
+                    $pathinfo = pathinfo($file['tmp_name'][$key] . '/' . $file['name'][$key]);
+                    if(isset($pathinfo['extension'])){
+                        $file_name = $message_id.'_'.APP::Module('Crypt')->Encode(time().$key).'.'.$pathinfo['extension'];
+
+                        $out['file'][$key]['id'] = APP::Module('DB')->Insert(
+                            $this->settings['module_comments_db_connection'], 'comments_files', [
+                                'id'         => 'NULL',
+                                'comment_id' => [$message_id, PDO::PARAM_INT],
+                                'title'       => [$file_name, PDO::PARAM_STR],
+                                'type'      => [$file['type'][$key], PDO::PARAM_STR],
+                                'cr_date'    => 'NOW()'
+                            ]
+                        );
+                        $out['file'][$key]['url'] = APP::Module('Routing')->root.'comments/download/'.APP::Module('Crypt')->Encode($out['file'][$key]['id']);
+                        $out['file'][$key]['type'] = $file['type'][$key];
+
+                        if (!$this->FileUpload(['type' => $file['type'][$key], 'size' => $file['size'][$key],'tmp_name' => $file['tmp_name'][$key]], $this->settings['module_comments_path'] . $file_name)) {
+                            APP::Module('DB')->Delete(
+                                $this->settings['module_comments_db_connection'], 'comments_files', [['id', '=', $out['file'][$key]['id'], PDO::PARAM_INT]]
+                            );
+                            $out['file'][$key]['id'] = 0;
+                            $out['file'][$key]['url'] = '';
+                            $out['file'][$key]['type'] = '';
+                            $out['status'] = 'error';
+                            $out['errors'][] = 3;
+                        }
+                    }
+                }
+            }
         }
 
         if ($out['status'] == 'success') {
@@ -353,6 +546,18 @@ class Comments {
         
         if ($out['status'] == 'success') {
             $out['count'] = APP::Module('DB')->Delete($this->settings['module_comments_db_connection'], 'comments_messages', [['id', '=', $_POST['id'], PDO::PARAM_INT]]);
+            
+            APP::Module('DB')->Delete($this->settings['module_comments_db_connection'], 'comments_files', [['comment_id', '=', $_POST['id'], PDO::PARAM_INT]]);
+            foreach(APP::Module('DB')->Select(
+                $this->settings['module_comments_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+                ['*'], 'comments_files',
+                [['comment_id', '=', $_POST['id'], PDO::PARAM_INT]]
+            ) as $file){
+                if (file_exists($this->settings['module_comments_path'] . $file['title'])) {
+                    unlink($this->settings['module_comments_path'] . $file['title']);
+                }
+            }
+            
             APP::Module('Triggers')->Exec('comments_remove_message', ['id' => $_POST['id'], 'result' => $out['count']]);
         }
 
@@ -498,7 +703,10 @@ class Comments {
 
     public function APIUpdateSettings() {
         APP::Module('Registry')->Update(['value' => $_POST['module_comments_db_connection']], [['item', '=', 'module_comments_db_connection', PDO::PARAM_STR]]);
-
+        APP::Module('Registry')->Update(['value' => $_POST['module_comments_mime']], [['item', '=', 'module_comments_mime', PDO::PARAM_STR]]);
+        APP::Module('Registry')->Update(['value' => $_POST['module_comments_path']], [['item', '=', 'module_comments_path', PDO::PARAM_STR]]);
+        APP::Module('Registry')->Update(['value' => isset($_POST['module_comments_files'])], [['item', '=', 'module_comments_files', PDO::PARAM_STR]]);
+        
         APP::Module('Triggers')->Exec('comments_update_settings', [
             'db_connection' => $_POST['module_comments_db_connection']
         ]);

@@ -44,6 +44,26 @@ if ($comments['total']) {
                             <span><i class="fa fa-calendar"></i> <?= date('Y-m-d H:i:s', $comment['up_date']) ?></span>
                         </h4>
                         <p style="white-space: pre-wrap;"><?= $comment['message'] ?></p>
+                        <? if(APP::Module('Comments')->settings['module_comments_files']){ 
+                            foreach($comment['files'] as $file){
+                                switch ($file['file_type']) {
+                                    case 'video/mp4':
+                                        ?>
+                                        <p><video width="640" height="480" controls>
+                                            <source src="<?= APP::Module('Routing')->root ?>comments/download/<?= APP::Module('Crypt')->Encode($file['file_id']) ?>" type="video/mp4">
+                                            </video><p><a href="<?= APP::Module('Routing')->root ?>comments/download/<?= APP::Module('Crypt')->Encode($file['file_id']) ?>">Download</a></p></p>
+                                        <?
+                                        break;
+                                    case 'application/pdf':
+                                        ?><p><span class="pdf-block" ><span style="display: inline-block" class="avatar-char palette-Orange-400 bg m-r-5"><i class="zmdi zmdi-file"></i></span></span><a href="<?= APP::Module('Routing')->root ?>comments/download/<?= APP::Module('Crypt')->Encode($file['file_id']) ?>">Download</a></p><?
+                                        break;
+                                    case 'image/jpeg':
+                                    case 'image/png':
+                                        ?><p><img style="height:200px;" src="<?= APP::Module('Routing')->root ?>comments/download/<?= APP::Module('Crypt')->Encode($file['file_id']) ?>"><p><a href="<?= APP::Module('Routing')->root ?>comments/download/<?= APP::Module('Crypt')->Encode($file['file_id']) ?>">Download</a></p></p><?
+                                        break;
+                                }
+                            }
+                        }?>
                         <div class="btn-group btn-group-xs" role="group">
                             <button type="button" class="reply btn btn-default btn-xs" data-token="<?= $comment_hash ?>"><i class="fa fa-reply"></i> Reply</button>
                             <?

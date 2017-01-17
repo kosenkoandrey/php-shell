@@ -33,6 +33,35 @@ if (isset($_POST['action'])) {
             <?
         }
     }
+    
+    if (!$error) {
+        if (!isset($_SESSION['core']['install']['comments']['settings'])) {
+            $error = true;
+            ?>
+            <h3>Settings</h3>
+            <form method="post">
+                <input type="hidden" name="action" value="comments_set_settings">
+                
+                <label for="settings[module_comments_files]">File in comment</label>
+                <br>
+                <input type="text" name="settings[module_comments_files]" value="1">
+                <br><br>
+                
+                <label for="settings[module_comments_mime]">Mime type</label>
+                <br>
+                <textarea name="settings[module_comments_mime]"></textarea>
+                <br><br>
+
+                <label for="settings[module_comments_path]">Path</label>
+                <br>
+                <input type="text" name="settings[module_comments_path]" value="/var/www/domains/dev1.sendthis.ru/protected/modules/Comments/Storage/">
+                <br><br>
+                
+                <input type="submit" value="Next">
+            </form>
+            <?
+        }
+    }
     ?>
 </body>
 </html>
@@ -69,7 +98,14 @@ APP::Module('DB')->Open($_SESSION['core']['install']['comments']['db_connection'
       `name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
       `up_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
+    
+    CREATE TABLE `comments_files` (
+      `id` int(10) UNSIGNED NOT NULL,
+      `comment_id` int(10) UNSIGNED NOT NULL,
+      `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+      `type` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+      `cr_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
     ALTER TABLE `comments_messages`
       ADD PRIMARY KEY (`id`),
@@ -79,11 +115,15 @@ APP::Module('DB')->Open($_SESSION['core']['install']['comments']['db_connection'
 
     ALTER TABLE `comments_objects`
       ADD PRIMARY KEY (`id`);
-
+     
+    ALTER TABLE `comments_files`
+      ADD PRIMARY KEY (`id`);
 
     ALTER TABLE `comments_messages`
       MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
     ALTER TABLE `comments_objects`
+      MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+    ALTER TABLE `comments_files`
       MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
     ALTER TABLE `comments_messages`
