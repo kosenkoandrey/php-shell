@@ -10,7 +10,7 @@
 
             settings = $.extend( {
                 'debug': false,
-                'url' : 'https://pult.glamurnenko.ru'
+                'url' : 'https://pult2.glamurnenko.ru/'
             }, options);
 
             $('<span/>', {
@@ -27,7 +27,7 @@
                 
                 $.ajax({
                     type: 'post',
-                    url: settings.url +'/mailing/admin/senders/api/list.json',
+                    url: settings.url +'mailing/admin/senders/api/list.json',
                     data: {
                         select: ['name'],
                         where: [
@@ -101,7 +101,7 @@
             // Get group path
             $.ajax({
                 type: 'post',
-                url: settings.url +'/mailing/admin/senders/api/groups/path.json',
+                url: settings.url +'mailing/admin/senders/api/groups/path.json',
                 data: {
                     group: group
                 },
@@ -122,7 +122,7 @@
                     // Get groups
                     $.ajax({
                         type: 'post',
-                        url: settings.url +'/mailing/admin/senders/api/groups/list.json',
+                        url: settings.url +'mailing/admin/senders/api/groups/list.json',
                         data: {
                             select: ['id', 'name'],
                             where: [
@@ -145,7 +145,7 @@
                             // Get senders
                             $.ajax({
                                 type: 'post',
-                                url: settings.url +'/mailing/admin/senders/api/list.json',
+                                url: settings.url +'mailing/admin/senders/api/list.json',
                                 data: {
                                     select: ['id', 'name'],
                                     where: [

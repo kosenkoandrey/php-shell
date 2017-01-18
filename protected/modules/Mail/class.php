@@ -2155,6 +2155,29 @@ class Mail {
         exit;
     }
     
+    public function APIGetSenders() {
+        $out = [];
+
+        foreach ((array) $_POST['where'] as $key => $value) {
+            $_POST['where'][$key][] = PDO::PARAM_STR;
+        }
+        
+        foreach (APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            $_POST['select'], 'mail_senders', 
+            $_POST['where']
+        ) as $value) {
+            //$value['token'] = APP::Module('Crypt')->Encode($value['id']);
+            $out[] = $value;
+        }
+        
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode($out);
+    }
+    
     public function APIGetLetters() {
         $out = [];
 
