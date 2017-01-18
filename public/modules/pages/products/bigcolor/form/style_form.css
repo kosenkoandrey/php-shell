@@ -1,0 +1,446 @@
+/* #Table of contents
+==================================================
+1. Reset
+2. Main and Structure
+3. Typography
+4. Form Styles
+5. Animate css
+6. Responsive
+7. Clearing and Misc
+
+==================================================
+*/
+
+/* #Reset
+================================================== */
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+/* HTML5 display-role reset for older browsers */
+
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+body {
+  line-height: 1.4;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+blockquote, q {
+  quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+
+/* #Main and structure
+================================================== */
+
+body {
+  font-family: 'Source Sans Pro', sans-serif;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  -webkit-backface-visibility: hidden;
+}
+
+#bg {
+  position: fixed;
+  top: -51%;
+  left: -51%;
+  width: 202%;
+  height: 202%;
+
+}
+#bg img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  min-width: 50%;
+  min-height: 50%;
+
+}
+
+.wrap {
+  /* max-width: 28.75em; 460 / 16 */
+  margin: 0.3em auto 0.3em;
+}
+
+.optin {
+  border-radius: 8px;
+  background: #2e3134;
+  text-align: center;
+  box-shadow: 0px 0px 0px .375em rgba(0,0,0,.3);
+}
+
+.inner-wrap {
+  padding: 1.875em 1.875em 1.25em;
+}
+
+
+/* #Typography
+================================================== */
+
+h1 {
+  background: #1e2124;
+  color: #ffc600;
+  border-radius: .166666667em .166666667em 0px 0px;
+  font-size: 2.5em;
+  padding: .208333333em .625em;
+  font-weight: bold;
+}
+
+h2 {
+  color: #fff;
+  font-size: 1.35em; /* 27 / 16 */
+  font-weight: 600;
+  margin-bottom: 1em;
+}
+
+p {
+  color: #fff;
+  margin-bottom: 1em;
+}
+
+h2, p {
+  text-shadow: 0px .125em .1875em rgba(0,0,0,.5);
+}
+
+strong {
+  font-weight: bold;
+}
+
+em {
+  font-style: italic;
+}
+
+a {
+  color: #ffc600;
+}
+
+
+/* #Form Styles
+================================================== */
+
+form {
+  margin-bottom: .625em; /* 10 / 16 */
+}
+
+input[type="text"] {
+  margin-bottom: .625em; /* 10 / 16 */
+  font-family: inherit;
+  text-align: center;
+  -webkit-appearance: none;
+}
+
+input[type="text"] {
+  width: 97.5%;
+  border: solid .25em #ffc600;
+}
+
+input, .error {
+  font-size: 1.25em; /* 20 / 16 */
+}
+
+input, button {
+  padding: .5em 0px;
+}
+
+.btn {
+  background-color: #ffc600;
+  border: none;
+  box-shadow: 0px 0.1875em 0px 0px #ac8600;
+  cursor: pointer;
+  font-size: 1.625em;
+  border-radius: .25em;
+  font-weight: 600;
+  -webkit-appearance: none;
+  width: 100%;
+  padding: .75em 0px;
+  margin-bottom: .75em;
+}
+
+.btn:hover {
+  background-color: #f2bc00;
+}
+
+.btn:active {
+  background-color: #e5b200;
+  box-shadow: inset 0px 0px 10px 0px rgba(0,0,0,.5);
+  position: relative;
+  top: 0.1875em;
+}
+
+.small {
+  font-size: .8em;
+}
+
+.small,
+.small a {
+  color: #b1b1b1;
+}
+
+.optin-error {
+  color: #f66;
+  display: none;
+  margin-top: -0.625em;
+  margin-bottom: 0.625em;
+}
+
+.has-error .optin-error {
+  display: block;
+}
+
+/* #Animate css
+================================================== */
+
+.animated {
+  -webkit-animation-duration: 1s;
+     -moz-animation-duration: 1s;
+       -o-animation-duration: 1s;
+          animation-duration: 1s;
+  -webkit-animation-fill-mode: both;
+     -moz-animation-fill-mode: both;
+       -o-animation-fill-mode: both;
+          animation-fill-mode: both;
+}
+
+.animated.hinge {
+  -webkit-animation-duration: 2s;
+     -moz-animation-duration: 2s;
+       -o-animation-duration: 2s;
+          animation-duration: 2s;
+}
+
+@-webkit-keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    -webkit-transform: translateY(-1.25em);
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+  }
+}
+
+@-moz-keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    -moz-transform: translateY(-1.25em);
+  }
+
+  100% {
+    opacity: 1;
+    -moz-transform: translateY(0);
+  }
+}
+
+@-o-keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    -o-transform: translateY(-1.25em);
+  }
+
+  100% {
+    opacity: 1;
+    -o-transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-1.25em);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fadeInDown {
+  -webkit-animation-name: fadeInDown;
+  -moz-animation-name: fadeInDown;
+  -o-animation-name: fadeInDown;
+  animation-name: fadeInDown;
+}
+
+@-webkit-keyframes shake {
+  0%, 100% {-webkit-transform: translateX(0);}
+  10%, 30%, 50%, 70%, 90% {-webkit-transform: translateX(-10px);}
+  20%, 40%, 60%, 80% {-webkit-transform: translateX(10px);}
+}
+
+@-moz-keyframes shake {
+  0%, 100% {-moz-transform: translateX(0);}
+  10%, 30%, 50%, 70%, 90% {-moz-transform: translateX(-10px);}
+  20%, 40%, 60%, 80% {-moz-transform: translateX(10px);}
+}
+
+@-o-keyframes shake {
+  0%, 100% {-o-transform: translateX(0);}
+  10%, 30%, 50%, 70%, 90% {-o-transform: translateX(-10px);}
+  20%, 40%, 60%, 80% {-o-transform: translateX(10px);}
+}
+
+@keyframes shake {
+  0%, 100% {transform: translateX(0);}
+  10%, 30%, 50%, 70%, 90% {transform: translateX(-10px);}
+  20%, 40%, 60%, 80% {transform: translateX(10px);}
+}
+
+.shake {
+  -webkit-animation-name: shake;
+  -moz-animation-name: shake;
+  -o-animation-name: shake;
+  animation-name: shake;
+}
+
+
+/* #Responsive
+================================================== */
+@media only screen and (max-width: 768px) {
+  body    { font-size: 80%; }
+  .wrap   { margin: 2em auto 6.25em; }
+  .optin  { margin: 0px 1em; }
+  h1      { font-size: 2.625em; }
+}
+
+
+/* #Clearing and Misc
+================================================== */
+
+.hide {
+  display: none;
+}
+
+/* Self Clearing Floats */
+
+.group {
+  position: relative;
+}
+
+.group:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+
+
+
+/* #Colors
+================================================== */
+/* Blurd */
+
+
+/* Blurd-Main Structure */
+.color-blurd .optin {
+  background: #2d3538;
+  padding: .9375em 1.875em;  /*17px top/btm 30px lt/rt*/     
+  box-shadow: 0px 0px 0px .375em #e0ecf1;    
+
+}
+
+.color-blurd .inner-wrap {
+  padding: 0px;
+}
+
+/* Blurd-Typography */
+.color-blurd h1 {
+  border-bottom: 1px solid #3d484c;
+  padding: 0px;
+  padding-bottom: 9px;
+  font-weight: normal;
+  background: #2d3538;
+  color: #fff;
+  font-size: 3em; /* 48 / 16 */
+}
+
+.color-blurd h2 {
+  font-size: 1.625em; /* 28 / 16  NOW 26*/ 
+  padding-top: 10px;
+  border-bottom: 1px solid #3d484c;
+  padding-bottom: 27px;
+  margin-bottom: 10px;
+}
+
+.color-blurd p {
+  font-size: 1.0625em;  /*17 / 16*/
+}
+
+.color-blurd a {
+  color: #8e8f90;
+}
+
+
+/* Blurd-Form Styles */
+.color-blurd input[type="text"] {
+  color: #fff;
+  background-color: #50595d;
+  border: solid #50595d;
+}
+
+.color-blurd .btn {
+  background-color: #2a80b9;
+  color: #fff;
+  box-shadow: 0px 0px 0px 0px #2d3538;
+}
+
+.color-blurd .btn:active {
+  background-color: #2a80b9;
+  position: static;
+  top: 0;
+}
+
+.color-blurd .small {
+  font-size: .75em;
+  color: #b1b1b1;
+}
+
+.error {
+  position: absolute;
+  top: 0px;
+  right: -1em;
+}
+

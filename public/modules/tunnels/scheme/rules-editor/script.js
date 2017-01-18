@@ -7,6 +7,7 @@
  */
 
 (function($) {
+    var settings;
     var methods = {
         init: function(options) { 
             $target_rules = $(this);
@@ -16,9 +17,10 @@
                 'process_label': 'Метка туннеля',
             };
 
-            var settings = $.extend( {
-                'rules': $.evalJSON($(this).val()),
-                'debug': false
+            settings = $.extend( {
+                'rules' : $.evalJSON($(this).val()),
+                'url'   : 'http://pult2.glamurnenko.ru/',
+                'debug' : false
             }, options);
 
             $('<div/>', {
@@ -76,7 +78,7 @@
                                     break;
                                 case 'process_label': 
                                     switch(id) {
-                                        case 'process_id': settings[id] = parseInt(param_value); break;
+                                        case 'tunnel_id': settings[id] = parseInt(param_value); break;
                                         case 'timeout-value': 
                                             if (settings.timeout === undefined) settings.timeout = new Object();
                                             settings.timeout.value = parseInt(param_value); 
@@ -305,7 +307,7 @@
                         '</table>'
                     ].join(''));
 
-                    $.post('https://pult.glamurnenko.ru/processes/admin/api/list.json', {
+                    $.post(settings.url + 'processes/admin/api/list.json', {
                         'select': [
                             'id',
                             'name',
@@ -364,7 +366,7 @@
                         ]
                     };
 
-                    $.post('https://pult.glamurnenko.ru/billing/products/api/list.json', JSON.stringify(data), function(resp) {
+                    $.post(settings.url + 'billing/products/api/list.json', JSON.stringify(data), function(resp) {
                         $('#select_filter_values', $trigger_rule_item).html('<select class="selectpicker" data-id="value" id="select_filter" title="Выберите значение..."></select>');
                         $.each(resp.rows,  function(index, value) {
                             if (value) $('#select_filter', $trigger_rule_item).append('<option value="' + value.id + '">' + value.name + ' (' + value.price + ' руб.)</option> ');
@@ -448,7 +450,7 @@
                                     '</select>',
                                 '</td>',
                                 '<td>',
-                                    '<input data-id="process_id" type="hidden">',
+                                    '<input data-id="tunnel_id" type="text">',
                                 '</td>',
                             '</tr>',
                             '<tr>',
@@ -485,8 +487,8 @@
                     if (rule.settings.mode !== undefined) $('.trigger_settings select[data-id="mode"]', $trigger_rule_item).val(rule.settings.mode);
                     $('.trigger_settings select[data-id="mode"]', $trigger_rule_item).on('change', function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))});
 
-                    if (rule.settings.process_id !== undefined) $('.trigger_settings input[data-id="process_id"]', $trigger_rule_item).val(rule.settings.process_id);
-                    $('.trigger_settings input[data-id="process_id"]', $trigger_rule_item).on('input propertychange paste', function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))}).ProcessesSelector();
+                    if (rule.settings.tunnel_id !== undefined) $('.trigger_settings input[data-id="tunnel_id"]', $trigger_rule_item).val(rule.settings.tunnel_id);
+                    $('.trigger_settings input[data-id="tunnel_id"]', $trigger_rule_item).on('input propertychange paste', function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))}).TunnelSelector({'url':settings.url});
 
                     if (rule.settings.label_id !== undefined) $('.trigger_settings input[data-id="label_id"]', $trigger_rule_item).val(rule.settings.label_id);
                     $('.trigger_settings input[data-id="label_id"]', $trigger_rule_item).on('input propertychange paste', function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))});
@@ -545,7 +547,7 @@
                     ].join(''));
 
                     if (rule.settings.letter !== undefined) $('.trigger_settings input[data-id="letter"]', $trigger_rule_item).val(rule.settings.letter);
-                    $('.trigger_settings input[data-id="letter"]', $trigger_rule_item).on('input propertychange paste', function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))}).MailingLetterSelector();
+                    $('.trigger_settings input[data-id="letter"]', $trigger_rule_item).on('input propertychange paste', function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))}).MailingLetterSelector({'url':settings.url});
 
                     if (rule.settings.mode !== undefined) $('.trigger_settings select[data-id="mode"]', $trigger_rule_item).val(rule.settings.mode);
                     $('.trigger_settings select[data-id="mode"]', $trigger_rule_item).on('change', function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))});

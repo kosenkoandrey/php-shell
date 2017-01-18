@@ -68,11 +68,10 @@ function mes()
                         url: '<?= APP::Module('Routing')->root ?>tunnels/api/tags/add.json',
                         async: false,
                         data: {
-							'user_tunnel_id'  : <?= APP::Module('Routing')->get['user_tunnel_id'] ?>,
-							'label_id'     : 'preentry',
-							'token'    : '',
-                                                        'info'    : ''
-                                                        
+                            'user_tunnel_id'  : <?= APP::Module('Routing')->get['user_tunnel_id'] ?>,
+                            'label_id'     : 'preentry',
+                            'token'    : '',
+                            'info'    : ''                         
                         },
                         success: function(data) {
                             

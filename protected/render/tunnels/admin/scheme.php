@@ -424,8 +424,8 @@
         <!--<script src="<?= APP::Module('Routing')->root ?>public/modules/tunnels/scheme/processes-selector/script.js"></script>-->
         <script src="<?= APP::Module('Routing')->root ?>public/modules/tunnels/scheme/letter-selector/script.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/modules/tunnels/scheme/letter-sender/script.js"></script>
-        <script src="<?= APP::Module('Routing')->root ?>public/modules/tunnels/scheme/rules-editor/script.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/modules/tunnels/scheme/tunnel-selector/script.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>public/modules/tunnels/scheme/rules-editor/script.js"></script>
         
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
         
@@ -3126,7 +3126,7 @@
                                 }
                                 break;
                             case 'condition':
-                                $('#in_rules').TriggerRulesEditor();
+                                $('#in_rules').TriggerRulesEditor({'url':'<?= APP::Module('Routing')->root ?>'});
                                 break;
                         }
                     });
