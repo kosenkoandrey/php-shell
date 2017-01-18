@@ -421,7 +421,7 @@
         <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
         <script src="<?= APP::Module('Routing')->root ?>public/modules/tunnels/scheme/ie10-viewport-bug-workaround.js"></script>
         
-        <script src="<?= APP::Module('Routing')->root ?>public/modules/tunnels/scheme/processes-selector/script.js"></script>
+        <!--<script src="<?= APP::Module('Routing')->root ?>public/modules/tunnels/scheme/processes-selector/script.js"></script>-->
         <script src="<?= APP::Module('Routing')->root ?>public/modules/tunnels/scheme/letter-selector/script.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/modules/tunnels/scheme/letter-sender/script.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/modules/tunnels/scheme/rules-editor/script.js"></script>
@@ -449,7 +449,8 @@
                         Update: '<?= APP::Module('Routing')->root ?>admin/tunnels/api/timeouts/update.json',
                         Remove: '<?= APP::Module('Routing')->root ?>admin/tunnels/api/timeouts/remove.json'
                     },
-                    GetLetters: '<?= APP::Module('Routing')->root ?>admin/mail/api/letters/get.json'
+                    GetLetters: '<?= APP::Module('Routing')->root ?>admin/mail/api/letters/get.json',
+                    GetSenders: '<?= APP::Module('Routing')->root ?>admin/mail/api/senders/get.json'
                 },
                 Tunnel: {},
                 Objects: {
@@ -1984,12 +1985,7 @@
                                                         )
                                                     )
                                                 );
-                                        
-                                                $('#in_process_0_' + random_subscribe_count).TunnelSelector({
-                                                    callback: function(process) {
-                                                        //$('#object-processes-list-title-' + random_subscribe_count + ' > a').html(process.name)
-;                                                   }
-                                                });
+                                                                                       
                                                 $('#in_activation_letter_' + random_subscribe_count).MailingLetterSelector();
                                         
                                                 ++ random_subscribe_count;
@@ -2147,7 +2143,7 @@
                                                     for: 'tunnel_id',
                                                     class: 'col-sm-2 control-label'
                                                 })
-                                                .append('ID туннеля')
+                                                .append('Туннель')
                                             )
                                             .append(
                                                 $('<div/>', {
@@ -2423,7 +2419,7 @@
                                                     for: 'tunnel_id',
                                                     class: 'col-sm-2 control-label'
                                                 })
-                                                .append('ID туннеля')
+                                                .append('Туннель')
                                             )
                                             .append(
                                                 $('<div/>', {
@@ -2854,14 +2850,17 @@
                             case 'action':
                                 switch (TunnelEditor.Objects.Actions[id].action) {
                                     case 'send_mail':
-                                        $('#in_letter').MailingLetterSelector();
+                                        $('#in_letter').MailingLetterSelector({'url':'<?= APP::Module('Routing')->root ?>'});
                                         break;
                                     case 'auto_complete':
-                                        $('#tunnel_id').TunnelSelector();
+                                        $('#tunnel_id').TunnelSelector({'url':'<?= APP::Module('Routing')->root ?>'});
+                                        break;
+                                    case 'activate_process':
+                                        $('#tunnel_id').TunnelSelector({'url':'<?= APP::Module('Routing')->root ?>'});
                                         break;
                                     case 'subscribe':
-                                        $('#in_process_0').TunnelSelector();
-                                        $('#in_activation_letter').MailingLetterSelector();
+                                        $('#in_process_0').TunnelSelector({'url':'<?= APP::Module('Routing')->root ?>'});
+                                        $('#in_activation_letter').MailingLetterSelector({'url':'<?= APP::Module('Routing')->root ?>'});
                                         break;
                                     case 'random_subscribe': 
                                         $.each(TunnelEditor.Objects.Actions[id].settings.processes, function(i, process) {
@@ -3121,11 +3120,6 @@
                                                 )
                                             );
                                     
-                                            $('#in_process_0_' + i).TunnelSelector({
-                                                callback: function(process) {
-                                                    //$('#object-processes-list-title-' + i + ' > a').html(process.name)
-;                                               }
-                                            });
                                             $('#in_activation_letter_' + i).MailingLetterSelector();
                                         });
                                         break;
@@ -3532,7 +3526,7 @@
                     switch (action_type) {
                         case 'send_mail':
                             if (action.settings.letter) {
-                                TunnelEditor.getSendMailInfo(action.settings.letter, action.settings.sender, function (sendMailInfo) {
+                                TunnelEditor.getSendMailInfo(action.settings.letter, function (sendMailInfo) {
                                     action_details += 'Тема: '+ sendMailInfo.subject;
                                     if (sendMailInfo.sender) {
                                         action_details += '<br>Отправитель: ' + sendMailInfo.sender
@@ -3681,13 +3675,12 @@
                     object.find('.condition_details').html(getDescription(rules));
                     condition.textDescription = getDescription(rules);
                 },
-                getSendMailInfo: function(letterId, senderId, cb) {
+                getSendMailInfo: function(letterId, cb) {
                     var sendMailInfo = {};
                     TunnelEditor.getLetterById(letterId, function (letterData) {
-                        console.log(letterData);
                         sendMailInfo.subject = letterData[0].subject;
-                        if (senderId) {
-                            TunnelEditor.getSenderById(senderId, function (senderData) {
+                        if (letterData[0].sender) {
+                            TunnelEditor.getSenderById(letterData[0].sender, function (senderData) {
                                 sendMailInfo.sender = senderData[0].name;
                                 cb(sendMailInfo);
                             })
@@ -3701,7 +3694,7 @@
                         type: 'post',
                         url: TunnelEditor.API.GetLetters,
                         data: {
-                            select: ['id', 'subject'],
+                            select: ['id', 'subject', 'sender'],
                             where: [
                                 ['id', '=', id]
                             ]
@@ -3714,7 +3707,7 @@
                 getSenderById: function (id, cb) {
                     $.ajax({
                         type: 'post',
-                        url: 'https://pult.glamurnenko.ru/mailing/admin/senders/api/list.json',
+                        url: TunnelEditor.API.GetSenders,
                         data: {
                             select: ['name'],
                             where: [

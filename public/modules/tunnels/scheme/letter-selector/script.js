@@ -13,7 +13,7 @@
 
             settings = $.extend( {
                 'debug': false,
-                'url' : 'http://pult2.glamurnenko.ru',
+                'url' : 'http://pult2.glamurnenko.ru/',
                  callback: function() {}
             }, options);
 
@@ -31,9 +31,9 @@
                 
                 $.ajax({
                     type: 'post',
-                    url: settings.url + '/admin/mail/api/letters/get.json',
+                    url: settings.url + 'admin/mail/api/letters/get.json',
                     data: {
-                        select: ['id', 'subject'],
+                        select: ['id', 'subject', 'sender'],
                         where: [
                             ['id', '=', letters_manager.val()]
                         ]
@@ -108,7 +108,7 @@
 
             $.ajax({
                 type: 'post',
-                url: settings.url +'/admin/mail/api/letters/manage.json',
+                url: settings.url +'admin/mail/api/letters/manage.json',
                 data: {
                     group: group
                 },

@@ -53,6 +53,7 @@ return [
         ['admin\/mail\/api\/senders\/groups\/add\.json(\?.*)?',         'Mail', 'APIAddSendersGroup'],      // [API] Add senders group
         ['admin\/mail\/api\/senders\/groups\/remove\.json(\?.*)?',      'Mail', 'APIRemoveSendersGroup'],   // [API] Remove senders group
         ['admin\/mail\/api\/senders\/groups\/update\.json(\?.*)?',      'Mail', 'APIUpdateSendersGroup'],   // [API] Update senders group
+        ['admin\/mail\/api\/senders\/get\.json(\?.*)?',                 'Mail', 'APIGetSenders'],           // [API] Get sender
         
         ['admin\/mail\/api\/settings\/update\.json(\?.*)?',             'Mail', 'APIUpdateSettings'],       // [API] Update mail settings
         

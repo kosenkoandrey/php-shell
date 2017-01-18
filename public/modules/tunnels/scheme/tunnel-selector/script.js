@@ -13,7 +13,7 @@
 
             settings = $.extend( {
                 'debug': false,
-                'url' : 'http://pult2.glamurnenko.ru',
+                'url' : 'http://pult2.glamurnenko.ru/',
                  callback: function() {}
             }, options);
             
@@ -24,7 +24,7 @@
 
             $.ajax({
                 type: 'post',
-                url: settings.url + '/admin/tunnels/api/manage.json',
+                url: settings.url + 'admin/tunnels/api/manage.json',
                 success: function(tunnels) {
                     $.each(tunnels, function(index, item) {
                         if (item.id == tunnel_selector.val()) {
