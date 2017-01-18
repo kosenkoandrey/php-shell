@@ -362,12 +362,13 @@ class Comments {
                 ]
             );
             $out['file'] = [];
-            
+
             if ($this->settings['module_comments_files']){
                 if (isset($_FILES['file']['name'])) {
                     foreach ($_FILES['file']['name'] as $key => $name){
                         if($_FILES['file']['tmp_name'][$key]){
                             $pathinfo = pathinfo($_FILES['file']['tmp_name'][$key] . '/' . $_FILES['file']['name'][$key]);
+
                             if(isset($pathinfo['extension'])){
                                 $file_name = $out['id'] . '_' . APP::Module('Crypt')->Encode(time() . $key) . '.' . $pathinfo['extension'];
 

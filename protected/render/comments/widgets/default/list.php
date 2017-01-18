@@ -72,11 +72,14 @@ if ($comments['total']) {
                             <p class="m-b-5 m-t-10 f-12 c-gray"><i class="zmdi zmdi-calendar"></i> <?= date('Y-m-d H:i:s', $comment['up_date']) ?></p>
                         </h4>
                         <p style="white-space: pre-wrap;" class="m-b-10"><?= $comment['message'] ?></p>
-                        <div class="lightbox">
+                        <div class="comments_files">
                             <?
+                            $comment_files = [];
+                            
                             if (APP::Module('Comments')->settings['module_comments_files']) { 
                                 foreach($comment['files'] as $file){
                                     switch ($file['file_type']) {
+                                        /*
                                         case 'video/mp4':
                                             ?>
                                             <p><video width="640" height="480" controls>
@@ -87,12 +90,89 @@ if ($comments['total']) {
                                         case 'application/pdf':
                                             ?><p><span class="pdf-block" ><span style="display: inline-block" class="avatar-char palette-Orange-400 bg m-r-5"><i class="zmdi zmdi-file"></i></span></span><a href="<?= APP::Module('Routing')->root ?>comments/download/<?= APP::Module('Crypt')->Encode($file['file_id']) ?>">Download</a></p><?
                                             break;
+                                         */
+                                        case 'image/cgm':
+                                        case 'image/fits':
+                                        case 'image/g3fax':
+                                        case 'image/gif':
+                                        case 'image/ief':
+                                        case 'image/jp2':
                                         case 'image/jpeg':
+                                        case 'image/jpm':
+                                        case 'image/jpx':
+                                        case 'image/naplps':
                                         case 'image/png':
-                                            ?><div data-src="<?= APP::Module('Routing')->root ?>comments/download/<?= APP::Module('Crypt')->Encode($file['file_id']) ?>"><div class="lightbox-item"><img src="<?= APP::Module('Routing')->root ?>comments/download/<?= APP::Module('Crypt')->Encode($file['file_id']) ?>" class="thumbnail"></div></div><?
+                                        case 'image/prs.btif':
+                                        case 'image/prs.pti':
+                                        case 'image/t38':
+                                        case 'image/tiff':
+                                        case 'image/tiff-fx':
+                                        case 'image/vnd.adobe.photoshop':
+                                        case 'image/vnd.cns.inf2':
+                                        case 'image/vnd.djvu':
+                                        case 'image/vnd.dwg':
+                                        case 'image/vnd.dxf':
+                                        case 'image/vnd.fastbidsheet':
+                                        case 'image/vnd.fpx':
+                                        case 'image/vnd.fst':
+                                        case 'image/vnd.fujixerox.edmics-mmr':
+                                        case 'image/vnd.fujixerox.edmics-rlc':
+                                        case 'image/vnd.globalgraphics.pgb':
+                                        case 'image/vnd.microsoft.icon':
+                                        case 'image/vnd.mix':
+                                        case 'image/vnd.ms-modi':
+                                        case 'image/vnd.net-fpx':
+                                        case 'image/vnd.sealed.png':
+                                        case 'image/vnd.sealedmedia.softseal.gif':
+                                        case 'image/vnd.sealedmedia.softseal.jpg':
+                                        case 'image/vnd.svf':
+                                        case 'image/vnd.wap.wbmp':
+                                        case 'image/vnd.xiff':
+                                            $comment_files['images'][] = '<div data-src="' . APP::Module('Routing')->root . 'comments/download/' . APP::Module('Crypt')->Encode($file['file_id']) . '"><div class="lightbox-item"><img src="' . APP::Module('Routing')->root . 'comments/download/' . APP::Module('Crypt')->Encode($file['file_id']) . '" class="thumbnail"></div></div>';
+                                            break;
+                                        case 'audio/aac':
+                                        case 'audio/wav':
+                                        case 'audio/webm':
+                                        case 'audio/basic':
+                                        case 'auido/L24':
+                                        case 'audio/mid': 
+                                        case 'audio/mpeg':
+                                        case 'audio/mp4':
+                                        case 'audio/x-aiff':	  
+                                        case 'audio/x-mpegurl':	 
+                                        case 'audio/vnd.rn-realaudio':	 
+                                        case 'audio/ogg':
+                                        case 'audio/vorbis':
+                                        case 'case audio/vnd.wav':
+                                        case 'audio/mp3':
+                                            $comment_files['audio'][] = '<div class="m-b-15 m-t-15" style="border: 1px solid #e3e3e3"><audio style="width: 100%;" src="' . APP::Module('Routing')->root . 'comments/download/' . APP::Module('Crypt')->Encode($file['file_id']) . '" preload="auto" controls></audio></div>';
                                             break;
                                     }
                                 }
+                            }
+                            
+                            if (isset($comment_files['images'])) {
+                                ?>
+                                <div class="lightbox">
+                                    <?
+                                    foreach ($comment_files['images'] as $value) {
+                                        echo $value;
+                                    }
+                                    ?>
+                                </div>
+                                <?
+                            }
+                            
+                            if (isset($comment_files['audio'])) {
+                                ?>
+                                <div class="audio">
+                                    <?
+                                    foreach ($comment_files['audio'] as $value) {
+                                        echo $value;
+                                    }
+                                    ?>
+                                </div>
+                                <?
                             }
                             ?>
                         </div>
