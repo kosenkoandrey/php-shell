@@ -10,7 +10,8 @@
     var methods = {
         init: function(options) { 
             var tunnel_selector = $(this);
-
+            var data = tunnel_selector.data();
+            
             settings = $.extend( {
                 'debug': false,
                 'url' : 'http://pult2.glamurnenko.ru/',
@@ -21,7 +22,7 @@
                 'id': 'tunnel_id',
                 'class': 'form-control'
             });
-
+            
             $.ajax({
                 type: 'post',
                 url: settings.url + 'admin/tunnels/api/manage.json',
@@ -38,10 +39,14 @@
                         }
                     });
                     
+                    $.each(data, function(k, i){
+                        selector.attr('data-'+k, i);
+                    });
+                    
                     tunnel_selector.replaceWith(selector);
                 }
             });
-
+            
             return this;
         }
     };
