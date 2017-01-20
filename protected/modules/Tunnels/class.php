@@ -3663,6 +3663,257 @@ class TunnelsSearch {
             [['name', $settings['logic'], $settings['value'], PDO::PARAM_STR]]
         );
     }
+    
+    public function send_mail($settings) {
+        switch ($settings['mode']) {
+            case 'exist':
+                return APP::Module('DB')->Select(
+                    APP::Module('Mail')->settings['module_mail_db_connection'], 
+                    ['fetchAll', PDO::FETCH_COLUMN], 
+                    ['DISTINCT user'], 'mail_log',
+                    [
+                        ['letter', '=', $settings['letter'], PDO::PARAM_INT],
+                        ['state', '=', 'success', PDO::PARAM_STR]
+                    ]
+                );
+                break;
+                
+            case 'not_exist':
+                return APP::Module('DB')->Select(
+                    APP::Module('Mail')->settings['module_mail_db_connection'], 
+                    ['fetchAll', PDO::FETCH_COLUMN], 
+                    ['DISTINCT user'], 'mail_log',
+                    [
+                        ['user', 'NOT IN', APP::Module('DB')->Select(
+                                APP::Module('Tunnels')->settings['module_mail_db_connection'], 
+                                ['fetchAll', PDO::FETCH_COLUMN], 
+                                ['DISTINCT user'], 'mail_log',
+                                [
+                                    ['letter', '=', $settings['letter'], PDO::PARAM_INT],
+                                    ['state', '=', 'success', PDO::PARAM_STR]
+                                ]
+                            )
+                        ],
+                        ['state', '=', 'success', PDO::PARAM_STR]
+                    ]
+                );
+                break;
+        }
+    }
+    
+    public function tunnel_label($settings) {
+        $settings['label_data'] = isset($settings['label_data']) ? $settings['label_data'] : '';
+
+        if(isset($settings['from']) || isset($settings['to'])){
+            if(!isset($settings['from'])){
+                $date_from = APP::Module('DB')->Select(
+                    APP::Module('Tunnels')->settings['module_tunnels_db_connection'], 
+                    ['fetchAll', PDO::FETCH_COLUMN],
+                    ['UNIX_TIMESTAMP(cr_date)'], 
+                    'tunnels_tags',
+                    false,
+                    false,
+                    false,
+                    false,
+                    ['cr_date', 'ASC']
+                );
+            }
+
+            $date_range = [
+                'from' => (isset($settings['from']) ? $settings['from'] : date('Y-m-d', $date_from)). ' 00:00:00',
+                'to' => (isset($settings['to']) ? $settings['to'] : date('Y-m-d', time())) . ' 23:59:59'
+            ];
+        }
+
+        switch ($settings['mode']) {
+            case 'exist':
+                $timeout = 0;
+                $cr_date = 0;
+                $where = false;
+                $join = false;
+
+                if (isset($settings['timeout'])) {
+                    switch ($settings['timeout']['mode']) {
+                        case 'min': $timeout = (int) $settings['timeout']['value'] * 60; break;
+                        case 'hours': $timeout = (int) $settings['timeout']['value'] * 3600; break;
+                        case 'days': $timeout = (int) $settings['timeout']['value'] * 86400; break;
+                        default: $timeout = (int) $settings['timeout']['value'];
+                    }
+                }
+
+                if (isset($settings['cr_date_mode'])) {
+                    switch ($settings['cr_date_mode']) {
+                        case 'min': $cr_date = (int) $settings['cr_date_value'] * 60; break;
+                        case 'hours': $cr_date = (int) $settings['cr_date_value'] * 3600; break;
+                        case 'days': $cr_date = (int) $settings['cr_date_value'] * 86400; break;
+                        default: $cr_date = (int) $settings['cr_date_value'];
+                    }
+                }
+
+                if(isset($settings['label_id'])){
+                    $where[] = ['label_id', '=', $settings['label_id'], PDO::PARAM_STR];
+                }
+
+                if($timeout){
+                    $where[] = ['UNIX_TIMESTAMP(cr_date)', '<=', (time() - $timeout), PDO::PARAM_STR];
+                }
+
+                if ($cr_date) {
+                    $where[] = ['cr_date', 'BETWEEN', '"' . date('Y-m-d H:i:s', (time() - $cr_date)) . '" AND "' . date('Y-m-d H:i:s',time()) . '"', PDO::PARAM_STR];
+                }
+
+                if ($date_range) {
+                    $where[] = ['cr_date', 'BETWEEN', '"' . $date_range['from'] . '" AND "' . $date_range['to'] . '"', PDO::PARAM_STR];
+                }
+                
+                if (isset($settings['token'])) {
+                    $where[] = ['token', '=', $settings['token'], PDO::PARAM_STR];
+                }
+
+
+                $join['join/tunnels_users'][] = ['tunnels_users.id', '=', 'tunnels_tags.user_tunnel_id'];
+
+                if (isset($settings['process_id'])) {
+                    $join['join/tunnels_users'][] = ['tunnels_users.tunnel_id', '=', $settings['tunnel_id']];
+                }
+
+                return  APP::Module('DB')->Select(
+                    APP::Module('Tunnels')->settings['module_tunnels_db_connection'], 
+                    ['fetchAll', PDO::FETCH_COLUMN],
+                    ['DISTINCT tunnels_users.user_id'], 
+                    'tunnels_tags',
+                    $where,
+                    $join,
+                    false,
+                    false,
+                    ['cr_date', 'DESC']
+                );
+            case 'not_exist': 
+                /*
+                $users = Shell::$app->Get('extensions','EModDB')->Open('pult_mailing')->prepare('
+                    SELECT DISTINCT tunnels_subscriptions.user_id 
+                    FROM tunnels_subscriptions 
+                    WHERE tunnels_subscriptions.user_id NOT IN (
+                        SELECT DISTINCT tunnels_subscriptions.user_id  
+                            FROM tunnels_labels 
+                            JOIN tunnels_subscriptions ON 
+                                tunnels_subscriptions.id = tunnels_labels.tunnel_id && 
+                                tunnels_subscriptions.tunnel_id = :tunnel_id
+                            WHERE 
+                                tunnels_labels.label_id = :label_id && 
+                                tunnels_labels.label_data = :label_data
+                    )
+                ');
+                $users->bindParam(':tunnel_id', $settings['tunnel_id'], PDO::PARAM_INT);
+                $users->bindParam(':label_id', $settings['label_id'], PDO::PARAM_STR);
+                $users->bindParam(':label_data', $settings['label_data'], PDO::PARAM_STR);
+                $users->execute();
+                
+                return $users->fetchAll(PDO::FETCH_COLUMN);
+                 * 
+                 */
+                return [];
+        }
+    }
+    
+    public function letter_click($settings) {
+        switch ($settings['mode']) {
+            case 'exist':
+                $timeout = 0;
+                
+                if (isset($settings['timeout'])) {
+                    switch ($settings['timeout']['mode']) {
+                        case 'min': $timeout = (int) $settings['timeout']['value'] * 60; break;
+                        case 'hours': $timeout = (int) $settings['timeout']['value'] * 3600; break;
+                        case 'days': $timeout = (int) $settings['timeout']['value'] * 86400; break;
+                        default: $timeout = (int) $settings['timeout']['value'];
+                    }
+                }
+
+                return APP::Module('DB')->Select(
+                    APP::Module('Mail')->settings['module_mail_db_connection'], 
+                    ['fetchAll', PDO::FETCH_COLUMN],
+                    ['DISTINCT user'], 
+                    'mail_events',
+                    [
+                        ['event', '=', 'click', PDO::PARAM_STR],
+                        ['letter', '=', $settings['letter'], PDO::PARAM_INT],
+                        ['UNIX_TIMESTAMP(cr_date)', '<=', (time() - $timeout), PDO::PARAM_STR],
+                        ['token', 'LIKE', $settings['url'] . '%', PDO::PARAM_STR]
+                    ]
+                );
+                break;
+            case 'not_exist': 
+                return APP::Module('DB')->Select(
+                    APP::Module('Mail')->settings['module_mail_db_connection'], 
+                    ['fetchAll', PDO::FETCH_COLUMN],
+                    ['DISTINCT user'], 
+                    'mail_log',
+                    [
+                        ['letter', '=', $settings['letter'], PDO::PARAM_INT],
+                        ['id', 'NOT IN', APP::Module('DB')->Select(
+                            APP::Module('Mail')->settings['module_mail_db_connection'], 
+                            ['fetchAll', PDO::FETCH_COLUMN],
+                            ['DISTINCT log'], 
+                            'mail_events',
+                            [
+                                ['event', '=', 'click', PDO::PARAM_STR],
+                                ['token', 'LIKE', $settings['url'] . '%', PDO::PARAM_STR]
+                            ]
+                        ), PDO::PARAM_INT],
+                    ]
+                );
+                break;
+        }
+    }
+    
+    public function letter_open($settings) {
+        switch ($settings['mode']) {
+            case 'exist':
+                $timeout = 0;
+                
+                if (isset($settings['timeout'])) {
+                    switch ($settings['timeout']['mode']) {
+                        case 'min': $timeout = (int) $settings['timeout']['value'] * 60; break;
+                        case 'hours': $timeout = (int) $settings['timeout']['value'] * 3600; break;
+                        case 'days': $timeout = (int) $settings['timeout']['value'] * 86400; break;
+                        default: $timeout = (int) $settings['timeout']['value'];
+                    }
+                }
+
+                return APP::Module('DB')->Select(
+                    APP::Module('Mail')->settings['module_mail_db_connection'], 
+                    ['fetchAll', PDO::FETCH_COLUMN], ['DISTINCT user'], 
+                    'mail_events',
+                    [
+                        ['event', 'IN', ['open','click'], PDO::PARAM_STR],
+                        ['letter', '=', $settings['letter'], PDO::PARAM_INT],
+                        ['UNIX_TIMESTAMP(cr_date)', '<=', (time() - $timeout), PDO::PARAM_STR]
+                    ]
+                );
+                break;
+            case 'not_exist': 
+                return APP::Module('DB')->Select(
+                    APP::Module('Mail')->settings['module_mail_db_connection'], 
+                    ['fetchAll', PDO::FETCH_COLUMN],
+                    ['DISTINCT user'], 
+                    'mail_log',
+                    [
+                        ['letter', '=', $settings['letter'], PDO::PARAM_INT],
+                        ['id', 'NOT IN', APP::Module('DB')->Select(
+                            APP::Module('Mail')->settings['module_mail_db_connection'], 
+                            ['fetchAll', PDO::FETCH_COLUMN],
+                            ['DISTINCT log'], 
+                            'mail_events',
+                            [
+                                ['event', '=', 'open', PDO::PARAM_STR],
+                            ]
+                        ), PDO::PARAM_INT],
+                    ]
+                );
+                break;
+        }
+    }
 
 }
 

@@ -3650,7 +3650,7 @@
                                     case 'send_mail':
                                         conditionItem = 'отправлено письмо с ID ' + rule.settings.letter;
                                         break;
-                                    case 'process_label':
+                                    case 'tunnel_label':
                                         conditionItem = 'есть метка ' + rule.settings.label_id + ' процесса с ID ' + rule.settings.tunnel_id;
                                         break;
                                     case 'letter_open':

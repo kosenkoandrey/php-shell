@@ -16,8 +16,9 @@ $cr_date = APP::Module('DB')->Select(
     ]
 );
 
+
 // Формирование диапазона дат
-$action_start = strtotime('+72 hours', $user_email);
+$action_start = strtotime('+72 hours', $cr_date);
 $action_end = strtotime('+84 hours', $action_start);
 
 $monthAr = array(
@@ -64,6 +65,7 @@ $monthAr = array(
 				<li><a class="a2" href="#point2">Кто ведет</a></li>
 				<li><a class="a3" href="#point3">Как все будет</a></li>
 				<li><a class="a4" href="#point4">Программа</a></li>
+				<li><a class="a5" href="#point5">Бонусы</a></li>
 				<li><a class="a6" href="#point6">Записаться</a></li>
 				<li><a class="a7" href="#point7">Отзывы</a></li>
 				<li><a class="a8" href="#point8">Вопросы</a></li>
@@ -340,7 +342,100 @@ if (APP::Module('DB')->Select(
 		</div>
 	</div>	
 	
+	<div class="block12"  id="point5">
+		<div class="ins">
+			<div class="bg"></div>
+			<div class="bl_name">БОНУСЫ</div>
+			<div class="item i2">
+				<div class="top"><span>бонус 1</span></div>
+				<div class="center">
+					<div class="pic"><img src="http://www.glamurnenko.ru/images/coverfw_1.png" ></div>
+					<div class="txt">
+						<div class="name">Тенденции сезона осень-зима 2016-2017 и как их применить для вашего гардероба </div>
+						<p>На этом семинаре:<br/>
+						- вы узнаете, какие тенденции актуальны в сезоне осень-зима 2016-2017;<br/>
+						- вы изучите актуальные цвета, фасоны, фактуры, компановки в костюмный ансамбль и узнаете, как применить их к своему гардеробу;<br/>
+						- сможете выбрать из них то, что подходит именно вам;<br/>
+						- узнаете, как с помощью тенденций "разбавить" имеющийся гардероб, сделав его более модным и актуальным.</p>
+					</div>	
+				</div>
+				<div class="bot"></div>
+			</div>
+			<div class="item i2">
+				<div class="top"><span>бонус 2</span></div>
+				<div class="center">
+					<div class="pic"><img src="http://www.glamurnenko.ru/images/coverfw_2.png" ></div>
+					<div class="txt">
+						<div class="name">Обувь и аксессуары сезона осень-зима 2016-2017 </div>
+						<p>Мы подробно разберем следующие вопросы:<br>
+						- на какие из аксессуаров стоит обратить внимание в этом году и как грамотно дополнить ими свой осенне-зимний образ;<br>
+						- какие модели обуви актуальны в этом сезоне и с чем их можно сочетать в своем гардеробе;<br>
+						- сумки каких цветов, моделей, фактур будут в тренде этой осенью и зимой и с чем их носить;<br>
+						- какие украшения, головные уборы, платки и шарфы станут изюминкой вашего гардероба в этом сезоне.
+						</p>
+					</div>	
+				</div>
+				<div class="bot"></div>
+			</div>
+			<div class="item i2">
+				<div class="top"><span>бонус 3</span></div>
+				<div class="center">
+					<div class="pic"><img src="http://www.glamurnenko.ru/images/coverfw_3.png" ></div>
+					<div class="txt">
+						<div class="name">MUST HAVE сезона осень-зима 2016-2017. 10 вещей, которые добавят изюминку вашему гардеробу </div>
+						<p>На этом семинаре вы узнаете о том минимуме, который - ну, просто необходимо купить в этом сезоне, чтобы освежить свой гардероб!<br><br>Я расскажу вам, каким образом вписать эти вещи в уже имеющийся гардероб так, чтобы сделать его более "острым", стильным и актуальным, но при этом не стать жертвой моды.
+						</p>
+					</div>	
+				</div>
+				<div class="bot"></div>
+			</div>
+			<div class="item i2">
+				<div class="top"><span>бонус 4</span></div>
+				<div class="center">
+					<div class="pic"><img src="http://www.glamurnenko.ru/images/coverfw_4.png" ></div>
+					<div class="txt">
+						<div class="name">Top-10 цветов сезона осень-зима 2016-2017 с идеями для вашего гардероба </div>
+						<p>На семинаре:<br/>
+						- вы узнаете TOP-10 цветов сезона осень-зима 2016-2017;<br>
+						- мы подробно разберем их на примерах коллекций этого сезона;<br>
+						- вы узнаете, с какими цветами они сочетаются;<br>
+						- вы сможете выбрать из них те, что подходят именно вам;<br>
+						- вы узнаете, как с их помощью сделать свой осенне-зимний гардероб более актуальным, стильным и "вкусным" с точки зрения цветовых решений;<br>
+						- вы сможете сделать текущий гардероб более актуальным и эффектным, добавив в него лишь несколько оттенков нового сезона.</p>
+					</div>	
+				</div>
+				<div class="bot"></div>
+			</div>
+			<div class="item i2">
+				<div class="top"><span>бонус 5</span></div>
+				<div class="center">
+					<div class="pic"><img src="http://www.glamurnenko.ru/products/shopping-fw/images/bns8-2.png" ></div>
+					<div class="txt">
+						<div class="name">Определение цветотипа по фотографии </div>
+						<p>Имиджмейкер нашей команды определит ваш цветотип по фотографиям и пришлет отчет по цветам, которые идут вам и смогут подчеркнуть вашу природную красоту.</p>
+					</div>	
+				</div>
+				<div class="bot"></div>
+			</div>
+			<div class="item i2">
+				<div class="top"><span>бонус 6</span></div>
+				<div class="center">
+					<div class="pic"><img src="http://www.glamurnenko.ru/products/shopping-fw/images/bns7-2.png" ></div>
+					<div class="txt">
+						<div class="name">Как определить свой цветотип и цвета, которые вам идут</div>
+						<p>Из этого семинара вы узнаете:<br/>
+						- как определить свой цветотип;<br/>
+                        - правила определения цветотипов "Зима", "Лето", "Весна" и "Осень", а также -- их подтипов;<br/>
+                        - какие цвета подходят каждому из цветотипов;<br/>
+                        - какие цветовые решения будут выигрышными именно для вас.</p>
+					</div>	
+				</div>
+				<div class="bot"></div>
+			</div>
+		</div>
+	</div>
 	   <link rel="stylesheet" type="text/css" href="<?= APP::Module('Routing')->root ?>public/modules/pages/products/bigcolor/css/style_1.css?t=1409284522"/>
+
 <section class="whiteBg"  style="background: white;"  id="point8">
     <section class="page" id="faq_block">
         <h1>Часто задаваемые вопросы:</h1>
@@ -355,6 +450,7 @@ if (APP::Module('DB')->Select(
         <p>Что-то вы сможете "дотянуть" из уже имеющейся у вас одежды. А что-то надо будет докупать. Но эти покупки будут очень рациональными и оправданными. Без покупки новых вещей сложно сделать что-то кардинально новое и интересное. Но в любом случае вы потратите намного меньше денег, чем просто самостоятельно закупая одежду без нашей поддержки.</p>
         <h2><span class="questSymbol">?</span> Могу ли я купить тренинг сейчас, а проходить через месяц / полгода / год?</h2>
         <p>Да, вы можете проходить тренинг в любое удобное для вас время. Вместе с тренингом идет гарантированный период проверки ваших домашних заданий - от 2 месяцев. Как только вы купили - этот период начался. Заморозить его, к сожалению, нельзя. Но вы можете потом продлить этот срок или включить, когда захотите (например, через полгода). Стоимость продления/включения = 500 рублей/мес</p>
+
 
            
     </section>
@@ -395,7 +491,7 @@ if (APP::Module('DB')->Select(
 } else { 
     ?>
     <div class="bl1">
-        Стандартная цена тренинга <strike>10 500 рублей</strike>.<br>
+				Стандартная цена тренинга <strike>10 500 рублей</strike>.<br>
 Цена со скидкой 5500 рублей.<br><br>Чтобы получить скидку в 50%,<br> запишитесь сейчас в предварительный список.
 			    </div>
 				<div class="bl1">
@@ -405,11 +501,10 @@ if (APP::Module('DB')->Select(
 </center>
     <?
 }
-?>                 
+?>                                
                                 
+                                      
                                 
-                                
-
 			</div>
 		</div>
 	</div>
@@ -426,7 +521,7 @@ if (APP::Module('DB')->Select(
 			</div>
 		</div>
 	</div>
-           
+	
 	<div class="block16"  id="point7">
 		<div class="ins">
 			<div class="bl_name">ОТЗЫВЫ НА ТРЕНИНГ</div>
@@ -1312,3 +1407,4 @@ mysql_close($link);
 <script type="text/javascript">(window.Image ? (new Image()) : document.createElement('img')).src = location.protocol + '//vk.com/rtrg?r=eZMf4u0yEbscLSPMFlFwJr6/517twPCV0GPr3aqBHlFRdluzoH7Ru1zbkXlM5XoNtvpT0/4oDVbdgH8aMYkZK*vyHG7PM0YGrL3pzTVjbf1U9C5JDvKUnz3Fu1VHSxhEz3lc7qVzQ2WDMpwH5eWFBRNarVkCRBLum8ad39oHQkE-';</script>
 </body>
 </html>
+

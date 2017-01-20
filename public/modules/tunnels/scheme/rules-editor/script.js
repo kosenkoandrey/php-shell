@@ -14,7 +14,7 @@
 
             $actions = {
                 'send_mail': 'Отправка письма',
-                'process_label': 'Метка туннеля',
+                'tunnel_label': 'Метка туннеля',
             };
 
             settings = $.extend( {
@@ -76,7 +76,7 @@
                                         default: settings[id] = param_value;
                                     }
                                     break;
-                                case 'process_label': 
+                                case 'tunnel_label': 
                                     switch(id) {
                                         case 'tunnel_id': settings[id] = parseInt(param_value); break;
                                         case 'timeout-value': 
@@ -196,11 +196,11 @@
                                     '<button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">и</button>',
                                     '<ul class="dropdown-menu" role="menu">',
                                         '<li><a class="add_trigger_rule" data-logic="intersect" data-method="send_mail" href="javascript:void(0)">Отправка письма</a></li>',
-                                        '<li><a class="add_trigger_rule" data-logic="intersect" data-method="process_label" href="javascript:void(0)">Метка процесса</a></li>',
+                                        '<li><a class="add_trigger_rule" data-logic="intersect" data-method="tunnel_label" href="javascript:void(0)">Метка процесса</a></li>',
                                         '<li><a class="add_trigger_rule" data-logic="intersect" data-method="letter_click" href="javascript:void(0)">Клик в письме</a></li>',
                                         '<li><a class="add_trigger_rule" data-logic="intersect" data-method="letter_open" href="javascript:void(0)">Открытие письма</a></li>',
-                                        '<li><a class="add_trigger_rule" data-logic="intersect" data-method="user_product_availability" href="javascript:void(0)">Доступность продукта</a></li>',
-                                        '<li><a class="add_trigger_rule" data-logic="intersect" data-method="user_processes" href="javascript:void(0)">Участие в процессе</a></li>',
+                                        '<li><a class="add_trigger_rule" data-logic="intersect" data-method="product_availability" href="javascript:void(0)">Доступность продукта</a></li>',
+                                        '<li><a class="add_trigger_rule" data-logic="intersect" data-method="tunnels_users" href="javascript:void(0)">Участие в процессе</a></li>',
                                         '<li><a class="add_trigger_rule" data-logic="intersect" data-method="user_sale" href="javascript:void(0)">Доступность распродажи</a></li>',
                                         '<li><a class="add_trigger_rule" data-logic="intersect" data-method="exist_queue_processes" href="javascript:void(0)">Нет туннелей в очереди</a></li>',
                                         '<li><a class="add_trigger_rule" data-logic="intersect" data-method="user_not_processes" href="javascript:void(0)">Не проходят туннели (по типам)</a></li>',
@@ -210,11 +210,11 @@
                                     '<button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">или</button>',
                                     '<ul class="dropdown-menu" role="menu">',
                                         '<li><a class="add_trigger_rule" data-logic="merge" data-method="send_mail" href="javascript:void(0)">Отправка письма</a></li>',
-                                        '<li><a class="add_trigger_rule" data-logic="merge" data-method="process_label" href="javascript:void(0)">Метка процесса</a></li>',
+                                        '<li><a class="add_trigger_rule" data-logic="merge" data-method="tunnel_label" href="javascript:void(0)">Метка процесса</a></li>',
                                         '<li><a class="add_trigger_rule" data-logic="merge" data-method="letter_click" href="javascript:void(0)">Клик в письме</a></li>',
                                         '<li><a class="add_trigger_rule" data-logic="merge" data-method="letter_open" href="javascript:void(0)">Открытие письма</a></li>',
-                                        '<li><a class="add_trigger_rule" data-logic="merge" data-method="user_product_availability" href="javascript:void(0)">Доступность продукта</a></li>',
-                                        '<li><a class="add_trigger_rule" data-logic="merge" data-method="user_processes" href="javascript:void(0)">Участие в процессе</a></li>',
+                                        '<li><a class="add_trigger_rule" data-logic="merge" data-method="product_availability" href="javascript:void(0)">Доступность продукта</a></li>',
+                                        '<li><a class="add_trigger_rule" data-logic="merge" data-method="tunnels_users" href="javascript:void(0)">Участие в процессе</a></li>',
                                         '<li><a class="add_trigger_rule" data-logic="merge" data-method="user_sale" href="javascript:void(0)">Доступность распродажи</a></li>',
                                         '<li><a class="add_trigger_rule" data-logic="merge" data-method="exist_queue_processes" href="javascript:void(0)">Нет туннелей в очереди</a></li>',
                                         '<li><a class="add_trigger_rule" data-logic="merge" data-method="user_not_processes" href="javascript:void(0)">Не проходят туннели (по типам)</a></li>',
@@ -261,17 +261,17 @@
                 case 'user_not_processes':
                     $('.trigger_settings', $trigger_rule_item).append([
                         'Не получает&nbsp;',
-                        '<select class="selectpicker" data-id="type" id="user_processes_type_' + elid + '" title="Выберите значение...">',
+                        '<select class="selectpicker" data-id="type" id="tunnels_users_type_' + elid + '" title="Выберите значение...">',
                             '<option value="static">статический</option>',
                             '<option value="dynamic">динамический</option>',
                         '</select>',
                         '&nbsp;туннель'
                     ].join(''));
 
-                    $('body').on('change', $('#user_processes_type_' + elid), function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))});
-                    if (rule.settings.type !== undefined) $('#user_processes_type_' + elid).val(rule.settings.type);
+                    $('body').on('change', $('#tunnels_users_type_' + elid), function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))});
+                    if (rule.settings.type !== undefined) $('#tunnels_users_type_' + elid).val(rule.settings.type);
                     
-                    $('#user_processes_type_' + elid)
+                    $('#tunnels_users_type_' + elid)
                     .selectpicker({
                         width: '140px',
                         liveSearch: false
@@ -286,12 +286,12 @@
                         '<input data-id="value" type="hidden" class="form-control" style="width: 300px; display: inline-block;" value="4,6,8,10,12,19,13,14,15,16,17">',
                     ].join(''));
                     break;
-                case 'user_processes':
+                case 'tunnels_users':
                     $('.trigger_settings', $trigger_rule_item).append([
                         '<table>',
                             '<tr>',
                                 '<td>',
-                                    '<select class="selectpicker" data-id="type" id="user_processes_type_' + elid + '" title="Выберите значение...">',
+                                    '<select class="selectpicker" data-id="type" id="tunnels_users_type_' + elid + '" title="Выберите значение...">',
                                         '<option value="exist">Есть подписка на</option>',
                                         '<option value="not_exist">Нет подписки на</option>',
                                         '<option value="active">Активная подписка на</option>',
@@ -300,47 +300,27 @@
                                         '<option value="permanent_pause">На постоянной паузе</option>',
                                     '</select>',
                                 '</td>',
-                                '<td id="user_processes_tunnels_' + elid + '">',
-                                    'загрузка туннелей..',
+                                '<td>',
+                                    '<input id="tunnels_users_tunnels_' + elid + '" type="text" data-id="tunnel_id" />',
                                 '<td>',
                             '</tr>',
                         '</table>'
                     ].join(''));
-
-                    $.post(settings.url + 'processes/admin/api/list.json', {
-                        'select': [
-                            'id',
-                            'name',
-                            'type'
-                        ]
-                    }, function(resp) {
-                        $('#user_processes_tunnels_' + elid).html('<select class="selectpicker" data-id="value" id="user_processes_tunnels_selector_' + elid + '" title="Выберите туннель..."></select>');
-                        
-                        $.each(resp,  function(index, value) {
-                            if (value) $('#user_processes_tunnels_selector_' + elid).append('<option value="' + value.id + '">' + value.name + ' (' + value.type + ')</option> ');
-                        });
-
-                        if (rule.settings.value !== undefined) $('#user_processes_tunnels_selector_' + elid).val(rule.settings.value);
-
-                        $('#user_processes_tunnels_selector_' + elid)
-                        .selectpicker({
-                            width: '300px',
-                            liveSearch: true
-                        });
-                    });
-
-                    $('body').on('change', $('#user_processes_tunnels_selector_' + elid), function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))});
-                    $('body').on('change', $('#user_processes_type_' + elid), function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))});
                     
-                    if (rule.settings.type !== undefined) $('#user_processes_type_' + elid).val(rule.settings.type);
+                    if (rule.settings.value !== undefined) $('#tunnels_users_tunnels_selector_' + elid).val(rule.settings.value);
+                    $(document).on('change', $('#tunnels_users_tunnels_selector_' + elid), function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))});
+                    $('#tunnels_users_tunnels_' + elid).TunnelSelector({'url':settings.url});
                     
-                    $('#user_processes_type_' + elid)
+                    if (rule.settings.type !== undefined) $('#tunnels_users_type_' + elid).val(rule.settings.type);
+                    $(document).on('change', $('#tunnels_users_type_' + elid), function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))});
+                    
+                    $('#tunnels_users_type_' + elid)
                     .selectpicker({
                         width: '190px',
                         liveSearch: false
                     });
                     break;
-                case 'user_product_availability':
+                case 'product_availability':
                     $('.trigger_settings', $trigger_rule_item).append([
                         '<table>',
                             '<tr>Доступность продукта</tr>',
@@ -356,29 +336,33 @@
                     ].join(''));
 
                     var data = {
-                        'select': [
-                            'admin_pult_billing.products.id',
-                            'admin_pult_billing.products.name',
-                            'admin_pult_billing.products.price',
-                            'admin_pult_billing.products.state',
-                            'admin_pult_billing.products.sort_index',
-                            'admin_pult_billing.products.multi_sale'
-                        ]
+                        search : '{"logic" :"intersect","rules" :[{"method":"name","settings": {"logic":"LIKE","value":"%"}}]}',
+                        sort_by: "id",
+                        sort_direction: "desc",
+                        current:1,
+                        rows:-1
                     };
+                    
+                    $.ajax({
+                        type: 'post',
+                        url: settings.url + 'admin/billing/products/api/search.json',
+                        data:JSON.stringify(data),
+                        contentType: 'application/json',
+                        success: function(resp) {
+                            $('#select_filter_values', $trigger_rule_item).html('<select class="selectpicker" data-id="value" id="select_filter" title="Выберите значение..."></select>');
+                            $.each(resp.rows,  function(index, value) {
+                                if (value) $('#select_filter', $trigger_rule_item).append('<option value="' + value.id + '">' + value.name + ' (' + value.amount + ' руб.)</option> ');
+                            });
 
-                    $.post(settings.url + 'billing/products/api/list.json', JSON.stringify(data), function(resp) {
-                        $('#select_filter_values', $trigger_rule_item).html('<select class="selectpicker" data-id="value" id="select_filter" title="Выберите значение..."></select>');
-                        $.each(resp.rows,  function(index, value) {
-                            if (value) $('#select_filter', $trigger_rule_item).append('<option value="' + value.id + '">' + value.name + ' (' + value.price + ' руб.)</option> ');
-                        });
-
-                        if (rule.settings.value !== undefined) $('#select_filter', $trigger_rule_item).val(rule.settings.value);
-
-                        $('#select_filter', $trigger_rule_item)
-                        .selectpicker({
-                            width: '300px',
-                            liveSearch: true
-                        });
+                            $('#select_filter', $trigger_rule_item)
+                            .selectpicker({
+                                width: '300px',
+                                liveSearch: true
+                            });
+                            
+                            if (rule.settings.value !== undefined) $('#select_filter', $trigger_rule_item).selectpicker('val', rule.settings.value);
+                            
+                        }
                     });
 
                     $('body').on('change', $('.trigger_settings select[data-id="value"]', $trigger_rule_item), function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))});
@@ -424,7 +408,7 @@
                     ].join(''));
 
                     if (rule.settings.letter !== undefined) $('.trigger_settings input[data-id="letter"]', $trigger_rule_item).val(rule.settings.letter);
-                    $('.trigger_settings input[data-id="letter"]', $trigger_rule_item).on('input propertychange paste', function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))}).MailingLetterSelector();
+                    $('.trigger_settings input[data-id="letter"]', $trigger_rule_item).on('input propertychange paste', function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))}).MailingLetterSelector({'url':settings.url});
 
                     if (rule.settings.mode !== undefined) $('.trigger_settings select[data-id="mode"]', $trigger_rule_item).val(rule.settings.mode);
                     $('.trigger_settings select[data-id="mode"]', $trigger_rule_item).on('change', function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))});
@@ -439,7 +423,7 @@
                     
                     break;
                     
-                case 'process_label': 
+                case 'tunnel_label': 
                     $('.trigger_settings', $trigger_rule_item).append([
                         '<table>',
                             '<tr>',
@@ -483,13 +467,17 @@
                             '</div>',
                         '</div>'
                     ].join(''));
-
+                    
+                    
+                            
                     if (rule.settings.mode !== undefined) $('.trigger_settings select[data-id="mode"]', $trigger_rule_item).val(rule.settings.mode);
                     $('.trigger_settings select[data-id="mode"]', $trigger_rule_item).on('change', function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))});
 
                     if (rule.settings.tunnel_id !== undefined) $('.trigger_settings input[data-id="tunnel_id"]', $trigger_rule_item).val(rule.settings.tunnel_id);
-                    $('.trigger_settings input[data-id="tunnel_id"]', $trigger_rule_item).on('input propertychange paste', function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))}).TunnelSelector({'url':settings.url});
-
+                    $(document).on('change', $('.trigger_settings select[data-id="tunnel_id"]', $trigger_rule_item), function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))});
+                    
+                    $('.trigger_settings input[data-id="tunnel_id"]', $trigger_rule_item).TunnelSelector({'url':settings.url});
+                    
                     if (rule.settings.label_id !== undefined) $('.trigger_settings input[data-id="label_id"]', $trigger_rule_item).val(rule.settings.label_id);
                     $('.trigger_settings input[data-id="label_id"]', $trigger_rule_item).on('input propertychange paste', function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))});
                     
@@ -604,7 +592,7 @@
                     ].join(''));
 
                     if (rule.settings.letter !== undefined) $('.trigger_settings input[data-id="letter"]', $trigger_rule_item).val(rule.settings.letter);
-                    $('.trigger_settings input[data-id="letter"]', $trigger_rule_item).on('input propertychange paste', function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))}).MailingLetterSelector();
+                    $('.trigger_settings input[data-id="letter"]', $trigger_rule_item).on('input propertychange paste', function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))}).MailingLetterSelector({'url':settings.url});
 
                     if (rule.settings.mode !== undefined) $('.trigger_settings select[data-id="mode"]', $trigger_rule_item).val(rule.settings.mode);
                     $('.trigger_settings select[data-id="mode"]', $trigger_rule_item).on('change', function(){$target_rules.val($.toJSON(methods.render_value($('#trigger_rules_editor > .trigger_children > .trigger_rule'))))});
