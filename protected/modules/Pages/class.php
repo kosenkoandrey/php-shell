@@ -265,6 +265,6 @@ class Pages {
     }
     
     public function ProductBigColorActivation() {
-        APP::Render('pages/products/bigcolor/activation');
+        APP::Render('pages/products/bigcolor/activate');
     }
 }
