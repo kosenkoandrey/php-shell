@@ -9,15 +9,14 @@ return [
             'password'  => 'DvRAUh4KGC9Jf8Fc',
             'charset'   => 'utf8'
         ],
-        
         'auto' => [
-           'type'      => 'mysql',
-           'host'      => 'localhost',
-           'database'  => 'phpshell_dev1',
-           'username'  => 'phpshell',
-           'password'  => 'UUY9mPCC5PBVQ7SJ',
-           'charset'   => 'utf8'
-       ]
+            'type'      => 'mysql',
+            'host'      => 'localhost',
+            'database'  => 'phpshell_pult',
+            'username'  => 'phpshell',
+            'password'  => 'UUY9mPCC5PBVQ7SJ',
+            'charset'   => 'utf8'
+        ]
     ],
     'init' => true
 ];
