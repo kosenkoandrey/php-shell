@@ -916,7 +916,7 @@ class Users {
             [['id', 'IN', $out, PDO::PARAM_INT]], 
             false, false, false,
             [$request['sort_by'], $request['sort_direction']],
-            $request['rows'] ? [($request['current'] - 1) * $request['rows'], $request['rows']] : false
+            $request['rows'] === -1 ? false : [($request['current'] - 1) * $request['rows'], $request['rows']]
         ) as $row) {
             $row['auth_token'] = APP::Module('Crypt')->Encode(json_encode([$row['email'], $row['password']]));
             $row['user_id_token'] = APP::Module('Crypt')->Encode($row['id']);
@@ -955,7 +955,7 @@ class Users {
             $_POST['searchPhrase'] ? array_merge([['email', 'LIKE', $_POST['searchPhrase'] . '%' ]], $where) : $where,
             false, false, false,
             [array_keys($_POST['sort'])[0], array_values($_POST['sort'])[0]],
-            [($_POST['current'] - 1) * $_POST['rowCount'], $_POST['rowCount']]
+            $_POST['rowCount'] == -1 ? false : [($_POST['current'] - 1) * $_POST['rowCount'], $_POST['rowCount']]
         ) as $row) {
             $row['auth_token'] = APP::Module('Crypt')->Encode(json_encode([$row['email'], $row['password']]));
             $row['user_id_token'] = APP::Module('Crypt')->Encode($row['id']);

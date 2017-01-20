@@ -121,7 +121,7 @@ class TaskManager {
             $_POST['searchPhrase'] ? [['token', 'LIKE', $_POST['searchPhrase'] . '%' ]] : false, 
             false, false, false,
             [array_keys($_POST['sort'])[0], array_values($_POST['sort'])[0]],
-            [($_POST['current'] - 1) * $_POST['rowCount'], $_POST['rowCount']]
+            $_POST['rowCount'] == -1 ? false : [($_POST['current'] - 1) * $_POST['rowCount'], $_POST['rowCount']]
         ) as $row) {
             $row['task_token'] = APP::Module('Crypt')->Encode($row['id']);
             array_push($rows, $row);

@@ -251,7 +251,7 @@ class Comments {
             ['comments_messages.id'], 
             false,
             [array_keys($_POST['sort'])[0], array_values($_POST['sort'])[0]],
-            [($_POST['current'] - 1) * $_POST['rowCount'], $_POST['rowCount']]
+            $_POST['rowCount'] == -1 ? false : [($_POST['current'] - 1) * $_POST['rowCount'], $_POST['rowCount']]
         ) as $row) {
             $row['id_token'] = APP::Module('Crypt')->Encode($row['id']);
             $row['user_token'] = APP::Module('Crypt')->Encode($row['user']);
@@ -346,6 +346,7 @@ class Comments {
 
         if ($out['status'] == 'success') {
             $message = strip_tags($_POST['message']);
+            $message = preg_replace("~(http|https|ftp|ftps)://(.*?)(\s|\n|[,.?!](\s|\n)|$)~", '<a target="_blank" href="$1://$2">$1://$2</a>$3', $message);
             
             $out['message'] = $message;
             $out['id'] = APP::Module('DB')->Insert(

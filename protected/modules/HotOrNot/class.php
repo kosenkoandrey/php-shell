@@ -233,7 +233,7 @@ class HotOrNot {
             [['id', 'IN', $out, PDO::PARAM_INT]], 
             false, false, false,
             [$request['sort_by'], $request['sort_direction']],
-            $request['rows'] ? [($request['current'] - 1) * $request['rows'], $request['rows']] : false
+            $request['rows'] === -1 ? false : [($request['current'] - 1) * $request['rows'], $request['rows']]
         ) as $row) {
             $row['people_id_token'] = APP::Module('Crypt')->Encode($row['id']);
             array_push($rows, $row);

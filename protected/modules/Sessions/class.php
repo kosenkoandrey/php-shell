@@ -19,7 +19,8 @@ class Sessions {
         
         ini_set('session.gc_maxlifetime', $this->settings['module_sessions_gc_maxlifetime']);
         ini_set('session.cookie_lifetime', $this->settings['module_sessions_cookie_lifetime']);
-        ini_set('session.cookie_domain', $this->settings['module_sessions_cookie_domain']);
+        //ini_set('session.cookie_domain', $this->settings['module_sessions_cookie_domain']);
+        ini_set('session.cookie_domain', $_SERVER['HTTP_HOST']);
 
         session_set_save_handler(
             [$this, 'Open'],

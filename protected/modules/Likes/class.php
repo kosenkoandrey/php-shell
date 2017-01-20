@@ -148,7 +148,7 @@ class Likes {
             ['likes_list.id'], 
             false,
             [array_keys($_POST['sort'])[0], array_values($_POST['sort'])[0]],
-            [($_POST['current'] - 1) * $_POST['rowCount'], $_POST['rowCount']]
+            $_POST['rowCount'] == -1 ? false : [($_POST['current'] - 1) * $_POST['rowCount'], $_POST['rowCount']]
         ) as $row) {
             $row['id_token'] = APP::Module('Crypt')->Encode($row['id']);
             $row['user_token'] = APP::Module('Crypt')->Encode($row['user']);

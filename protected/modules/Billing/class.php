@@ -426,7 +426,7 @@ class Billing {
         $rows    = [];
 
         foreach (APP::Module('DB')->Select(
-            $this->settings['module_billing_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], ['id', 'name', 'amount', 'up_date'], 'billing_products', [['id', 'IN', $out, PDO::PARAM_INT]], false, false, false, [$request['sort_by'], $request['sort_direction']], [($request['current'] - 1) * $request['rows'], $request['rows']]
+            $this->settings['module_billing_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], ['id', 'name', 'amount', 'up_date'], 'billing_products', [['id', 'IN', $out, PDO::PARAM_INT]], false, false, false, [$request['sort_by'], $request['sort_direction']], $request['rows'] === -1 ? false : [($request['current'] - 1) * $request['rows'], $request['rows']]
         ) as $row) {
             $row['product_id_token'] = APP::Module('Crypt')->Encode($row['id']);
             array_push($rows, $row);

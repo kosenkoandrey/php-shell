@@ -1,1 +1,1 @@
-<li><a href="<?= APP::Module('Routing')->root ?>admin/triggers">Rules</a></li>
+<li><a href="<?= APP::Module('Routing')->root ?>admin/triggers">Управление</a></li>

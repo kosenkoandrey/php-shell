@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>PHP-shell - Activate</title>
+        <title>Активация учетной записи</title>
 
         <!-- Vendor CSS -->
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
@@ -20,16 +20,16 @@
                 <div class="lb-header palette-Teal bg">
                     <?
                     switch ($data) {
-                        case 'success': ?><i class="zmdi zmdi-check-circle"></i>Account activation successful<? break;
-                        case 'error': ?><i class="zmdi zmdi-close-circle"></i>Account activation failed<? break;
+                        case 'success': ?><i class="zmdi zmdi-check-circle"></i>Учетная запись успешно активирована<? break;
+                        case 'error': ?><i class="zmdi zmdi-close-circle"></i>Учетная запись не была активирована<? break;
                     }
                     ?>
                     
                 </div>
                 <?
                 switch ($data) {
-                    case 'success': ?><a href="<?= APP::Module('Routing')->root ?>users/actions/login" class="btn btn-default btn-lg btn-block waves-effect">Sign in</a><? break;
-                    case 'error': ?><div class="lb-body">Check activation link</div><? break;
+                    case 'success': ?><a href="<?= APP::Module('Routing')->root ?>users/actions/login" class="btn btn-default btn-lg btn-block waves-effect">Войти</a><? break;
+                    case 'error': ?><div class="lb-body">Проверьте ссылку активации</div><? break;
                 }
                 ?>
             </div>
