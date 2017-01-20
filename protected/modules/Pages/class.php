@@ -112,7 +112,7 @@ class Pages {
             ['COUNT(id)'], 'tunnels_users',
             [
                 ['id', '=', $tunnel_subscribtion_id, PDO::PARAM_INT],
-                ['tunnel_id', '=', 48, PDO::PARAM_INT]
+                ['tunnel_id', '=', 60, PDO::PARAM_INT]
             ]
         )) {
             $tunnel_subscribtion = APP::Module('DB')->Select(
@@ -262,5 +262,9 @@ class Pages {
     
     public function ProductBigColorForm() {
         APP::Render('pages/products/bigcolor/form');
+    }
+    
+    public function ProductBigColorActivation() {
+        APP::Render('pages/products/bigcolor/activation');
     }
 }

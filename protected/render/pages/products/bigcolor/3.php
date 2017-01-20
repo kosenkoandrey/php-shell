@@ -1414,7 +1414,7 @@ if (APP::Module('DB')->Select(
 
 					
 <?php
-$link = mysql_connect("localhost", "admin_glamdb", "jZOmgN8Ia8") or trigger_error(mysql_error());
+/*$link = mysql_connect("localhost", "admin_glamdb", "jZOmgN8Ia8") or trigger_error(mysql_error());
 mysql_select_db('admin_glam-blog', $link) or trigger_error(mysql_error());
 mysql_query("set character_set_results=utf8;",    $link);
 mysql_query("set character_set_connection=utf8;", $link);
@@ -1427,10 +1427,10 @@ where `post_type`='reviews' ";
 $result = mysql_query($query) or trigger_error(mysql_error());
 $row = mysql_fetch_array($result);
 $C = $row['C'];
-mysql_close($link);
+mysql_close($link);*/
 ?>					
 <br/>					
-						<div class="bl_name"><a href="http://glamurnenko.ru/blog/reviews/" target="_blank">прочитать все отзывы ( <?=$C; ?> шт. )</a></div>
+						<div class="bl_name"><a href="http://glamurnenko.ru/blog/reviews/" target="_blank">прочитать все отзывы ( <?php //echo $C; ?> шт. )</a></div>
 
 			</div>			
 			
