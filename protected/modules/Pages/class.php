@@ -267,4 +267,139 @@ class Pages {
     public function ProductBigColorActivation() {
         APP::Render('pages/products/bigcolor/activate');
     }
+    
+    public function Product101OfficeSale() {
+        $cookie_tunnel_subscribtion_id = isset($_COOKIE['tunnel_subscribtion_id']) ? $_COOKIE['tunnel_subscribtion_id'] : 0;
+        $tunnel_subscribtion_id = isset(APP::Module('Routing')->get['token']) ? APP::Module('Crypt')->Decode(APP::Module('Routing')->get['token']) : $cookie_tunnel_subscribtion_id;
+
+        if (APP::Module('DB')->Select(
+            APP::Module('Tunnels')->settings['module_tunnels_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+            ['COUNT(id)'], 'tunnels_users',
+            [['id', '=', $tunnel_subscribtion_id, PDO::PARAM_INT]]
+        )) {
+            setcookie('tunnel_subscribtion_id', $tunnel_subscribtion_id, time() + 31556926, '/', '.glamurnenko.ru');
+        } else {
+            APP::Render('pages/products/101office/5');
+            exit;
+        }
+        
+        // Проверка ID подписки на туннель и получение информации о подписке
+        if (APP::Module('DB')->Select(
+            APP::Module('Tunnels')->settings['module_tunnels_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+            ['COUNT(id)'], 'tunnels_users',
+            [
+                ['id', '=', $tunnel_subscribtion_id, PDO::PARAM_INT],
+                ['tunnel_id', '=', 61, PDO::PARAM_INT]
+            ]
+        )) {
+            $tunnel_subscribtion = APP::Module('DB')->Select(
+                APP::Module('Tunnels')->settings['module_tunnels_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
+                ['id', 'user_id', 'state'], 'tunnels_users',
+                [['id', '=', $tunnel_subscribtion_id, PDO::PARAM_INT]]
+            );
+        } else {
+            APP::Render('pages/products/101office/5');
+            exit;
+        }
+
+        // Если туннель не активный
+        if ($tunnel_subscribtion['state'] != 'active') {
+            APP::Render('pages/products/101office/5', 'include', $tunnel_subscribtion);
+            exit;
+        }
+
+        // Получение массива меток
+        // Получение массива меток
+        $tunnel_subscription_labels = [];
+        
+        foreach (APP::Module('DB')->Select(
+            APP::Module('Tunnels')->settings['module_tunnels_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            ['label_id', 'token'], 'tunnels_tags',
+            [['user_tunnel_id', '=', $tunnel_subscribtion_id, PDO::PARAM_INT]]
+        ) as $label) {
+            $tunnel_subscription_labels[$label['label_id']][] = $label['token'];
+        }
+
+        // Логика отображения вариантов страниц ////////////////////////////////////////
+
+
+        // Получил 13 письмо
+        if (array_search('70', $tunnel_subscription_labels['sendmail']) !== false) {
+            APP::Render('pages/products/101office/5', 'include', $tunnel_subscribtion);
+            exit;
+        }
+
+        // Получил 12 письмо
+        if (array_search('69', $tunnel_subscription_labels['sendmail']) !== false) {
+            $label = APP::Module('DB')->Select(
+                APP::Module('Tunnels')->settings['module_tunnels_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
+                ['label_id', 'token', 'UNIX_TIMESTAMP(cr_date) AS cr_date'], 'tunnels_tags',
+                [
+                    ['user_tunnel_id', '=', $tunnel_subscribtion_id, PDO::PARAM_INT],
+                    ['label_id', '=', 'sendmail', PDO::PARAM_STR],
+                    ['token', '=', '69', PDO::PARAM_STR]
+                ]
+            );
+
+            // Дата окончания таймера
+            $timer_stop = strtotime('+12 hours', $label['cr_date']);
+
+            // Проверка на окончание таймера
+            if ($timer_stop < time()) {
+                // Если закончился таймер
+                APP::Render('pages/products/101office/5', 'include', $tunnel_subscribtion);
+            } else {
+                // Если не закончился таймер 
+                APP::Render('pages/products/101office/4', 'include', $tunnel_subscribtion);
+            }
+            exit;
+
+
+            APP::Render('pages/products/101office/4', 'include', $tunnel_subscribtion);
+            exit;
+        }
+
+        // Получил 9/10/11/12 письмо
+        if (
+            (array_search('66', $tunnel_subscription_labels['sendmail']) !== false) || 
+            (array_search('67', $tunnel_subscription_labels['sendmail']) !== false) || 
+            (array_search('68', $tunnel_subscription_labels['sendmail']) !== false)
+        ) {
+            APP::Render('pages/products/101office/4', 'include', $tunnel_subscribtion);
+            exit;
+        }
+
+        // Получил 8 письмо
+        if (array_search('65', $tunnel_subscription_labels['sendmail']) !== false) {
+            APP::Render('pages/products/101office/3', 'include', $tunnel_subscribtion);
+            exit;
+        }
+
+        // Получил 7 письмо
+        if (array_search('64', $tunnel_subscription_labels['sendmail']) !== false) {
+            APP::Render('pages/products/101office/2', 'include', $tunnel_subscribtion);
+            exit;
+        }
+
+        // Получил 1/2/3/4/5/6 письмо
+        if (
+            (array_search('58', $tunnel_subscription_labels['sendmail']) !== false) || 
+            (array_search('59', $tunnel_subscription_labels['sendmail']) !== false) || 
+            (array_search('60', $tunnel_subscription_labels['sendmail']) !== false) || 
+            (array_search('61', $tunnel_subscription_labels['sendmail']) !== false) || 
+            (array_search('62', $tunnel_subscription_labels['sendmail']) !== false) || 
+            (array_search('63', $tunnel_subscription_labels['sendmail']) !== false)
+        ) {
+            APP::Render('pages/products/101office/1', 'include', $tunnel_subscribtion);
+            exit;
+        }
+    }
+    
+    public function Product101OfficeForm() {
+        APP::Render('pages/products/101office/form');
+    }
+    
+    public function Product101OfficeActivation() {
+        APP::Render('pages/products/101office/activate');
+    }
 }

@@ -1,0 +1,246 @@
+/* #Table of contents
+==================================================
+#1 Reset
+#2 Main and Structure
+#3 Typography
+#4 Footer
+#5 Responsive
+#6 Colors
+==================================================
+*/
+
+/* #1 Reset
+================================================== */
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+
+/* HTML5 display-role reset for older browsers */
+
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+
+body {
+	line-height: 1.4;
+}
+
+ol, ul {
+	list-style: none;
+}
+
+blockquote, q {
+	quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+
+/* #2 Main and Structure
+================================================== */
+
+body {
+	font-family: 'Open Sans', sans-serif;
+	color: #333;
+	background: #f2f2f2;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+}
+
+.header, .panel, .footer {
+	max-width: 50em;
+}
+
+.header {
+	margin: 0px auto;
+	background-color: #102933;
+}
+
+.panel {
+	background-color: #fff;
+	margin-bottom: 2.5em;
+	margin: 5em auto 3em;
+}
+
+.inner-wrap {
+	padding: 3em 4em;
+}
+
+
+/* #3 Typography
+================================================== */
+
+h1 {
+	font-weight: lighter;
+	font-size: 2.125em;
+	padding: 1em 0px 1em 1.8em;
+	color: #fff;
+}
+
+h2 {
+	font-size: 1.375em;
+	margin-bottom: 1em;
+}
+
+p {
+	margin-bottom: 1.2em;
+	line-height: 1.6em;
+}
+
+ul, ol	{ margin-bottom: 1.2em; }
+li			{ line-height: 1.6em; }
+strong	{ font-weight: bold; }
+em			{ font-style: italic; }
+ul, ol	{ margin-left: 2em; }
+ul			{ list-style-type: disc; }
+ol			{ list-style-type: decimal; }
+
+a {
+	color: #ff3d42;
+}
+
+a:hover { color: #ee282d; }
+
+
+/* #4 Footer
+================================================== */
+
+.footer {
+	margin: 0px auto;
+	padding-bottom: 6em;
+}
+
+.footer p {
+	text-align: center;
+	font-size: .875em;
+	color: #999;
+}
+
+.footer a {
+	color: #999;
+	text-decoration: underline;
+}
+
+.footer a:hover {
+	color: #777;
+}
+
+
+/* #5 Responsive
+================================================== */
+
+ @media only screen and (max-width: 768px) {
+	body	 { font-size: 80%; }
+	.panel {
+		margin: 1em;
+	}
+	h1 {
+		margin-bottom: 0px;
+		text-align: center;
+		padding: 1em;
+	}
+	.inner-wrap {
+		padding: 2em;
+	}
+}
+
+
+/* #5 Responsive
+================================================== */
+
+
+/* #6 Colors
+================================================== */
+
+
+/* Athos */
+.color-athos {
+	background: #9CAFAB;
+}
+
+.color-athos .header {
+	background-color: #35464D;
+}
+
+.color-athos a, .color-athos a:visited {
+	color: #732752;
+}
+
+.color-athos a:hover {
+	color: #B87084;
+}
+
+.color-athos .footer p {
+	color: #333;
+}
+
+
+/* Porthos */
+.color-porthos {
+	background: #568F84;
+}
+
+.color-porthos .header {
+	background-color: #000;
+}
+
+.color-porthos .inner-wrap {
+	background-color: #E3FFF3;
+}
+
+.color-porthos a, .color-porthos a:visited {
+	color: #618F36;
+}
+
+.color-porthos a:hover {
+	color: #A7D16F;
+}
+
+.color-porthos .footer p,
+.color-porthos .footer a {
+	color: #FFF;
+}
+
+
+/* Aramis */
+.color-aramis {
+	background: #383245;
+}
+
+.color-aramis .header {
+	background-color: #569492;
+}
+
+.color-aramis a, .color-aramis a:visited {
+	color: #569492;
+}
