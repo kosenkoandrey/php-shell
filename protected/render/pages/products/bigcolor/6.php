@@ -1421,23 +1421,18 @@ if (APP::Module('DB')->Select(
 
 					
 <?php
-$link = mysql_connect("localhost", "admin_glamdb", "jZOmgN8Ia8") or trigger_error(mysql_error());
-mysql_select_db('admin_glam-blog', $link) or trigger_error(mysql_error());
-mysql_query("set character_set_results=utf8;",    $link);
-mysql_query("set character_set_connection=utf8;", $link);
-mysql_query("set character_set_client=utf8;",     $link);
-mysql_query("set character_set_database=utf8;",   $link);
-	$query = "SELECT SQL_NO_CACHE count(*) as C FROM `aa_posts`
-left join `aa_term_relationships` on `id`=`object_id`
-left join `aa_terms` on `term_taxonomy_id`=`term_id`
-where `post_type`='reviews' ";
-$result = mysql_query($query) or trigger_error(mysql_error());
-$row = mysql_fetch_array($result);
-$C = $row['C'];
-mysql_close($link);
+/*$C = APP::Module('DB')->Select(
+    'glamdb', ['fetch', PDO::FETCH_COLUMN], 
+    ['count(*) as C'], 'aa_posts',
+    [['post_type', '=', 'reviews', PDO::PARAM_STR]],
+    [
+        'left join/aa_term_relationships' => [['id', '=', 'object_id']],
+        'left join/aa_terms' => [['term_taxonomy_id', '=', 'term_id']]
+    ]
+);*/
 ?>					
 <br/>					
-						<div class="bl_name"><a href="http://glamurnenko.ru/blog/reviews/" target="_blank">прочитать все отзывы ( <?=$C; ?> шт. )</a></div>
+						<div class="bl_name"><a href="http://glamurnenko.ru/blog/reviews/" target="_blank">прочитать все отзывы ( <?php //echo $C; ?> шт. )</a></div>
 
 			</div>			
 			

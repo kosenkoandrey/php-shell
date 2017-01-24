@@ -93,7 +93,7 @@ var elements=document.getElementById(pair[0]);if(elements){if(typeof elements=='
                                 'value'    : f["firstname"].value
                             },
                             success: function(data) {
-                                window.top.location.href = "http://www.glamurnenko.ru/bigcolor/activate/wait-list-final.php";
+                                window.top.location.href = "<?= APP::Module('Routing')->root ?>products/bigcolor/activation";
                             }
                         });
                     }
