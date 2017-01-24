@@ -79,7 +79,7 @@ $filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Deco
                                 <thead>
                                     <tr>
                                         <th data-column-id="id" data-type="numeric" data-order="desc">ID</th>
-                                        <th data-column-id="email">E-Mail</th>
+                                        <th data-column-id="email" data-formatter="email">E-Mail</th>
                                         <th data-column-id="role">Role</th>
                                         <th data-column-id="reg_date">Reg date</th>
                                         <th data-column-id="last_visit">Last visit</th>
@@ -370,9 +370,11 @@ $filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Deco
                         search: ""
                     },
                     formatters: {
+                        email: function(column, row) {
+                            return  '<a href="<?= APP::Module('Routing')->root ?>admin/users/profile/' + row.id + '" target="_blank">' + row.email + '</a>';
+                        },
                         actions: function(column, row) {
-                            return  '<a href="<?= APP::Module('Routing')->root ?>admin/users/profile/' + row.id + '" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-account"></span></a> ' + 
-                                    '<a href="<?= APP::Module('Routing')->root ?>admin/users/edit/' + row.user_id_token + '" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-edit"></span></a> ' + 
+                            return  '<a target="_blank" href="<?= APP::Module('Routing')->root ?>admin/users/edit/' + row.user_id_token + '" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-edit"></span></a> ' + 
                                     '<a href="javascript:void(0)" class="btn btn-sm btn-default btn-icon waves-effect waves-circle remove-user" data-user-id="' + row.id + '"><span class="zmdi zmdi-delete"></span></a>';
                         }
                     }

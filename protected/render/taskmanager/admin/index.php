@@ -104,7 +104,7 @@
                     },
                     formatters: {
                         actions: function(column, row) {
-                            return  '<a href="<?= APP::Module('Routing')->root ?>admin/taskmanager/edit/' + row.task_token + '" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-edit"></span></a> ' + 
+                            return  '<a target="_blank" href="<?= APP::Module('Routing')->root ?>admin/taskmanager/edit/' + row.task_token + '" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-edit"></span></a> ' + 
                                     '<a href="javascript:void(0)" class="btn btn-sm btn-default btn-icon waves-effect waves-circle remove-task" data-task-id="' + row.id + '"><span class="zmdi zmdi-delete"></span></a>';
                         }
                     }

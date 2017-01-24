@@ -102,7 +102,7 @@
                             return row.trigger[1] + ' / ' + row.trigger[2];
                         },
                         actions: function(column, row) {
-                            return  '<a href="<?= APP::Module('Routing')->root ?>admin/triggers/edit/' + row.token + '" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-edit"></span></a> ' + 
+                            return  '<a target="_blank" href="<?= APP::Module('Routing')->root ?>admin/triggers/edit/' + row.token + '" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-edit"></span></a> ' + 
                                     '<a href="javascript:void(0)" class="btn btn-sm btn-default btn-icon waves-effect waves-circle remove-trigger" data-trigger-id="' + row.id + '"><span class="zmdi zmdi-delete"></span></a>';
                         }
                     }

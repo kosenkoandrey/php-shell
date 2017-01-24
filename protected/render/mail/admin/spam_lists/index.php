@@ -100,7 +100,7 @@
                             return parseInt(row.spam_lists) ? '<i class="zmdi zmdi-alert-triangle"></i> FOUND IN ' + row.spam_lists + ' LISTS' : 'NOT FOUND';
                         },
                         actions: function(column, row) {
-                            return '<a href="<?= APP::Module('Routing')->root ?>admin/mail/spam_lists/ip/status/' + row.token + '" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-assignment"></span></a> ' +
+                            return '<a target="_blank" href="<?= APP::Module('Routing')->root ?>admin/mail/spam_lists/ip/status/' + row.token + '" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-assignment"></span></a> ' +
                                    '<a href="javascript:void(0)" class="btn btn-sm btn-default btn-icon waves-effect waves-circle remove-ip" data-ip-id="' + row.id + '"><span class="zmdi zmdi-delete"></span></a>';
                         }
                     }

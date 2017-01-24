@@ -14,8 +14,10 @@
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bootgrid/jquery.bootgrid.min.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/css/bootstrap-select.css" rel="stylesheet">
+        
         <? APP::Render('core/widgets/css') ?>
-        <? APP::Render('core/widgets/template/css') ?>
+        <? APP::Render('core/widgets/template/css_glamurnenko') ?>
+        
         <style>
             .period-block span{
                 vertical-align: top;
@@ -23,13 +25,13 @@
         </style>
     </head>
     <body data-ma-header="teal">
-        <? APP::Render('core/widgets/template/header', 'include', [
-            'Отписка от рассылок' => 'users/unsubscribe/' . APP::Module('Routing')->get['mail_log_hash']
-        ]) ?>
         <section id="main" class="center">
             <section id="content">
                 <div class="container">
-                    <div class="card">
+                    <? APP::Render('core/widgets/template/header', 'include', [
+                        'Отписка от рассылок' => 'users/unsubscribe/' . APP::Module('Routing')->get['mail_log_hash']
+                    ]) ?>
+                    <div class="card" style="margin-bottom: 1px;">
                     <? if($data['error']) { ?>
                         <div class="card-header"><h2>Неверная ссылка отписки</h2></div>
                         <div class="card-body card-padding">

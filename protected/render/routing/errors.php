@@ -3,15 +3,15 @@
 switch ($data) {
     case 'route_not_found': 
         header('HTTP/1.0 404 Not Found');
-        $info = ['Route not found']; 
+        $info = ['Ошибка 404 - Страница не найдена']; 
         break;
-    default: $info = ['Unknown error']; break;
+    default: $info = ['Неизвестная ошибка']; break;
 }
 ?>
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-    <title>Error</title>
+    <title>Ошибка</title>
     <meta charset="UTF-8">
     <meta name="robots" content="none">
 </head>	

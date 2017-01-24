@@ -215,96 +215,101 @@ class SendThis {
 
     
     public function Webhooks() {
-        $mail_events_log = fopen($this->settings['module_sendthis_tmp_dir'] . '/mail_events_' . md5(implode(APP::$conf['location'])), 'a');
+        $mail_events_log = fopen($this->settings['module_sendthis_tmp_dir'] . '/mail_events', 'a');
         flock($mail_events_log, LOCK_EX);
         
         foreach ((array) $_POST['tasks'] as $task) {
-            $mail = APP::Module('DB')->Select(
-                APP::Module('Mail')->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
-                ['id', 'user', 'letter'], 'mail_log', [['id', '=', $task['params']['id'], PDO::PARAM_STR]]
-            );
+            if (APP::Module('DB')->Select(
+                APP::Module('Mail')->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                ['COUNT(id)'], 'mail_log', [['id', '=', isset($task['params']['id']) ? $task['params']['id'] : 0, PDO::PARAM_STR]]
+            )) {
+                $mail = APP::Module('DB')->Select(
+                    APP::Module('Mail')->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
+                    ['id', 'user', 'letter'], 'mail_log', [['id', '=', $task['params']['id'], PDO::PARAM_STR]]
+                );
 
-            $token = false;
+                $token = false;
 
-            switch ($task['event']) {
-                case 'processed': 
-                    APP::Module('Triggers')->Exec('mail_event_processed', [
-                        'id' => $mail['id'],
-                        'task' => $task
-                    ]);
-                    break;
-                case 'delivered': 
-                    APP::Module('Triggers')->Exec('mail_event_delivered', [
-                        'id' => $mail['id'],
-                        'task' => $task
-                    ]);
-                    break;
-                case 'deferred': 
-                    APP::Module('Triggers')->Exec('mail_event_deferred', [
-                        'id' => $mail['id'],
-                        'task' => $task
-                    ]);
-                    break;
-                case 'bounce': 
-                    $token = $task['dsn'];
-
-                    if ((int) $token{0} === 5) {
-                        APP::Module('Triggers')->Exec('mail_event_bounce_hard', [
+                switch ($task['event']) {
+                    case 'processed': 
+                        APP::Module('Triggers')->Exec('mail_event_processed', [
                             'id' => $mail['id'],
                             'task' => $task
                         ]);
-                    } else {
-                        APP::Module('Triggers')->Exec('mail_event_bounce_soft', [
+                        break;
+                    case 'delivered': 
+                        APP::Module('Triggers')->Exec('mail_event_delivered', [
                             'id' => $mail['id'],
                             'task' => $task
                         ]);
-                    }
-                    break;
-                case 'unsubscribe': 
-                    APP::Module('Triggers')->Exec('mail_event_unsubscribe', [
-                        'id' => $mail['id'],
-                        'task' => $task
-                    ]);
-                    break;
-                case 'spamreport': 
-                    APP::Module('Triggers')->Exec('mail_event_spamreport', [
-                        'id' => $mail['id'],
-                        'task' => $task
-                    ]);
-                    break;
-                case 'open': 
-                    APP::Module('Triggers')->Exec('mail_event_open', [
-                        'id' => $mail['id'],
-                        'task' => $task
-                    ]);
-                    break;
-                case 'click':
-                    $token = $task['url'];
-                    /*
-                    if (!APP::Module('DB')->Select(
-                        APP::Module('Mail')->settings['module_mail_db_connection'], ['fetchColumn', 0], 
-                        ['COUNT(id)'], 'mail_events', [
-                            ['log', '=', $mail['id'], PDO::PARAM_INT],
-                            ['event', '=', 'open', PDO::PARAM_STR]
-                        ]
-                    )) {
-                        fwrite($mail_events_log, "NULL\t" . $mail['id'] . "\t" . $mail['user'] . "\t" . $mail['letter'] . "\topen\t{}\t\t" . date('Y-m-d H:i:s', $task['timestamp']) . "\n");
+                        break;
+                    case 'deferred': 
+                        APP::Module('Triggers')->Exec('mail_event_deferred', [
+                            'id' => $mail['id'],
+                            'task' => $task
+                        ]);
+                        break;
+                    case 'bounce': 
+                        $token = $task['dsn'];
 
+                        if ((int) $token{0} === 5) {
+                            APP::Module('Triggers')->Exec('mail_event_bounce_hard', [
+                                'id' => $mail['id'],
+                                'task' => $task
+                            ]);
+                        } else {
+                            APP::Module('Triggers')->Exec('mail_event_bounce_soft', [
+                                'id' => $mail['id'],
+                                'task' => $task
+                            ]);
+                        }
+                        break;
+                    case 'unsubscribe': 
+                        APP::Module('Triggers')->Exec('mail_event_unsubscribe', [
+                            'id' => $mail['id'],
+                            'task' => $task
+                        ]);
+                        break;
+                    case 'spamreport': 
+                        APP::Module('Triggers')->Exec('mail_event_spamreport', [
+                            'id' => $mail['id'],
+                            'task' => $task
+                        ]);
+                        break;
+                    case 'open': 
                         APP::Module('Triggers')->Exec('mail_event_open', [
-                            'id' => $mail['id']
+                            'id' => $mail['id'],
+                            'task' => $task
                         ]);
-                    }
-                     * 
-                     */
+                        break;
+                    case 'click':
+                        $token = $task['url'];
+                        /*
+                        if (!APP::Module('DB')->Select(
+                            APP::Module('Mail')->settings['module_mail_db_connection'], ['fetchColumn', 0], 
+                            ['COUNT(id)'], 'mail_events', [
+                                ['log', '=', $mail['id'], PDO::PARAM_INT],
+                                ['event', '=', 'open', PDO::PARAM_STR]
+                            ]
+                        )) {
+                            fwrite($mail_events_log, "NULL\t" . $mail['id'] . "\t" . $mail['user'] . "\t" . $mail['letter'] . "\topen\t{}\t\t" . date('Y-m-d H:i:s', $task['timestamp']) . "\n");
 
-                    APP::Module('Triggers')->Exec('click', [
-                        'id' => $mail['id'],
-                        'task' => $task
-                    ]);
-                    break;
+                            APP::Module('Triggers')->Exec('mail_event_open', [
+                                'id' => $mail['id']
+                            ]);
+                        }
+                         * 
+                         */
+
+                        APP::Module('Triggers')->Exec('click', [
+                            'id' => $mail['id'],
+                            'task' => $task
+                        ]);
+                        break;
+                }
+
+                fwrite($mail_events_log, "NULL\t" . $mail['id'] . "\t" . $mail['user'] . "\t" . $mail['letter'] . "\t" . $task['event'] . "\t" . json_encode($task) . "\t" . $token . "\t" . date('Y-m-d H:i:s', $task['timestamp']) . "\n");
             }
-
-            fwrite($mail_events_log, "NULL\t" . $mail['id'] . "\t" . $mail['user'] . "\t" . $mail['letter'] . "\t" . $task['event'] . "\t" . json_encode($task) . "\t" . $token . "\t" . date('Y-m-d H:i:s', $task['timestamp']) . "\n");
         }
         
         flock($mail_events_log, LOCK_UN);
@@ -324,13 +329,21 @@ class SendThis {
         $lock = fopen($this->settings['module_sendthis_tmp_dir'] . '/module_sendthis_load_webhooks.lock', 'w'); 
         
         if (flock($lock, LOCK_EX|LOCK_NB)) { 
-            APP::Module('DB')->Open(APP::Module('Mail')->settings['module_mail_db_connection'])->query('LOAD DATA INFILE \'' . $this->settings['module_sendthis_tmp_dir'] . '/mail_events_' . md5(implode(APP::$conf['location'])) . '\' INTO TABLE mail_events');
-            exec('rm ' . $this->settings['module_sendthis_tmp_dir'] . '/mail_events_' . md5(implode(APP::$conf['location'])));
+            APP::Module('DB')->Open(APP::Module('Mail')->settings['module_mail_db_connection'])->query('LOAD DATA INFILE \'' . $this->settings['module_sendthis_tmp_dir'] . '/mail_events' . '\' INTO TABLE mail_events');
+            exec('rm ' . $this->settings['module_sendthis_tmp_dir'] . '/mail_events');
         } else { 
             exit;
         } 
         
         fclose($lock);
+    }
+    
+    public function BackwardCompatibilityWebhooks($id, $data) {
+        APP::Module('Utils')->Curl([
+            'url' => 'http://pult.glamurnenko.ru/sendthis/webhooks.json',
+            'return_transfer' => true,
+            'post' => $data
+        ]);
     }
     
     

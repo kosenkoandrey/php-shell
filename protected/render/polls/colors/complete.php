@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Возобновление подписки</title>
+        <title><?= $data ?></title>
 
         <!-- Vendor CSS -->
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
@@ -22,21 +22,20 @@
             <section id="content">
                 <div class="container">
                     <? APP::Render('core/widgets/template/header', 'include', [
-                        'Возобновление подписки' => 'users/restore/' . APP::Module('Routing')->get['user_email_hash']
+                        $data => 'polls/colors/' . APP::Module('Routing')->get['token']
                     ]) ?>
-                    <div class="card" style="margin-bottom: 1px;">
-                    <? if($data) { ?>
-                        <div class="card-header"><h2>Вы успешно возобновили подписку на рассылки</h2></div>
-                    <? }else{ ?>
-                        <div class="card-header"><h2>Неверная ссылка на восстановление подписки</h2></div>
+                    <div class="card" style="margin-bottom: 0;">
+                        <div class="card-header"><h2><?= $data ?></h2></div>
                         <div class="card-body card-padding">
-                        Если вы уверены, что прошли по правильной ссылке, пожалуйста, напишите на <a href="mailto:support@glamurnenko.ru">support@glamurnenko.ru</a> и приложите вашу ссылку.
-                        <br><br>
-                        А пока вы ждете ответа от нашей службы поддержки, посмотрите наш сайт:
-                        <br>
-                        <a href="http://glamurnenko.ru">http://glamurnenko.ru</a>
+                            <b>Спасибо большое, что прошли опрос до конца!</b>
+                            <br>
+                            В ближайшее время я прочитаю ваш ответ и постараюсь помочь вам в будущих материалах. 
+                            <br>
+                            Следите за письмами. И небольшой бонус...
+                            <br>
+                            Видео с фотосессии для клиентки. 
                         </div>
-                    <? } ?>
+                        <iframe width="100%" height="480" src="//www.youtube.com/embed/MptfOwAKXOc" frameborder="0" allowfullscreen></iframe>
                     </div>
                     <div class="card">
                         <div class="card-body card-padding">

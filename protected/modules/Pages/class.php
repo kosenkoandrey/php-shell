@@ -263,4 +263,5 @@ class Pages {
     public function ProductBigColorForm() {
         APP::Render('pages/products/bigcolor/form');
     }
+    
 }

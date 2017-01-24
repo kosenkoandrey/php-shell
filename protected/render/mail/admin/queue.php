@@ -96,7 +96,7 @@
                     },
                     formatters: {
                         user: function(column, row) {
-                            return  '<a href="<?= APP::Module('Routing')->root ?>admin/users/edit/' + row.user_token + '" target="_blank">' + row.recepient + '</a>';
+                            return  '<a href="<?= APP::Module('Routing')->root ?>admin/users/profile/' + row.user + '" target="_blank">' + row.recepient + '</a>';
                         },
                         letter: function(column, row) {
                             return  '<a href="<?= APP::Module('Routing')->root ?>admin/mail/letters/' + row.letter_group[1] + '/edit/' + row.letter[1] + '" target="_blank">' + row.subject + '</a>';

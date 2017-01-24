@@ -1,6 +1,6 @@
 <?
 return [
-    'location'          => ['http', $_SERVER['HTTP_HOST'], '/'],
+    'location'          => ['http', isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : false, '/'],
     'encoding'          => 'UTF-8',
     'locale'            => 'en_US',
     'timezone'          => 'Etc/GMT-3',

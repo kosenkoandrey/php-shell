@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>PHP-shell - Users</title>
+        <title>Пользователи - Добавление пользователя</title>
 
         <!-- Vendor CSS -->
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
@@ -19,7 +19,7 @@
     <body data-ma-header="teal">
         <? 
         APP::Render('admin/widgets/header', 'include', [
-            'Users' => 'admin/users'
+            'Пользователи' => 'admin/users'
         ]);
         ?>
         <section id="main">
@@ -30,7 +30,7 @@
                     <div class="card">
                         <form id="add-user" class="form-horizontal" role="form">
                             <div class="card-header">
-                                <h2>Add new user</h2>
+                                <h2>Добавление пользователя</h2>
                             </div>
                             <div class="card-body card-padding">
                                 <div class="form-group">
@@ -42,7 +42,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="password" class="col-sm-2 control-label">Password</label>
+                                    <label for="password" class="col-sm-2 control-label">Пароль</label>
                                     <div class="col-sm-3">
                                         <div class="fg-line">
                                             <input type="password" class="form-control" name="password" id="password">
@@ -50,7 +50,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="re-password" class="col-sm-2 control-label">Retype password</label>
+                                    <label for="re-password" class="col-sm-2 control-label">Повтор пароля</label>
                                     <div class="col-sm-3">
                                         <div class="fg-line">
                                             <input type="password" class="form-control" name="re-password" id="re-password">
@@ -58,26 +58,34 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="role" class="col-sm-2 control-label">Role</label>
+                                    <label for="role" class="col-sm-2 control-label">Роль</label>
                                     <div class="col-sm-3">
                                         <select id="role" name="role" class="selectpicker">
-                                            <? foreach ($data['roles'] as $role) { ?><option value="<?= $role ?>"><?= $role ?></option><? } ?>
+                                            <? foreach ($data['roles'] as $role) { ?><option value="<?= $role ?>"><?
+                                            switch ($role) {
+                                                case 'default': echo 'гость'; break;
+                                                case 'new': echo 'неактивированный пользователь'; break;
+                                                case 'user': echo 'активированный пользователь'; break;
+                                                case 'admin': echo 'администратор'; break;
+                                                default: echo $role; break;
+                                            } 
+                                            ?></option><? } ?>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="notification" class="col-sm-2 control-label">Notification</label>
+                                    <label for="notification" class="col-sm-2 control-label">Уведомление</label>
                                     <div class="col-sm-3">
                                         <select id="notification" name="notification" class="selectpicker">
-                                            <option value="0">none</option>
-                                            <option value="<?= APP::Module('Users')->settings['module_users_register_activation_letter'] ?>">with activation link</option>
-                                            <option value="<?= APP::Module('Users')->settings['module_users_register_letter'] ?>">without activation link</option>
+                                            <option value="0">без уведомления</option>
+                                            <option value="<?= APP::Module('Users')->settings['module_users_register_activation_letter'] ?>">с ссылкой активации</option>
+                                            <option value="<?= APP::Module('Users')->settings['module_users_register_letter'] ?>">без ссылки активации</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div class="col-sm-offset-2 col-sm-5">
-                                        <button type="submit" class="btn palette-Teal bg waves-effect btn-lg">Add</button>
+                                        <button type="submit" class="btn palette-Teal bg waves-effect btn-lg">Добавить</button>
                                     </div>
                                 </div>
                             </div>
@@ -120,12 +128,11 @@
                     notification.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
 
                     if (email.val() === '') { email.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
-                    if (password.val() === '') { password.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
                     if (password.val() !== re_password.val()) { re_password.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Passwords do not match</small>'); return false; }
                     if (role.val() === '') { role.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
                     if (notification.val() === '') { notification.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
 
-                    $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
+                    $(this).find('[type="submit"]').html('Добавление...').attr('disabled', true);
 
                     $.ajax({
                         type: 'post',
@@ -135,8 +142,8 @@
                             switch(result.status) {
                                 case 'success':
                                     swal({
-                                        title: 'Done!',
-                                        text: 'User "' + email.val() + '" has been added',
+                                        title: 'Готово!',
+                                        text: 'Пользователь "' + email.val() + '" был добавлен',
                                         type: 'success',
                                         showCancelButton: false,
                                         confirmButtonText: 'Ok',
@@ -148,13 +155,13 @@
                                 case 'error': 
                                     $.each(result.errors, function(i, error) {
                                         switch(error) {
-                                            case 2: email.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Already registered</small>'); break;
+                                            case 2: email.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Уже зарегистрирован</small>'); break;
                                         }
                                     });
                                     break;
                             }
 
-                            $('#add-user').find('[type="submit"]').html('Add').attr('disabled', false);
+                            $('#add-user').find('[type="submit"]').html('Добавить').attr('disabled', false);
                         }
                     });
                   });

@@ -14,17 +14,17 @@
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.css" rel="stylesheet">
         
         <? APP::Render('core/widgets/css') ?>
-        <? APP::Render('core/widgets/template/css') ?>
+        <? APP::Render('core/widgets/template/css_glamurnenko') ?>
     </head>
     <body data-ma-header="teal">
-        <? 
-        APP::Render('core/widgets/template/header', 'include', [
-            $data['user']['email'] => 'users/profile'
-        ]);
-        ?>
         <section id="main" class="center">
             <section id="content">
                 <div class="container">
+                    <? 
+                    APP::Render('core/widgets/template/header', 'include', [
+                        $data['user']['email'] => 'users/profile'
+                    ]);
+                    ?>
                     <div class="card" id="profile-main">
                         <div class="pm-overview c-overflow">
                             <div class="pmo-pic">

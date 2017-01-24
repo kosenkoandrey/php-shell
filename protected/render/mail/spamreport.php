@@ -15,16 +15,16 @@
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bootgrid/jquery.bootgrid.min.css" rel="stylesheet">
         
         <? APP::Render('core/widgets/css') ?>
-        <? APP::Render('core/widgets/template/css') ?>
+        <? APP::Render('core/widgets/template/css_glamurnenko') ?>
     </head>
     <body data-ma-header="teal">
-        <? APP::Render('core/widgets/template/header', 'include', [
-            'Жалоба на спам' => 'mail/spamreport/' . APP::Module('Routing')->get['mail_log_hash']
-        ]) ?>
         <section id="main" class="center">
             <section id="content">
                 <div class="container">
-                    <div class="card">
+                    <? APP::Render('core/widgets/template/header', 'include', [
+                        'Жалоба на спам' => 'mail/spamreport/' . APP::Module('Routing')->get['mail_log_hash']
+                    ]) ?>
+                    <div class="card" style="margin-bottom: 1px;">
                     <? if($data['result']) { ?>
                         <div class="card-header"><h2><i class="zmdi zmdi-check"></i> Вы успешно отписаны от рассылок</h2></div>
                     <? }else{ ?>
