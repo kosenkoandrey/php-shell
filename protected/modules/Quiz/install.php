@@ -123,8 +123,8 @@ $db->query("
     CREATE TABLE `quiz_answers` (
     `id` int(10) UNSIGNED NOT NULL,
     `question_id` int(10) UNSIGNED NOT NULL,
-    `rating` int(10)  NOT NULL,
     `text` text COLLATE utf8_unicode_ci NOT NULL,
+    `rating` int(10)  NOT NULL,
     `correct` tinyint(1) UNSIGNED NOT NULL,
     `cr_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
