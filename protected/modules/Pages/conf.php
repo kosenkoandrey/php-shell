@@ -10,5 +10,6 @@ return [
         ['products\/101office\/form(\?.*)?',        'Pages', 'Product101OfficeForm'],
         ['products\/101office\/activation(\?.*)?',  'Pages', 'Product101OfficeActivation'],
         ['products\/101office\/(?P<token>.*)',      'Pages', 'Product101OfficeSale'],
+        ['products\/imageschool\/(?P<token>.*)',      'Pages', 'ProductimageschoolSale'],
     ]
 ];

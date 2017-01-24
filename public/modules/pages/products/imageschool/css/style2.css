@@ -1,0 +1,76 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+body {
+	font: 12px/18px Arial, Tahoma, Verdana, sans-serif;
+	background: url(../images/blockback2.jpg) no-repeat top center;
+}
+a {
+	color: blue;
+	outline: none;
+	text-decoration: underline;
+}
+a:hover {
+	text-decoration: none;
+}
+p {
+	margin: 0 0 18px
+}
+img {
+	border: none;
+}
+input {
+	vertical-align: middle;
+}
+#wrapper {
+	width: 100%;
+	min-width: 1000px;
+}
+
+
+/* Header
+-----------------------------------------------------------------------------*/
+#header {height: 125px;margin:0 auto;}
+#headramka{background: url(../images/ramka.png);width:925px;height:120px;margin-left:180px;margin:0 auto;}
+#ir{text-align:center;font-family: Arial;font-size: 20px; font-style: italic;color:#f9f9f9;padding-top:30px;margin:0 auto;}
+#conter{width:380px;height:140px;margin-left:750px;margin-top:-450px;}
+#forma{width:400px;background:#ffffff;border-radius:15px;margin-top:30px;margin-left:700px;padding-bottom: 10px;border: 1px #645b4f solid;}
+#textform{text-align:center;font-family: Arial;font-size: 13px; font-style: regular;color:#282828;padding-top:20px;}
+#zagolovok{text-align:center;font-family: Arial;font-size: 33px; font-style: regular;color:#3f4040;}
+#inp{margin-left:40px;font-family: Arial;font-size: 13px; font-style: regular;color:#3f4040;}
+#in, #field_email{width:315px;height:35px;border-radius:7px;margin-top:-16px;outline:none;box-shadow: 0px 0px 10px #c4c4c4 inset;border:none;padding-left:10px;}
+#in2{outline:none;width:234px;cursor: pointer;background: url(../images/button.png);height:72px;border:none;font-family: Arial;font-size: 17px; font-style: regular;color:#ffffff;}
+#button{position: absolute;cursor: pointer;margin-top:10px;margin-left:85px;border:none;outline:none;}
+#button:active{padding:1px 0 0 1px;}
+#contertext{font-family: Arial;font-size: 28px; font-style: regular;color:#ffffff;margin-left: -20px;}
+#rozovi{width:415px;height:180px;background: url(../images/invizfon.png);margin-top:285px;margin-left:130px;font-family: Arial;font-size: 21px; font-style: regular;color:#ffffff;line-height:40px;}
+#rozovtext{padding-top:25px;margin-left:20px;}
+#ds{width:10px;height:10px;}
+#center{margin:0 auto;width:1000px;}
+#time{margin-left:-80px;margin-top:20px;}
+#copy{width:1000px;margin:0 auto;font-family: Arial;font-size: 12px; font-style: regular;color:#797a7a;padding-top:10px;}
+#ka{width:369px;margin-left:17px;}
+#flow{width:132px;height:120px;background: url(../images/flow.png);padding-left:33px;margin-top:90px;}
+#fbblock{margin-top: -92px;}
+.fb-like{margin-left:15px;margin-top:-215px;}
+
+/* Middle
+-----------------------------------------------------------------------------*/
+#content {
+margin:0 auto;
+min-height:675px;
+min-width:1000px;
+/*background: url(images/blockback.jpg) ;*/
+}
+
+
+
+
+/* Footer
+-----------------------------------------------------------------------------*/
+#footer {
+	height: 40px;
+/*	background: url(images/back.png);*/
+}
+.clr { clear: both; }

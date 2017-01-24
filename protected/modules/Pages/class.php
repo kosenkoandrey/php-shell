@@ -402,4 +402,107 @@ class Pages {
     public function Product101OfficeActivation() {
         APP::Render('pages/products/101office/activate');
     }
+    
+    public function ProductimageschoolSale() {
+        $cookie_tunnel_subscribtion_id = isset($_COOKIE['tunnel_subscribtion_id']) ? $_COOKIE['tunnel_subscribtion_id'] : 0;
+        $tunnel_subscribtion_id = isset(APP::Module('Routing')->get['token']) ? APP::Module('Crypt')->Decode(APP::Module('Routing')->get['token']) : $cookie_tunnel_subscribtion_id;
+
+        if (APP::Module('DB')->Select(
+            APP::Module('Tunnels')->settings['module_tunnels_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+            ['COUNT(id)'], 'tunnels_users',
+            [['id', '=', $tunnel_subscribtion_id, PDO::PARAM_INT]]
+        )) {
+            setcookie('tunnel_subscribtion_id', $tunnel_subscribtion_id, time() + 31556926, '/', '.glamurnenko.ru');
+        } else {
+            APP::Render('pages/products/imageschool/0');
+            exit;
+        }
+        
+        // Проверка ID подписки на туннель и получение информации о подписке
+        if (APP::Module('DB')->Select(
+            APP::Module('Tunnels')->settings['module_tunnels_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+            ['COUNT(id)'], 'tunnels_users',
+            [
+                ['id', '=', $tunnel_subscribtion_id, PDO::PARAM_INT],
+                ['tunnel_id', '=', 62, PDO::PARAM_INT]
+            ]
+        )) {
+            $tunnel_subscribtion = APP::Module('DB')->Select(
+                APP::Module('Tunnels')->settings['module_tunnels_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
+                ['id', 'user_id', 'state'], 'tunnels_users',
+                [['id', '=', $tunnel_subscribtion_id, PDO::PARAM_INT]]
+            );
+        } else {
+            APP::Render('pages/products/imageschool/0');
+            exit;
+        }
+
+
+        // Если туннель не активный, то 5 вариант
+        if ($tunnel_subscribtion['state'] != 'active') {
+            APP::Render('pages/products/imageschool/0');
+            exit;
+        }
+
+        // Получение массива меток
+        $tunnel_subscription_labels = Array();
+
+        foreach (APP::Module('DB')->Select(
+            APP::Module('Tunnels')->settings['module_tunnels_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            ['label_id', 'token'], 'tunnels_tags',
+            [['user_tunnel_id', '=', $tunnel_subscribtion_id, PDO::PARAM_INT]]
+        ) as $label) {
+            $tunnel_subscription_labels[$label['label_id']][] = $label['token'];
+        }
+
+        // Логика отображения вариантов страниц ////////////////////////////////////////
+
+        // Получил 18/19/20 письмо
+        if (
+            (array_search('74', $tunnel_subscription_labels['sendmail']) !== false) || 
+            (array_search('75', $tunnel_subscription_labels['sendmail']) !== false) ||
+            (array_search('76', $tunnel_subscription_labels['sendmail']) !== false)
+        ) {
+            APP::Render('pages/products/imageschool/0', 'include', $tunnel_subscribtion);
+            exit;
+        }
+
+        // Получил 16/17 письмо
+        if (
+            (array_search('77', $tunnel_subscription_labels['sendmail']) !== false) || 
+            (array_search('78', $tunnel_subscription_labels['sendmail']) !== false)
+        ) {
+            APP::Render('pages/products/imageschool/2', 'include', $tunnel_subscribtion);
+            exit;
+        }
+
+        // Получил 8/9/10/11/12/13/14/15 письмо
+        if (
+            (array_search('79', $tunnel_subscription_labels['sendmail']) !== false) || 
+            (array_search('80', $tunnel_subscription_labels['sendmail']) !== false) || 
+            (array_search('81', $tunnel_subscription_labels['sendmail']) !== false) || 
+            (array_search('82', $tunnel_subscription_labels['sendmail']) !== false) || 
+            (array_search('83', $tunnel_subscription_labels['sendmail']) !== false) || 
+            (array_search('84', $tunnel_subscription_labels['sendmail']) !== false) || 
+            (array_search('85', $tunnel_subscription_labels['sendmail']) !== false) || 
+            (array_search('86', $tunnel_subscription_labels['sendmail']) !== false)
+        ) {
+            APP::Render('pages/products/imageschool/1', 'include', $tunnel_subscribtion);
+            exit;
+        }
+
+        // Получил 1/2/3/4/5/6/7 письмо
+        if (
+            (array_search('87', $tunnel_subscription_labels['sendmail']) !== false) || 
+            (array_search('88', $tunnel_subscription_labels['sendmail']) !== false) || 
+            (array_search('89', $tunnel_subscription_labels['sendmail']) !== false) || 
+            (array_search('90', $tunnel_subscription_labels['sendmail']) !== false) || 
+            (array_search('91', $tunnel_subscription_labels['sendmail']) !== false) || 
+            (array_search('92', $tunnel_subscription_labels['sendmail']) !== false) || 
+            (array_search('93', $tunnel_subscription_labels['sendmail']) !== false)
+        ) {
+            APP::Render('pages/products/imageschool/0', 'include', $tunnel_subscribtion);
+            exit;
+        }
+    }
 }
