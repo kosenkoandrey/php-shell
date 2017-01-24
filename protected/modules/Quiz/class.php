@@ -356,8 +356,8 @@ class Quiz {
                 [
                     'id'            => 'NULL',
                     'question_id'   => [$_POST['question_id'], PDO::PARAM_INT],
-                    'rating'        => [$_POST['rating'], PDO::PARAM_INT],
                     'text'          => [$_POST['text'], PDO::PARAM_STR],
+                    'rating'        => [$_POST['rating'], PDO::PARAM_INT],
                     'correct'       => [$_POST['correct'], PDO::PARAM_STR],
                     'cr_date'       => 'NOW()'
                 ]

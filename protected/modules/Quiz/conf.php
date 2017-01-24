@@ -10,7 +10,7 @@ return [
         ['admin\/quiz\/answer\/edit\/(?P<question_id_hash>.*)\/(?P<answer_id_hash>.*)', 'Quiz', 'EditAnswer'],
         ['admin\/quiz\/answer\/(?P<question_id_hash>.*)',                               'Quiz', 'Answers'],
         
-        ['admin\/quiz\/user\/answer\/(?P<answer_id_hash>.*)\/(?P<token>.*)',            'Quiz', 'UserAnswer'],
+        ['quiz\/answer\/(?P<answer_id_hash>.*)\/(?P<token>.*)',                         'Quiz', 'UserAnswer'],
         
         ['admin\/quiz\/api\/question\/list.json(\?.*)?',                                'Quiz', 'APIQuestionsList'],
         ['admin\/quiz\/api\/question\/create\.json(\?.*)?',                             'Quiz', 'APICreateQuestion'],
