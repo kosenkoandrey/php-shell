@@ -3839,7 +3839,7 @@ class TunnelsSearch {
                         ['event', '=', 'click', PDO::PARAM_STR],
                         ['letter', '=', $settings['letter'], PDO::PARAM_INT],
                         ['UNIX_TIMESTAMP(cr_date)', '<=', (time() - $timeout), PDO::PARAM_STR],
-                        ['token', 'LIKE', $settings['url'] . '%', PDO::PARAM_STR]
+                        ['token', 'LIKE', (isset($settings['url']) ? $settings['url'] : '') . '%', PDO::PARAM_STR]
                     ]
                 );
                 break;
@@ -3858,7 +3858,7 @@ class TunnelsSearch {
                             'mail_events',
                             [
                                 ['event', '=', 'click', PDO::PARAM_STR],
-                                ['token', 'LIKE', $settings['url'] . '%', PDO::PARAM_STR]
+                                ['token', 'LIKE', (isset($settings['url']) ? $settings['url'] : '') . '%', PDO::PARAM_STR]
                             ]
                         ), PDO::PARAM_INT],
                     ]
