@@ -129,7 +129,6 @@ class Quiz {
         APP::Render('quiz/answer', 'include', ['state'=> 'success']);
     }
     
-    
     public function AnswersOnLastQuestions($recepient_id) {
         $answers_on_last_questions = Array();
         
