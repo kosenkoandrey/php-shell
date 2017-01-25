@@ -152,7 +152,7 @@ class Quiz {
             ],
             ['quiz_user_answers.id']
         ) as $answer) {
-            $answers_on_last_questions[$answer['question_id']] = Array($answer['answer_id'], $answer['rating'], $answer['correct']);
+            $answers_on_last_questions[$answer['question_id']][$answer['answer_id']] = Array($answer['answer_id'], $answer['rating'], $answer['correct']);
         }
         
         return $answers_on_last_questions;
