@@ -30,9 +30,9 @@ foreach (APP::$modules as $key => $value) {
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Filesystem</th>
-                        <th>Size</th>
-                        <th>Used</th>
+                        <th>ФС</th>
+                        <th>Размер</th>
+                        <th>Исп.</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -55,35 +55,35 @@ foreach (APP::$modules as $key => $value) {
             <table class="table">
                 <tbody>
                     <tr>
-                        <td>Total</td>
+                        <td>Всего</td>
                         <td><?= APP::Module('Utils')->SizeConvert($system[2][1][1] * 1024) ?></td>
                     </tr>
                     <tr>
-                        <td>Used</td>
+                        <td>Использовано</td>
                         <td><?= APP::Module('Utils')->SizeConvert($system[2][1][2] * 1024) ?></td>
                     </tr>
                     <tr>
-                        <td>Free</td>
+                        <td>Свободно</td>
                         <td><?= APP::Module('Utils')->SizeConvert($system[2][1][3] * 1024) ?></td>
                     </tr>
                     <tr>
-                        <td>Shared</td>
+                        <td>Расшарено</td>
                         <td><?= APP::Module('Utils')->SizeConvert($system[2][1][4] * 1024) ?></td>
                     </tr>
                     <tr>
-                        <td>Buffers</td>
+                        <td>Буффер</td>
                         <td><?= APP::Module('Utils')->SizeConvert($system[2][1][5] * 1024) ?></td>
                     </tr>
                     <tr>
-                        <td>Cached</td>
+                        <td>Кэшировано</td>
                         <td><?= APP::Module('Utils')->SizeConvert($system[2][1][6] * 1024) ?></td>
                     </tr>
                     <tr>
-                        <td>Buffers/cache</td>
+                        <td>Буффер/кэш</td>
                         <td><?= APP::Module('Utils')->SizeConvert($system[2][2][2] * 1024) ?> / <?= APP::Module('Utils')->SizeConvert($system[2][2][3] * 1024) ?></td>
                     </tr>
                     <tr>
-                        <td>Swap</td>
+                        <td>Своп</td>
                         <td><?= APP::Module('Utils')->SizeConvert($system[2][3][1] * 1024) ?> / <?= APP::Module('Utils')->SizeConvert($system[2][3][2] * 1024) ?></td>
                     </tr>
                 </tbody>
@@ -111,17 +111,43 @@ foreach (APP::$modules as $key => $value) {
 
     <ul class="main-menu">
         <li class="sub-menu">
-            <a href="" data-ma-action="submenu-toggle"><i class="zmdi zmdi-caret-right"></i> Application</a>
+            <a href="" data-ma-action="submenu-toggle"><i class="zmdi zmdi-caret-right"></i> Система</a>
             <ul>
-                <li><a href="<?= APP::Module('Routing')->root ?>admin/app">Configuration</a></li>
-                <li><a href="<?= APP::Module('Routing')->root ?>admin/modules">Modules</a></li>
+                <li><a href="<?= APP::Module('Routing')->root ?>admin/app">Конфигурация</a></li>
+                <li><a href="<?= APP::Module('Routing')->root ?>admin/modules">Модули</a></li>
             </ul>
         </li>
         <?
         foreach ($modules as $key => $value) {
             ?>
             <li class="sub-menu">
-                <a href="" data-ma-action="submenu-toggle"><i class="zmdi zmdi-caret-right"></i> <?= $key ?></a>
+                <a href="" data-ma-action="submenu-toggle"><i class="zmdi zmdi-caret-right"></i> <? 
+                    switch ($key) {
+                        case 'Analytics': echo 'Аналитика'; break;
+                        case 'Billing': echo 'Биллинг'; break;
+                        case 'Blog': echo 'Блог'; break;
+                        case 'Cache': echo 'Кэш'; break;
+                        case 'Comments': echo 'Комментарии'; break;
+                        case 'Costs': echo 'Расходы'; break;
+                        case 'Cron': echo 'Управление Cron'; break;
+                        case 'Crypt': echo 'Шифрование'; break;
+                        case 'Files': echo 'Файлы'; break;
+                        case 'HotOrNot': echo 'Hot or not'; break;
+                        case 'Likes': echo 'Оценки'; break;
+                        case 'Logs': echo 'Журналы'; break;
+                        case 'Mail': echo 'Почта'; break;
+                        case 'Members': echo 'Мемберка'; break;
+                        case 'Rating': echo 'Рейтинг'; break;
+                        case 'Sessions': echo 'Сессии'; break;
+                        case 'SocialNetworks': echo 'Социальные сети'; break;
+                        case 'SSH': echo 'SSH соединения'; break;
+                        case 'TaskManager': echo 'Менеджер задач'; break;
+                        case 'Triggers': echo 'Триггеры'; break;
+                        case 'Tunnels': echo 'Туннели'; break;
+                        case 'Users': echo 'Пользователи'; break;
+                        default: echo $key; break;
+                    }
+                ?></a>
                 <ul>
                     <?= $value ?>
                 </ul>

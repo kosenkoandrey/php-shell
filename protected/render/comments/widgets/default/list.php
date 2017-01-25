@@ -69,7 +69,7 @@ if ($comments['total']) {
                                 ?><a target="_blank" href="<?= APP::Module('Routing')->root ?>users/profile/<?= APP::Module('Crypt')->Encode($comment['user']) ?>" class="btn btn-default waves-effect btn-xs"><?= $username ?></a><?
                             }
                             ?>
-                            <p class="m-b-5 m-t-10 f-12 c-gray"><i class="zmdi zmdi-calendar"></i> <?= date('Y-m-d H:i:s', $comment['up_date']) ?></p>
+                            <p class="m-b-5 m-t-10 f-12 c-gray"><? if (APP::Module('Users')->user['role'] == 'admin') { echo '#' . $comment['id'] . '&nbsp;'; } ?><i class="zmdi zmdi-calendar"></i> <?= date('Y-m-d H:i:s', $comment['up_date']) ?></p>
                         </h4>
                         <p style="white-space: pre-wrap;" class="m-b-10"><?= $comment['message'] ?></p>
                         <div class="comments_files">

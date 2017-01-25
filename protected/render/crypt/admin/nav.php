@@ -1,1 +1,1 @@
-<li><a href="<?= APP::Module('Routing')->root ?>admin/crypt">Settings</a></li>
+<li><a href="<?= APP::Module('Routing')->root ?>admin/crypt">Настройки</a></li>

@@ -90,6 +90,7 @@ class Pages {
         APP::Render('pages/products/garderob100/form');
     }
     
+    
     public function ProductBigColorSale(){
         // Получение ID подписки на туннель
         $cookie_tunnel_subscribtion_id = isset($_COOKIE['tunnel_subscribtion_id']) ? $_COOKIE['tunnel_subscribtion_id'] : 0;
@@ -268,6 +269,7 @@ class Pages {
         APP::Render('pages/products/bigcolor/activate');
     }
     
+    
     public function Product101OfficeSale() {
         $cookie_tunnel_subscribtion_id = isset($_COOKIE['tunnel_subscribtion_id']) ? $_COOKIE['tunnel_subscribtion_id'] : 0;
         $tunnel_subscribtion_id = isset(APP::Module('Routing')->get['token']) ? APP::Module('Crypt')->Decode(APP::Module('Routing')->get['token']) : $cookie_tunnel_subscribtion_id;
@@ -403,6 +405,7 @@ class Pages {
         APP::Render('pages/products/101office/activate');
     }
     
+    
     public function ProductimageschoolSale() {
         $cookie_tunnel_subscribtion_id = isset($_COOKIE['tunnel_subscribtion_id']) ? $_COOKIE['tunnel_subscribtion_id'] : 0;
         $tunnel_subscribtion_id = isset(APP::Module('Routing')->get['token']) ? APP::Module('Crypt')->Decode(APP::Module('Routing')->get['token']) : $cookie_tunnel_subscribtion_id;
@@ -505,4 +508,5 @@ class Pages {
             exit;
         }
     }
+    
 }

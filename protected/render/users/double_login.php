@@ -7,7 +7,7 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>PHP-shell - Users</title>
+        <title>Подтверждение пароля</title>
 
         <!-- Vendor CSS -->
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
@@ -23,7 +23,7 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
             <div class="l-block toggled" id="l-lockscreen">
                 <div class="lb-header palette-Teal bg">
                     <img src="<?= APP::$conf['location'][0] ?>://www.gravatar.com/avatar/<?= md5($data['email']) ?>?s=40&d=<?= urlencode(APP::Module('Routing')->root . APP::Module('Users')->settings['module_users_profile_picture']) ?>&t=<?= time() ?>" class="avatar-img">
-                    The operation requires a password
+                    Эта операция требует повторного ввода пароля
                 </div>
 
                 <div class="lb-body">
@@ -31,11 +31,11 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                         <div class="form-group fg-float">
                             <div class="fg-line">
                                 <input type="password" id="password" name="password" class="input-sm form-control fg-input">
-                                <label class="fg-label">Password</label>
+                                <label class="fg-label">Пароль</label>
                             </div>
                         </div>
 
-                        <button class="btn palette-Teal bg">Login</button>
+                        <button class="btn palette-Teal bg">Далее</button>
                     </form>
                 </div>
             </div>
@@ -60,7 +60,7 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
 
                     var password = $(this).find('#password');
                     password.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
-                    if (password.val() === '') { password.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    if (password.val() === '') { password.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Не введен</small>'); return false; }
 
                     $(this).find('[type="submit"]').attr('disabled', true);
 
@@ -72,7 +72,7 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                             switch (result.status) {
                                 case 'error': 
                                     password.val('');
-                                    swal('Error', 'Login failed', 'error');
+                                    swal('Ошибка', 'Неверный пароль', 'error');
                                     break;
                                 case 'success': 
                                     window.location.href = '<?= $return ?>'; 

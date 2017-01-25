@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>PHP-shell - <?= $data['user']['email'] ?></title>
+        <title><?= $data['user']['email'] ?></title>
 
         <!-- Vendor CSS -->
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
@@ -14,17 +14,17 @@
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.css" rel="stylesheet">
         
         <? APP::Render('core/widgets/css') ?>
-        <? APP::Render('core/widgets/template/css') ?>
+        <? APP::Render('core/widgets/template/css_glamurnenko') ?>
     </head>
     <body data-ma-header="teal">
-        <? 
-        APP::Render('core/widgets/template/header', 'include', [
-            $data['user']['email'] => 'users/profile'
-        ]);
-        ?>
         <section id="main" class="center">
             <section id="content">
                 <div class="container">
+                    <? 
+                    APP::Render('core/widgets/template/header', 'include', [
+                        $data['user']['email'] => 'users/profile'
+                    ]);
+                    ?>
                     <div class="card" id="profile-main">
                         <div class="pm-overview c-overflow">
                             <div class="pmo-pic">
@@ -41,7 +41,7 @@
                                     APP::Render('likes/widgets/default', 'include', [
                                         'type' => APP::Module('DB')->Select(APP::Module('Likes')->settings['module_likes_db_connection'], ['fetchColumn', 0], ['id'], 'likes_objects', [['name', '=', "User", PDO::PARAM_STR]]),
                                         'id' => $data['user']['id'],
-                                        'text' => 'Like',
+                                        'text' => 'Мне нравится',
                                         'class' => ['btn-lg', 'btn-block', 'f-700'],
                                         'details' => true
                                     ]);
@@ -59,7 +59,7 @@
                                 <?
                                 if (count($data['social-profiles'])) {
                                     ?>
-                                    <h2>Accounts</h2>
+                                    <h2>Социальные сети</h2>
                                     <ul>
                                         <?
                                         foreach ($data['social-profiles'] as $profile) {
@@ -80,23 +80,23 @@
 
                         <div class="pm-body clearfix">
                             <ul class="tab-nav" data-tab-color="teal">
-                                <li class="active waves-effect"><a href="#tab-about" aria-controls="tab-about" role="tab" data-toggle="tab">About</a></li>
-                                <? if ($data['comments']) { ?><li class="waves-effect"><a href="#tab-comments" aria-controls="tab-comments" role="tab" data-toggle="tab">Comments</a></li><? } ?>
-                                <? if ($data['likes']) { ?><li class="waves-effect"><a href="#tab-likes" aria-controls="tab-likes" role="tab" data-toggle="tab">Likes</a></li><? } ?>
-                                <? if ($data['premium']) { ?><li class="waves-effect"><a href="#tab-premium" aria-controls="tab-premium" role="tab" data-toggle="tab">Premium</a></li><? } ?>
+                                <li class="active waves-effect"><a href="#tab-about" aria-controls="tab-about" role="tab" data-toggle="tab">Основное</a></li>
+                                <? if ($data['comments']) { ?><li class="waves-effect"><a href="#tab-comments" aria-controls="tab-comments" role="tab" data-toggle="tab">Комментарии</a></li><? } ?>
+                                <? if ($data['likes']) { ?><li class="waves-effect"><a href="#tab-likes" aria-controls="tab-likes" role="tab" data-toggle="tab">Оценки</a></li><? } ?>
+                                <? if ($data['premium']) { ?><li class="waves-effect"><a href="#tab-premium" aria-controls="tab-premium" role="tab" data-toggle="tab">Платные материалы</a></li><? } ?>
                             </ul>
                             
                             <div class="tab-content">
                                 <div role="tabpanel" class="tab-pane active" id="tab-about">
                                     <div class="pmb-block">
                                         <div class="pmbb-header">
-                                            <h2><i class="zmdi zmdi-account m-r-5"></i> Basic</h2>
+                                            <h2><i class="zmdi zmdi-account m-r-5"></i> Основное</h2>
 
                                             <ul class="actions">
                                                 <li class="dropdown">
                                                     <a href="javascript:void(0)" data-toggle="dropdown"><i class="zmdi zmdi-more-vert"></i></a>
                                                     <ul class="dropdown-menu dropdown-menu-right">
-                                                        <li><a class="toggle-basic" href="javascript:void(0)">Edit</a></li>
+                                                        <li><a class="toggle-basic" href="javascript:void(0)">Редиктировать</a></li>
                                                     </ul>
                                                 </li>
                                             </ul>
@@ -104,14 +104,14 @@
                                         <div class="p-l-25">
                                             <div id="view-basic" class="pmbb-view">
                                                 <dl class="dl-horizontal">
-                                                    <dt>Username</dt>
+                                                    <dt>Имя пользователя</dt>
                                                     <dd id="about-username-value"><?= isset($data['about']['username']) ? $data['about']['username'] : 'user' . $data['user']['id'] ?></dd>
                                                 </dl>
                                             </div>
 
                                             <form id="form-basic" class="pmbb-edit">
                                                 <dl class="dl-horizontal">
-                                                    <dt class="p-t-10">Username</dt>
+                                                    <dt class="p-t-10">Имя пользователя</dt>
                                                     <dd>
                                                         <div class="fg-line">
                                                             <input type="text" id="about_username" name="about[username]" class="form-control" placeholder="user<?= $data['user']['id'] ?>">
@@ -119,8 +119,8 @@
                                                     </dd>
                                                 </dl>
                                                 <div class="m-t-30">
-                                                    <button type="submit" class="btn palette-Teal bg waves-effect">Save</button>
-                                                    <button type="button" class="toggle-basic btn btn-link c-black">Cancel</button>
+                                                    <button type="submit" class="btn palette-Teal bg waves-effect">Сохранить</button>
+                                                    <button type="button" class="toggle-basic btn btn-link c-black">Отмена</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -128,13 +128,13 @@
                                     
                                     <div class="pmb-block">
                                         <div class="pmbb-header">
-                                            <h2><i class="zmdi zmdi-phone m-r-5"></i> Contact</h2>
+                                            <h2><i class="zmdi zmdi-phone m-r-5"></i> Контакты</h2>
 
                                             <ul class="actions">
                                                 <li class="dropdown">
                                                     <a href="javascript:void(0)" data-toggle="dropdown"><i class="zmdi zmdi-more-vert"></i></a>
                                                     <ul class="dropdown-menu dropdown-menu-right">
-                                                        <li><a class="toggle-contact" href="javascript:void(0)">Edit</a></li>
+                                                        <li><a class="toggle-contact" href="javascript:void(0)">Редактировать</a></li>
                                                     </ul>
                                                 </li>
                                             </ul>
@@ -142,22 +142,22 @@
                                         <div class="p-l-25">
                                             <div id="view-contact" class="pmbb-view">
                                                 <dl class="dl-horizontal">
-                                                    <dt>Mobile Phone</dt>
-                                                    <dd id="about-mobile-phone-value"><?= isset($data['about']['mobile_phone']) ? $data['about']['mobile_phone'] : 'none' ?></dd>
+                                                    <dt>Телефон</dt>
+                                                    <dd id="about-mobile-phone-value"><?= isset($data['about']['mobile_phone']) ? $data['about']['mobile_phone'] : 'нет' ?></dd>
                                                 </dl>
                                                 <dl class="dl-horizontal">
                                                     <dt>Twitter</dt>
-                                                    <dd id="about-twitter-value"><?= isset($data['about']['twitter']) ? $data['about']['twitter'] : 'none' ?></dd>
+                                                    <dd id="about-twitter-value"><?= isset($data['about']['twitter']) ? $data['about']['twitter'] : 'нет' ?></dd>
                                                 </dl>
                                                 <dl class="dl-horizontal">
                                                     <dt>Skype</dt>
-                                                    <dd id="about-skype-value"><?= isset($data['about']['skype']) ? $data['about']['skype'] : 'none' ?></dd>
+                                                    <dd id="about-skype-value"><?= isset($data['about']['skype']) ? $data['about']['skype'] : 'нет' ?></dd>
                                                 </dl>
                                             </div>
 
                                             <form id="form-contact" class="pmbb-edit">
                                                 <dl class="dl-horizontal">
-                                                    <dt class="p-t-10">Mobile Phone</dt>
+                                                    <dt class="p-t-10">Телефон</dt>
                                                     <dd>
                                                         <div class="fg-line">
                                                             <input type="text" id="about_mobile_phone" name="about[mobile_phone]" class="form-control input-mask" data-mask="+000000000000" maxlength="15" autocomplete="off">
@@ -181,8 +181,8 @@
                                                     </dd>
                                                 </dl>
                                                 <div class="m-t-30">
-                                                    <button type="submit" class="btn palette-Teal bg waves-effect">Save</button>
-                                                    <button type="button" class="toggle-contact btn btn-link c-black">Cancel</button>
+                                                    <button type="submit" class="btn palette-Teal bg waves-effect">Сохранить</button>
+                                                    <button type="button" class="toggle-contact btn btn-link c-black">Отмена</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -205,7 +205,7 @@
                                                         <p class="m-b-5 f-12 c-gray"><i class="zmdi zmdi-calendar"></i> <?= date('Y-m-d H:i:s', $comment['up_date']) ?></p>
                                                     </h4>
                                                     <p style="white-space: pre-wrap" class="m-b-10"><?= $comment['message'] ?></p>
-                                                    <p><a href="<?= $comment['url'] ?>#comment-<?= APP::Module('Crypt')->Encode($comment['id']) ?>" target="_blank" class="btn palette-Teal bg waves-effect btn-xs"><i class="zmdi zmdi-open-in-new"></i> View</a></p>
+                                                    <p><a href="<?= $comment['url'] ?>#comment-<?= APP::Module('Crypt')->Encode($comment['id']) ?>" target="_blank" class="btn palette-Teal bg waves-effect btn-xs"><i class="zmdi zmdi-open-in-new"></i> Перейти</a></p>
                                                 </div>
                                             </div>
                                             <?
@@ -229,7 +229,7 @@
                                                     <h4 class="media-heading">
                                                         <p class="m-b-5 f-12 c-gray"><i class="zmdi zmdi-calendar"></i> <?= date('Y-m-d H:i:s', $like['up_date']) ?></p>
                                                     </h4>
-                                                    <p><a href="<?= $like['url'] ?>" target="_blank" class="btn palette-Teal bg waves-effect btn-xs"><i class="zmdi zmdi-open-in-new"></i> View</a></p>
+                                                    <p><a href="<?= $like['url'] ?>" target="_blank" class="btn palette-Teal bg waves-effect btn-xs"><i class="zmdi zmdi-open-in-new"></i> Перейти</a></p>
                                                 </div>
                                             </div>
                                             <?
@@ -244,7 +244,7 @@
                                     <div role="tabpanel" class="tab-pane" id="tab-premium">
                                         <div class="pmb-block">
                                             <div class="pmbb-header">
-                                                <h2><i class="zmdi zmdi-lock-open m-r-5"></i> You have the following materials</h2>
+                                                <h2><i class="zmdi zmdi-lock-open m-r-5"></i> У вас есть доступ к следующим материалам</h2>
                                             </div>
                                         </div>
                                         <table class="table table-hover table-vmiddle">
@@ -319,7 +319,7 @@
                 $('#form-basic').submit(function(event) {
                     event.preventDefault();
 
-                    $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
+                    $(this).find('[type="submit"]').html('Подождите...').attr('disabled', true);
                     $(this).find('.toggle-basic').hide();
 
                     $.ajax({
@@ -328,14 +328,13 @@
                         data: $(this).serialize(),
                         success: function() {
                             swal({
-                                title: 'Done!',
-                                text: 'Basic information has been updated',
+                                title: 'Основная информация была обновлена',
                                 type: 'success',
-                                timer: 1500,
+                                timer: 2500,
                                 showConfirmButton: false
                             });
 
-                            $('#form-basic').find('[type="submit"]').html('Save').attr('disabled', false);
+                            $('#form-basic').find('[type="submit"]').html('Сохранить').attr('disabled', false);
                             $('#form-basic').find('.toggle-basic').show();
                             
                             var about_username = $('#about_username').val();
@@ -351,7 +350,7 @@
                 $('#form-contact').submit(function(event) {
                     event.preventDefault();
 
-                    $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
+                    $(this).find('[type="submit"]').html('Подождите...').attr('disabled', true);
                     $(this).find('.toggle-contact').hide();
                     
                     $.ajax({
@@ -360,23 +359,22 @@
                         data: $(this).serialize(),
                         success: function() {
                             swal({
-                                title: 'Done!',
-                                text: 'Contact information has been updated',
+                                title: 'Контактная информация была обновлена',
                                 type: 'success',
-                                timer: 1500,
+                                timer: 2500,
                                 showConfirmButton: false
                             });
 
-                            $('#form-contact').find('[type="submit"]').html('Save').attr('disabled', false);
+                            $('#form-contact').find('[type="submit"]').html('Сохранить').attr('disabled', false);
                             $('#form-contact').find('.toggle-contact').show();
                             
                             var about_mobile_phone = $('#about_mobile_phone').val();
                             var about_twitter = $('#about_twitter').val();
                             var about_skype = $('#about_skype').val();
                             
-                            $('#about-mobile-phone-value').html(about_mobile_phone ? about_mobile_phone : 'none');
-                            $('#about-twitter-value').html(about_twitter ? about_twitter : 'none');
-                            $('#about-skype-value').html(about_skype ? about_skype : 'none');
+                            $('#about-mobile-phone-value').html(about_mobile_phone ? about_mobile_phone : 'нет');
+                            $('#about-twitter-value').html(about_twitter ? about_twitter : 'нет');
+                            $('#about-skype-value').html(about_skype ? about_skype : 'нет');
                             
                             $('#view-contact').toggle();
                             $('#form-contact').toggle();

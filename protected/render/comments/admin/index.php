@@ -99,7 +99,7 @@
                             return '<a href="' + row.url + '#comment-' + row.id_token + '" target="_blank">' + row.object_name + ' / ' + row.object_id + '</a>';
                         },
                         actions: function(column, row) {
-                            return  '<a href="<?= APP::Module('Routing')->root ?>admin/comments/edit/' + row.id_token + '" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-edit"></span></a> ' + 
+                            return  '<a target="_blank" href="<?= APP::Module('Routing')->root ?>admin/comments/edit/' + row.id_token + '" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-edit"></span></a> ' + 
                                     '<a href="javascript:void(0)" class="btn btn-sm btn-default btn-icon waves-effect waves-circle remove-comment" data-comment-id="' + row.id + '"><span class="zmdi zmdi-delete"></span></a>';
                         }
                     }

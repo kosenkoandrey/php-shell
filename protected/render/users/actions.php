@@ -346,9 +346,9 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                     var email = $(this).find('#email');
                     email.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
 
-                    if (email.val() === '') { email.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    if (email.val() === '') { email.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Не введен</small>'); return false; }
 
-                    $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
+                    $(this).find('[type="submit"]').html('Подождите...').attr('disabled', true);
 
                     $.ajax({
                         type: 'post',
@@ -358,8 +358,8 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                             switch(result.status) {
                                 case 'success':
                                     swal({
-                                        title: 'Done!',
-                                        text: 'Check your email and click the reset link',
+                                        title: 'Готово!',
+                                        text: 'На ваш E-Mail была отправлена ссылка для установки нового пароля',
                                         type: 'success',
                                         showConfirmButton: false
                                     });
@@ -367,15 +367,15 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                                 case 'error':
                                     $.each(result.errors, function(i, error) {
                                         switch(error) {
-                                            case 1: email.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Invalid email</small>'); break;
-                                            case 2: email.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">E-Mail not found</small>'); break;
-                                            case 3: alert('Service turned off'); break;
+                                            case 1: email.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Неверный E-Mail</small>'); break;
+                                            case 2: email.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">E-Mail не найден</small>'); break;
+                                            case 3: alert('Восстановление паролей отключено'); break;
                                         }
                                     });
                                     break;
                             }
 
-                            $('#reset-password').find('[type="submit"]').html('Reset password').attr('disabled', false);
+                            $('#reset-password').find('[type="submit"]').html('Восстановить пароль').attr('disabled', false);
                         }
                     });
                   });
@@ -389,10 +389,10 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                     password.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
                     re_password.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
 
-                    if (password.val() === '') { password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
-                    if (password.val() !== re_password.val()) { re_password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Passwords do not match</small>'); return false; }
+                    if (password.val() === '') { password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Не введен</small>'); return false; }
+                    if (password.val() !== re_password.val()) { re_password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Пароли не совпадают</small>'); return false; }
 
-                    $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
+                    $(this).find('[type="submit"]').html('Подождите...').attr('disabled', true);
 
                     $.ajax({
                         type: 'post',
@@ -402,8 +402,8 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                             switch(result.status) {
                                 case 'success':
                                     swal({
-                                        title: 'Done!',
-                                        text: 'Password has been updated',
+                                        title: 'Готово!',
+                                        text: 'Пароль был успешно изменен',
                                         type: 'success',
                                         showCancelButton: false,
                                         confirmButtonText: 'Ok',
@@ -415,17 +415,17 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                                 case 'error':
                                     $.each(result.errors, function(i, error) {
                                         switch(error) {
-                                            case 1: alert('You must be logged'); break;
-                                            case 2: password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); break;
-                                            case 3: password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Password too short</small>'); break;
-                                            case 4: password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Passwords do not match</small>'); break;
+                                            case 1: alert('Вы должны войти'); break;
+                                            case 2: password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Не введен</small>'); break;
+                                            case 3: password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Пароль слишком короткий</small>'); break;
+                                            case 4: password.closest('.form-group').addClass('has-error has-feedback').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Пароли не совпадают</small>'); break;
                                             case 5: alert('Service turned off'); break;
                                         }
                                     });
                                     break;
                             }
 
-                            $('#register').find('[type="submit"]').html('Change Password').attr('disabled', false);
+                            $('#register').find('[type="submit"]').html('Изменить пароль').attr('disabled', false);
                         }
                     });
                   });

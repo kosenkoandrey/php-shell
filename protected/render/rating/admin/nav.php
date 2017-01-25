@@ -1,1 +1,1 @@
-<li><a href="<?= APP::Module('Routing')->root ?>admin/rating">Rating</a></li>
+<li><a href="<?= APP::Module('Routing')->root ?>admin/rating">Управление</a></li>

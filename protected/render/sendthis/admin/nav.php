@@ -1,1 +1,1 @@
-<li><a href="<?= APP::Module('Routing')->root ?>admin/sendthis">Settings</a></li>
+<li><a href="<?= APP::Module('Routing')->root ?>admin/sendthis">Настройки</a></li>

@@ -32,13 +32,13 @@ foreach ($data['path'] as $key => $value) {
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bootgrid/jquery.bootgrid.min.css" rel="stylesheet">
         
         <? APP::Render('core/widgets/css') ?>
-        <? APP::Render('core/widgets/template/css') ?>
+        <? APP::Render('core/widgets/template/css_glamurnenko') ?>
     </head>
     <body data-ma-header="teal">
-        <? APP::Render('core/widgets/template/header', 'include', $nav) ?>
         <section id="main" class="center">
             <section id="content">
                 <div class="container">
+                    <? APP::Render('core/widgets/template/header', 'include', $nav) ?>
                     <div class="card">
                         <div class="card-body">
                             <?

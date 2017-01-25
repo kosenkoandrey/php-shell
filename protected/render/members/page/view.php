@@ -31,15 +31,15 @@
         </style>
         
         <? APP::Render('core/widgets/css') ?>
-        <? APP::Render('core/widgets/template/css') ?>
+        <? APP::Render('core/widgets/template/css_glamurnenko') ?>
     </head>
     <body data-ma-header="teal">
-        <? APP::Render('core/widgets/template/header', 'include', [
-            $data['page']['title'] => 'members/page/' . APP::Module('Routing')->get['page_id_hash']
-        ]) ?>
         <section id="main" class="center">
             <section id="content">
                 <div class="container">
+                    <? APP::Render('core/widgets/template/header', 'include', [
+                        $data['page']['title'] => 'members/page/' . APP::Module('Routing')->get['page_id_hash']
+                    ]) ?>
                     <?
                     echo eval('?>' . $data['page']['content'] . '<?');
                     ?>

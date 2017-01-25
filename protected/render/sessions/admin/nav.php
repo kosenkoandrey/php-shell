@@ -1,1 +1,1 @@
-<li><a href="<?= APP::Module('Routing')->root ?>admin/sessions">Settings</a></li>
+<li><a href="<?= APP::Module('Routing')->root ?>admin/sessions">Настройки</a></li>

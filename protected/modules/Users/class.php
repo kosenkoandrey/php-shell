@@ -810,7 +810,11 @@ class Users {
 
     public function AdminProfile() {
         $user_id = APP::Module('Routing')->get['user_id'];
+        
         $about = [];
+        $mail = false;
+        $tunnels = false;
+        $tags = false;
         $comments = false;
         $likes = false;
         $premium = false;
@@ -830,6 +834,114 @@ class Users {
             [['user', '=', $user_id, PDO::PARAM_INT]]
         ) as $value) {
             $about[$value['item']] = $value['value'];
+        }
+        
+        $mail_id = [];
+        
+        foreach (APP::Module('DB')->Select(
+            APP::Module('Mail')->settings['module_mail_db_connection'], ['fetchAll', PDO::FETCH_ASSOC],
+            [
+                'mail_log.id', 
+                'mail_log.letter', 
+                'mail_log.sender', 
+                'mail_log.transport', 
+                'mail_log.state', 
+                'mail_log.result', 
+                'mail_log.retries', 
+                'mail_log.ping', 
+                'mail_log.cr_date',
+                
+                'mail_letters.subject AS letter_subject',
+                'mail_letters.priority AS letter_priority',
+                
+                'mail_senders.name AS sender_name',
+                'mail_senders.email AS sender_email',
+                
+                'mail_transport.module AS transport_module',
+                'mail_transport.method AS transport_method'
+            ], 
+            'mail_log',
+            [['user', '=', $user_id, PDO::PARAM_INT]],
+            [
+                'join/mail_letters' => [['mail_letters.id', '=', 'mail_log.letter']],
+                'join/mail_senders' => [['mail_senders.id', '=', 'mail_log.sender']],
+                'join/mail_transport' => [['mail_transport.id', '=', 'mail_log.transport']]
+            ],
+            ['mail_log.id'],
+            false,
+            ['mail_log.id', 'DESC']
+        ) as $value) {
+            $mail_id[] = $value['id'];
+            $mail[$value['id']] = [
+                'log' => $value,
+                'events' => [],
+                'tags' => []
+            ];
+        }
+        
+        foreach (APP::Module('DB')->Select(
+            APP::Module('Mail')->settings['module_mail_db_connection'], ['fetchAll', PDO::FETCH_ASSOC],
+            ['id', 'log', 'event', 'details', 'cr_date'], 'mail_events',
+            [['log', 'IN', $mail_id]],
+            false, false, false,
+            ['id', 'DESC']
+        ) as $value) {
+            $mail[$value['log']]['events'][] = $value;
+            $mail[$value['log']]['tags'][] = $value['event'];
+        }
+
+        $tunnels_id = [];
+        
+        foreach (APP::Module('DB')->Select(
+            APP::Module('Tunnels')->settings['module_tunnels_db_connection'], ['fetchAll', PDO::FETCH_ASSOC],
+            [
+                'tunnels_users.id', 
+                'tunnels_users.tunnel_id', 
+                'tunnels_users.state', 
+                
+                'tunnels.type AS tunnel_type',
+                'tunnels.name AS tunnel_name'
+            ], 
+            'tunnels_users',
+            [['user_id', '=', $user_id, PDO::PARAM_INT]],
+            [
+                'join/tunnels' => [['tunnels.id', '=', 'tunnels_users.tunnel_id']]
+            ],
+            ['tunnels_users.id'],
+            false,
+            ['tunnels_users.id', 'DESC']
+        ) as $value) {
+            $tunnels_id[] = $value['id'];
+            $tunnels[$value['id']] = [
+                'info' => $value,
+                'tags' => []
+            ];
+        }
+        
+        foreach (APP::Module('DB')->Select(
+            APP::Module('Tunnels')->settings['module_tunnels_db_connection'], ['fetchAll', PDO::FETCH_ASSOC],
+            ['id', 'user_tunnel_id', 'label_id', 'info', 'cr_date'], 'tunnels_tags',
+            [['user_tunnel_id', 'IN', $tunnels_id]],
+            false, false, false,
+            ['id', 'DESC']
+        ) as $value) {
+            $tunnels[$value['user_tunnel_id']]['tags'][] = $value;
+        }
+        
+        foreach (APP::Module('DB')->Select(
+            $this->settings['module_users_db_connection'], ['fetchAll', PDO::FETCH_ASSOC],
+            [
+                'users_tags.id', 
+                'users_tags.item', 
+                'users_tags.value', 
+                'users_tags.cr_date'
+            ], 
+            'users_tags',
+            [['user', '=', $user_id, PDO::PARAM_INT]],
+            false, false, false,
+            ['users_tags.id', 'DESC']
+        ) as $value) {
+            $tags[$value['id']] = $value;
         }
 
         if (isset(APP::$modules['Comments'])) {
@@ -898,6 +1010,9 @@ class Users {
                     [['user_id', '=', $user_id, PDO::PARAM_INT]]
                 ),
                 'about' => $about,
+                'mail' => $mail,
+                'tunnels' => $tunnels,
+                'tags' => $tags,
                 'comments' => $comments,
                 'likes' => $likes,
                 'premium' => $premium
@@ -916,7 +1031,7 @@ class Users {
             [['id', 'IN', $out, PDO::PARAM_INT]], 
             false, false, false,
             [$request['sort_by'], $request['sort_direction']],
-            $request['rows'] ? [($request['current'] - 1) * $request['rows'], $request['rows']] : false
+            $request['rows'] === -1 ? false : [($request['current'] - 1) * $request['rows'], $request['rows']]
         ) as $row) {
             $row['auth_token'] = APP::Module('Crypt')->Encode(json_encode([$row['email'], $row['password']]));
             $row['user_id_token'] = APP::Module('Crypt')->Encode($row['id']);
@@ -955,7 +1070,7 @@ class Users {
             $_POST['searchPhrase'] ? array_merge([['email', 'LIKE', $_POST['searchPhrase'] . '%' ]], $where) : $where,
             false, false, false,
             [array_keys($_POST['sort'])[0], array_values($_POST['sort'])[0]],
-            [($_POST['current'] - 1) * $_POST['rowCount'], $_POST['rowCount']]
+            $_POST['rowCount'] == -1 ? false : [($_POST['current'] - 1) * $_POST['rowCount'], $_POST['rowCount']]
         ) as $row) {
             $row['auth_token'] = APP::Module('Crypt')->Encode(json_encode([$row['email'], $row['password']]));
             $row['user_id_token'] = APP::Module('Crypt')->Encode($row['id']);
@@ -1023,14 +1138,13 @@ class Users {
         }
 
         if (empty($_POST['password'])) {
-            $out['status'] = 'error';
-            $out['errors'][] = 3;
+            $_POST['password'] = $this->GeneratePassword((int) $this->settings['module_users_gen_pass_length']);
         } else if (strlen($_POST['password']) < (int) $this->settings['module_users_min_pass_length']) {
             $out['status'] = 'error';
-            $out['errors'][] = 4;
+            $out['errors'][] = 3;
         } else if ($_POST['password'] != $_POST['re-password']) {
             $out['status'] = 'error';
-            $out['errors'][] = 5;
+            $out['errors'][] = 4;
         }
 
         if ($out['status'] == 'success') {

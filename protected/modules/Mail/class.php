@@ -1814,7 +1814,7 @@ class Mail {
             $_POST['searchPhrase'] ? [['code', 'LIKE', $_POST['searchPhrase'] . '%' ]] : false, 
             false, false, false,
             [array_keys($_POST['sort'])[0], array_values($_POST['sort'])[0]],
-            [($_POST['current'] - 1) * $_POST['rowCount'], $_POST['rowCount']]
+            $_POST['rowCount'] == -1 ? false : [($_POST['current'] - 1) * $_POST['rowCount'], $_POST['rowCount']]
         ) as $row) {
             $row['token'] = APP::Module('Crypt')->Encode($row['id']);
             array_push($rows, $row);
@@ -1994,7 +1994,7 @@ class Mail {
             ['mail_log.id'], 
             false,
             [array_keys($_POST['sort'])[0], array_values($_POST['sort'])[0]],
-            [($_POST['current'] - 1) * $_POST['rowCount'], $_POST['rowCount']]
+            $_POST['rowCount'] == -1 ? false : [($_POST['current'] - 1) * $_POST['rowCount'], $_POST['rowCount']]
         ) as $row) {
             $row['id_token'] = APP::Module('Crypt')->Encode($row['id']);
             $row['user_token'] = APP::Module('Crypt')->Encode($row['user']);
@@ -2086,7 +2086,7 @@ class Mail {
             ['mail_queue.id'], 
             false,
             [array_keys($_POST['sort'])[0], array_values($_POST['sort'])[0]],
-            [($_POST['current'] - 1) * $_POST['rowCount'], $_POST['rowCount']]
+            $_POST['rowCount'] == -1 ? false : [($_POST['current'] - 1) * $_POST['rowCount'], $_POST['rowCount']]
         ) as $row) {
             $row['id_token'] = APP::Module('Crypt')->Encode($row['id']);
             $row['log_token'] = APP::Module('Crypt')->Encode($row['log']);
@@ -2256,7 +2256,7 @@ class Mail {
             ],
             ['mail_ip.id'], false,
             [array_keys($_POST['sort'])[0], array_values($_POST['sort'])[0]],
-            [($_POST['current'] - 1) * $_POST['rowCount'], $_POST['rowCount']]
+            $_POST['rowCount'] == -1 ? false : [($_POST['current'] - 1) * $_POST['rowCount'], $_POST['rowCount']]
         ) as $row) {
             $row['token'] = APP::Module('Crypt')->Encode($row['id']);
             array_push($rows, $row);

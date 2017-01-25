@@ -23,12 +23,12 @@
                 <input type="hidden" name="token" value="<?= APP::Module('Crypt')->Encode(json_encode($data)) ?>">
                 <input type="hidden" name="reply" value="<?= APP::Module('Crypt')->Encode(0) ?>">
                 <? if (APP::Module('Comments')->settings['module_comments_files']) { ?>
-                <div class="fg-line m-b-10"><textarea name="message" class="form-control" placeholder="Начните писать ваш комментарий..."></textarea></div>
-                <div class="fg-line m-b-15">
-                    <div id="new-files"></div>
-                    <a href="javascript:void(0)" id="add-file" class="btn btn-default btn-sm m-b-20"><i class="zmdi zmdi-plus"></i> Добавить файл</a>
-                </div>
-                <? }else{ ?>
+                    <div class="fg-line m-b-10"><textarea name="message" class="form-control" placeholder="Начните писать ваш комментарий..."></textarea></div>
+                    <div class="fg-line m-b-15">
+                        <div id="new-files"></div>
+                        <a href="javascript:void(0)" id="add-file" class="btn btn-default btn-sm m-b-20"><i class="zmdi zmdi-plus"></i> Добавить файл</a>
+                    </div>
+                <? } else { ?>
                 <div class="fg-line m-b-15"><textarea name="message" class="form-control" placeholder="Начните писать ваш комментарий..."></textarea></div>
                 <? } ?>
                 <button type="submit" class="btn palette-Teal bg waves-effect btn-lg"><i class="zmdi zmdi-mail-send"></i> Отправить</button>
@@ -127,20 +127,70 @@ ob_start();
                     <? if (APP::Module('Comments')->settings['module_comments_files']) { ?>$('#new-files').html('');<? } ?>
                     var token = $('#post-comment > [name="reply"]').val();
                     var offset = token ? (parseInt($('.' + token).css('margin-left'), 10) + 35) : 0;
-                    var file = [];
                     
-                    if(result.file.length){
-                        $.each(result.file, function(i, j){
-                            switch(j.type){
-                                case 'image/png':
+                    var files = {
+                        images: [],
+                        audio: []
+                    };
+                    
+                    if (result.file.length) {
+                        $.each(result.file, function(i, j) {
+                            switch (j.type ){
+                                case 'image/cgm':
+                                case 'image/fits':
+                                case 'image/g3fax':
+                                case 'image/gif':
+                                case 'image/ief':
+                                case 'image/jp2':
                                 case 'image/jpeg':
-                                    file.push('<p><img style="height:200px;" src="'+j.url+'"><p><a href="'+j.url+'">Download</a></p></p>');
+                                case 'image/jpm':
+                                case 'image/jpx':
+                                case 'image/naplps':
+                                case 'image/png':
+                                case 'image/prs.btif':
+                                case 'image/prs.pti':
+                                case 'image/t38':
+                                case 'image/tiff':
+                                case 'image/tiff-fx':
+                                case 'image/vnd.adobe.photoshop':
+                                case 'image/vnd.cns.inf2':
+                                case 'image/vnd.djvu':
+                                case 'image/vnd.dwg':
+                                case 'image/vnd.dxf':
+                                case 'image/vnd.fastbidsheet':
+                                case 'image/vnd.fpx':
+                                case 'image/vnd.fst':
+                                case 'image/vnd.fujixerox.edmics-mmr':
+                                case 'image/vnd.fujixerox.edmics-rlc':
+                                case 'image/vnd.globalgraphics.pgb':
+                                case 'image/vnd.microsoft.icon':
+                                case 'image/vnd.mix':
+                                case 'image/vnd.ms-modi':
+                                case 'image/vnd.net-fpx':
+                                case 'image/vnd.sealed.png':
+                                case 'image/vnd.sealedmedia.softseal.gif':
+                                case 'image/vnd.sealedmedia.softseal.jpg':
+                                case 'image/vnd.svf':
+                                case 'image/vnd.wap.wbmp':
+                                case 'image/vnd.xiff':
+                                    files['images'].push('<div data-src="'+j.url+'"><div class="lightbox-item"><img src="'+j.url+'" class="thumbnail"></div></div>');
                                     break;
-                                case 'video/mp4':
-                                    file.push('<p><video width="640" height="480" controls><source src="'+j.url+'" type="video/mp4"></video><p><a href="'+j.url+'">Download</a></p></p>');
-                                    break;
-                                case 'application/pdf':
-                                    file.push('<p><span class="pdf-block" ><span style="display: inline-block" class="avatar-char palette-Orange-400 bg m-r-5"><i class="zmdi zmdi-file"></i><a href="'+j.url+'">Download</a></p>');
+                                case 'audio/aac':
+                                case 'audio/wav':
+                                case 'audio/webm':
+                                case 'audio/basic':
+                                case 'auido/L24':
+                                case 'audio/mid': 
+                                case 'audio/mpeg':
+                                case 'audio/mp4':
+                                case 'audio/x-aiff':	  
+                                case 'audio/x-mpegurl':	 
+                                case 'audio/vnd.rn-realaudio':	 
+                                case 'audio/ogg':
+                                case 'audio/vorbis':
+                                case 'case audio/vnd.wav':
+                                case 'audio/mp3':
+                                    files['audio'].push('<div class="m-b-15 m-t-15" style="border: 1px solid #e3e3e3"><audio style="width: 100%;" src="'+j.url+'" preload="auto" controls></audio></div>');
                                     break;
                             }
                         });
@@ -160,10 +210,13 @@ ob_start();
                             '<div class="media-body">',
                                 '<h4 class="media-heading">',
                                     'Я',
-                                    '<p class="m-b-5 m-t-10 f-12 c-gray"><i class="zmdi zmdi-calendar"></i> только что</p>',
+                                    '<p class="m-b-5 m-t-10 f-12 c-gray"><? if (APP::Module('Users')->user['role'] == 'admin') { echo '# \'+ result.id + \'&nbsp;'; } ?><i class="zmdi zmdi-calendar"></i> только что</p>',
                                 '</h4>',
                                 '<p style="white-space: pre-wrap; margin-bottom: 10px;">' + result.message + '</p>',
-                                file.join(''),
+                                '<div class="comments_files">',
+                                    files.images.length ? '<div class="lightbox">' + files.images.join('') + '</div>' : '',
+                                    files.audio.length ? '<div class="audio">' + files.audio.join('') + '</div>' : '',
+                                '</div>',
                             '</div>',
                         '</div>'
                     ].join('');
@@ -191,7 +244,7 @@ ob_start();
                     $('html, body').animate({
                         scrollTop: $('.comment.' + result.token).offset().top - 200
                     }, 500);
-                    
+
                     swal({
                         title: 'Готово',
                         text: 'Ваш комментарий был успешно отправлен',

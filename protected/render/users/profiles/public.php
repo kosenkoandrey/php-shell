@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>PHP-shell - <?= isset($data['about']['username']) ? $data['about']['username'] : 'user' . $data['user']['id'] ?></title>
+        <title><?= isset($data['about']['username']) ? $data['about']['username'] : 'user' . $data['user']['id'] ?></title>
 
         <!-- Vendor CSS -->
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
@@ -14,17 +14,17 @@
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.css" rel="stylesheet">
         
         <? APP::Render('core/widgets/css') ?>
-        <? APP::Render('core/widgets/template/css') ?>
+        <? APP::Render('core/widgets/template/css_glamurnenko') ?>
     </head>
     <body data-ma-header="teal">
-        <? 
-        APP::Render('core/widgets/template/header', 'include', [
-            isset($data['about']['username']) ? $data['about']['username'] : 'user' . $data['user']['id'] => 'users/profile/' . APP::Module('Routing')->get['user_id_hash']
-        ]);
-        ?>
         <section id="main" class="center">
             <section id="content">
                 <div class="container">
+                    <? 
+                    APP::Render('core/widgets/template/header', 'include', [
+                        isset($data['about']['username']) ? $data['about']['username'] : 'user' . $data['user']['id'] => 'users/profile/' . APP::Module('Routing')->get['user_id_hash']
+                    ]);
+                    ?>
                     <div class="card" id="profile-main">
                         <div class="pm-overview c-overflow">
                             <div class="pmo-pic">
@@ -41,7 +41,7 @@
                                     APP::Render('likes/widgets/default', 'include', [
                                         'type' => APP::Module('DB')->Select(APP::Module('Likes')->settings['module_likes_db_connection'], ['fetchColumn', 0], ['id'], 'likes_objects', [['name', '=', "User", PDO::PARAM_STR]]),
                                         'id' => $data['user']['id'],
-                                        'text' => 'Like',
+                                        'text' => 'Мне нравится',
                                         'class' => ['btn-lg', 'btn-block', 'f-700'],
                                         'details' => true
                                     ]);
@@ -60,7 +60,7 @@
                                 <?
                                 if (count($data['social-profiles'])) {
                                     ?>
-                                    <h2>Accounts</h2>
+                                    <h2>Социальные сети</h2>
                                     <ul>
                                         <?
                                         foreach ($data['social-profiles'] as $profile) {
@@ -81,19 +81,19 @@
 
                         <div class="pm-body clearfix">
                             <ul class="tab-nav" data-tab-color="teal">
-                                <li class="active waves-effect"><a href="#tab-about" aria-controls="tab-about" role="tab" data-toggle="tab">About</a></li>
+                                <li class="active waves-effect"><a href="#tab-about" aria-controls="tab-about" role="tab" data-toggle="tab">Основное</a></li>
                             </ul>
                             
                             <div class="tab-content">
                                 <div role="tabpanel" class="tab-pane active" id="tab-about">
                                     <div class="pmb-block">
                                         <div class="pmbb-header">
-                                            <h2><i class="zmdi zmdi-account m-r-5"></i> Basic</h2>
+                                            <h2><i class="zmdi zmdi-account m-r-5"></i> Основное</h2>
                                         </div>
                                         <div class="p-l-25">
                                             <div id="view-basic" class="pmbb-view">
                                                 <dl class="dl-horizontal">
-                                                    <dt>Username</dt>
+                                                    <dt>Имя пользователя</dt>
                                                     <dd id="about-username-value"><?= isset($data['about']['username']) ? $data['about']['username'] : 'user' . $data['user']['id'] ?></dd>
                                                 </dl>
                                             </div>
@@ -102,21 +102,21 @@
                                     
                                     <div class="pmb-block">
                                         <div class="pmbb-header">
-                                            <h2><i class="zmdi zmdi-phone m-r-5"></i> Contact</h2>
+                                            <h2><i class="zmdi zmdi-phone m-r-5"></i> Контакты</h2>
                                         </div>
                                         <div class="p-l-25">
                                             <div id="view-contact" class="pmbb-view">
                                                 <dl class="dl-horizontal">
-                                                    <dt>Mobile Phone</dt>
-                                                    <dd id="about-mobile-phone-value"><?= isset($data['about']['mobile_phone']) ? $data['about']['mobile_phone'] : 'none' ?></dd>
+                                                    <dt>Телефон</dt>
+                                                    <dd id="about-mobile-phone-value"><?= isset($data['about']['mobile_phone']) ? $data['about']['mobile_phone'] : 'нет' ?></dd>
                                                 </dl>
                                                 <dl class="dl-horizontal">
                                                     <dt>Twitter</dt>
-                                                    <dd id="about-twitter-value"><?= isset($data['about']['twitter']) ? $data['about']['twitter'] : 'none' ?></dd>
+                                                    <dd id="about-twitter-value"><?= isset($data['about']['twitter']) ? $data['about']['twitter'] : 'нет' ?></dd>
                                                 </dl>
                                                 <dl class="dl-horizontal">
                                                     <dt>Skype</dt>
-                                                    <dd id="about-skype-value"><?= isset($data['about']['skype']) ? $data['about']['skype'] : 'none' ?></dd>
+                                                    <dd id="about-skype-value"><?= isset($data['about']['skype']) ? $data['about']['skype'] : 'нет' ?></dd>
                                                 </dl>
                                             </div>
                                         </div>
