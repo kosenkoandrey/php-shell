@@ -458,4 +458,5 @@ class Quiz {
         echo json_encode($out);
         exit;
     }
+    
 }
