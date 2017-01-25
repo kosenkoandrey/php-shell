@@ -26,9 +26,8 @@
                 <div class="container">
                     <div class="card">
                         <?
-                        switch ($data) {
-                            case 'error_user':
-                            case 'error_answer':
+                        switch ($data['state']) {
+                            case 'error':
                                 ?>
                                 <div class="card-header"><h2>Произошла ошибка</h2></div>
                                 <div class="card-body card-padding">
@@ -42,17 +41,20 @@
                                 break;
                             case 'success':
                                 ?>
-                                <div class="card-header"><h2>Спасибо за ответ.<br>Правильный ответ и мое объяснение - в следующем письме!</h2></div>
+                                <div class="card-header"><h2>Спасибо за ответ</h2></div>
+                                <div class="card-body card-padding">Правильный ответ и мое объяснение - в следующем письме!</div>
                                 <?
                                 break;
                             case 'exist_answer':
                                 ?>
-                                <div class="card-header"><h2>Повторно ответить нельзя :(<br>В следующий раз отвечайте сразу наверняка!</h2></div>
+                                <div class="card-header"><h2>Повторно ответить нельзя :(</h2></div>
+                                <div class="card-body card-padding">В следующий раз отвечайте сразу наверняка!</div>
                                 <?
                                 break;
                             case 'unavailable':
                                 ?>
-                                <div class="card-header"><h2>Время отведенное на ответ закончилось :(<br>В следующий раз поторопитесь с ответом!</h2></div>
+                                <div class="card-header"><h2>Время отведенное на ответ закончилось :(</h2></div>
+                                <div class="card-body card-padding">В следующий раз поторопитесь с ответом!</div>
                                 <?
                                 break;
                         }

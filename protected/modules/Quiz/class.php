@@ -55,14 +55,14 @@ class Quiz {
         $out= [];
         
         $token = json_decode(APP::Module('Crypt')->Decode(APP::Module('Routing')->get['token']), 1);
-        $answer_id = Shell::$app->Get('extensions','ECrypt')->Decrypt(APP::Module('Routing')->get['answer_hash_id']);
-        
-        if (!APP::Module('DB')->Select(
+        $answer_id = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['answer_id_hash']);
+
+        if (!$user_id = APP::Module('DB')->Select(
             APP::Module('Users')->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
             ['id'], 'users',
-            [['id', '=', $token['user_id'], PDO::PARAM_INT]]
+            [['email', '=', $token['email'], PDO::PARAM_INT]]
         )) {
-            APP::Render('quiz/admin/answers/user_answer', 'include', ['state'=> 'error']);
+            APP::Render('quiz/answer', 'include', ['state'=> 'error']);
             exit;
         }
         
@@ -71,7 +71,7 @@ class Quiz {
             ['id'], 'quiz_answers',
             [['id', '=', $answer_id, PDO::PARAM_INT]]
         )) {
-            APP::Render('quiz/admin/answers/user_answer', 'include', ['state'=> 'error']);
+            APP::Render('quiz/answer', 'include', ['state'=> 'error']);
             exit;
         }
         
@@ -85,13 +85,13 @@ class Quiz {
             APP::Module('Users')->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
             ['value'], 'users_tags',
             [
-                ['user', '=', $token['user_id'], PDO::PARAM_INT],
+                ['user', '=', $user_id, PDO::PARAM_INT],
                 ['item', '=', 'quiz_questions_available', PDO::PARAM_STR],
             ]
         );
         
         if (!in_array($question_id, explode(',', $quiz_questions_available))) {
-            APP::Render('quiz/admin/answers/user_answer', 'include', ['state'=> 'unavailable']);
+            APP::Render('quiz/answer', 'include', ['state'=> 'unavailable']);
             exit;
         }
 
@@ -99,14 +99,14 @@ class Quiz {
             $this->settings['module_quiz_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
             ['id'], 'quiz_user_answers',
             [
-                ['user', '=', $token['user_id'], PDO::PARAM_INT],
+                ['user_id', '=', $user_id, PDO::PARAM_INT],
                 ['answer_id', 'IN', APP::Module('DB')->Select(
                     $this->settings['module_quiz_db_connection'], ['fetchAll', PDO::FETCH_COLUMN], 
                     ['id'], 'quiz_answers',[['question_id', '=', $question_id, PDO::PARAM_INT]]
                 ), PDO::PARAM_INT],
             ]
-        )) {
-            APP::Render('quiz/admin/answers/user_answer', 'include', ['state'=> 'exist_answer']);
+        )) { 
+            APP::Render('quiz/answer', 'include', ['state'=> 'exist_answer']);
             exit;
         }
 
@@ -114,7 +114,7 @@ class Quiz {
             $this->settings['module_quiz_db_connection'], 'quiz_user_answers',
             [
                 'id' => 'NULL',
-                'user_id'   => [$token['user_id'], PDO::PARAM_INT],
+                'user_id'   => [$user_id, PDO::PARAM_INT],
                 'answer_id' => [$answer_id, PDO::PARAM_INT],
                 'cr_date' => 'NOW()'
             ]
@@ -122,11 +122,11 @@ class Quiz {
         
         APP::Module('Triggers')->Exec('quiz_add_question', [
             'id' => $out['user_answer_id'],
-            'user_id'   => $token['user_id'],
+            'user_id'   => $user_id,
             'answer_id' => $answer_id
         ]);
         
-        APP::Render('quiz/admin/answers/user_answer', 'include', ['state'=> 'success']);
+        APP::Render('quiz/answer', 'include', ['state'=> 'success']);
     }
     
     public function AnswersOnLastQuestions($recepient_id) {
@@ -140,16 +140,16 @@ class Quiz {
             [
                 'join/quiz_answers' => [
                     ['quiz_answers.id', '=', 'quiz_user_answers.answer_id'],
-                    ['quiz_answers.question_id', 'IN', APP::Module('DB')->Select(
-                        APP::Module('Users')->settings['module_users_db_connection'], ['fetchAll', PDO::FETCH_COLUMN], 
+                    ['quiz_answers.question_id', 'IN', '(' . APP::Module('DB')->Select(
+                        APP::Module('Users')->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
                         ['value'], 'users_tags',
                         [
                             ['user', '=', $recepient_id, PDO::PARAM_INT],
                             ['item', '=', 'quiz_questions_available', PDO::PARAM_STR],
                         ]
-                    )]
+                    ) . ')']
                 ]
-            ]
+            ],
             ['quiz_user_answers.id']
         ) as $answer) {
             $answers_on_last_questions[$answer['question_id']] = Array($answer['answer_id'], $answer['rating'], $answer['correct']);

@@ -2963,7 +2963,7 @@ class Tunnels {
                 break;
             case 'set_user_tag':
                 if (APP::Module('DB')->Select(
-                    $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                    APP::Module('Users')->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
                     ['id'], 'users_tags',
                     [
                         ['user', '=', $tunnel['user_id'], PDO::PARAM_INT],
@@ -2978,7 +2978,7 @@ class Tunnels {
                             'label_id' => ['update_user_tag', PDO::PARAM_STR],
                             'token' => '""',
                             'info' => [json_encode([
-                                'result' => APP::Module('DB')->Update($this->settings['module_users_db_connection'], 'users_tags', [
+                                'result' => APP::Module('DB')->Update(APP::Module('Users')->settings['module_users_db_connection'], 'users_tags', [
                                     'value' => $object['settings']['tag_details']
                                 ], [
                                     ['user', '=', $tunnel['user_id'], PDO::PARAM_INT],
@@ -3000,7 +3000,7 @@ class Tunnels {
                             'token' => '""',
                             'info' => [json_encode([
                                 'result' => APP::Module('DB')->Insert(
-                                    $this->settings['module_users_db_connection'], 'users_tags',
+                                    APP::Module('Users')->settings['module_users_db_connection'], 'users_tags',
                                     [
                                         'id' => 'NULL',
                                         'user' => [$tunnel['user_id'], PDO::PARAM_INT],
