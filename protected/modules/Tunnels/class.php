@@ -3762,7 +3762,7 @@ class TunnelsSearch {
                     $where[] = ['cr_date', 'BETWEEN', '"' . date('Y-m-d H:i:s', (time() - $cr_date)) . '" AND "' . date('Y-m-d H:i:s',time()) . '"', PDO::PARAM_STR];
                 }
 
-                if ($date_range) {
+                if (isset($date_range)) {
                     $where[] = ['cr_date', 'BETWEEN', '"' . $date_range['from'] . '" AND "' . $date_range['to'] . '"', PDO::PARAM_STR];
                 }
                 
@@ -3773,7 +3773,7 @@ class TunnelsSearch {
 
                 $join['join/tunnels_users'][] = ['tunnels_users.id', '=', 'tunnels_tags.user_tunnel_id'];
 
-                if (isset($settings['process_id'])) {
+                if (isset($settings['tunnel_id'])) {
                     $join['join/tunnels_users'][] = ['tunnels_users.tunnel_id', '=', $settings['tunnel_id']];
                 }
 

@@ -456,7 +456,7 @@
                                 '<div class="panel-collapse collapse" id="add_settings' + elid + '">',
                                     '<div class="panel-body">',
                                         'Таймаут',
-                                        '<input data-id="timeout-value" type="text" class="form-control" style="width: 80px; display: inline-block;">',
+                                        '<input data-id="timeout-value" value="1" type="text" class="form-control" style="width: 80px; display: inline-block;">',
                                         '<select data-id="timeout-mode" class="form-control">',
                                             '<option value="min">мин.</option>',
                                             '<option value="hours">час.</option>',
