@@ -1,6 +1,6 @@
 <?
 return [
-    'location'          => ['http', 'pult2.glamurnenko.ru', '/'],
+    'location'          => ['http', $_SERVER['HTTP_HOST'], '/'],
     'encoding'          => 'UTF-8',
     'locale'            => 'en_US',
     'timezone'          => 'Etc/GMT-3',
