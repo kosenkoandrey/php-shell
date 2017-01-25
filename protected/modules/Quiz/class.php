@@ -55,7 +55,7 @@ class Quiz {
         $out= [];
         
         $token = json_decode(APP::Module('Crypt')->Decode(APP::Module('Routing')->get['token']), 1);
-        $answer_id = Shell::$app->Get('extensions','ECrypt')->Decrypt(APP::Module('Routing')->get['answer_hash_id']);
+        $answer_id = Shell::$app->Get('extensions','ECrypt')->Decrypt(APP::Module('Routing')->get['answer_id_hash']);
         
         if (!APP::Module('DB')->Select(
             APP::Module('Users')->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
@@ -149,7 +149,7 @@ class Quiz {
                         ]
                     )]
                 ]
-            ]
+            ],
             ['quiz_user_answers.id']
         ) as $answer) {
             $answers_on_last_questions[$answer['question_id']] = Array($answer['answer_id'], $answer['rating'], $answer['correct']);
