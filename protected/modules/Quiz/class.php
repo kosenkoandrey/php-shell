@@ -161,7 +161,7 @@ class Quiz {
     public function UserRating($user_id, $questions) {
         return APP::Module('DB')->Select(
             $this->settings['module_quiz_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
-            ['SUM(quiz_user_answers.rating)'], 'quiz_user_answers',
+            ['SUM(quiz_answers.rating)'], 'quiz_user_answers',
             [['quiz_user_answers.user_id', '=', $user_id, PDO::PARAM_INT]],
             [
                 'join/quiz_answers' => [
