@@ -304,15 +304,15 @@ ob_end_clean();
                 
                 $.plot("#analytics-chart", [
                     { 
-                        label: "Visits", 
+                        label: "Визиты", 
                         data: data.visits 
                     },
                     { 
-                        label: "Users", 
+                        label: "Посетители", 
                         data: data.users 
                     },
                     { 
-                        label: "Page views", 
+                        label: "Просмотры", 
                         data: data.pageviews 
                     }
                 ], {
@@ -371,7 +371,7 @@ ob_end_clean();
                         var date = new Date(item.datapoint[0]);
 
                         $("#card-<?= $data['hash'] ?>-tooltip")
-                        .html(item.datapoint[1] + ' ' + item.series.label + ' of ' + date.getDate() + '-' + (date.getMonth() + 1) + '-' + date.getFullYear())
+                        .html(item.datapoint[1] + ' ' + item.series.label + ' - ' + date.getDate() + '-' + (date.getMonth() + 1) + '-' + date.getFullYear())
                         .css({
                             top: item.pageY+5, 
                             left: item.pageX+5

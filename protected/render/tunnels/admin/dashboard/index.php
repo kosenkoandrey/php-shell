@@ -1,6 +1,6 @@
 <?
-$title = 'Overview';
-$tab = 'Tunnels';
+$title = 'Обзор';
+$tab = 'Туннели';
 $hash = md5($title . $tab);
 
 return [[
