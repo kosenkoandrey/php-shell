@@ -1,6 +1,6 @@
 <?
-$card = 'Overview';
-$tab = 'Comments';
+$card = 'Разное';
+$tab = 'Комментарии';
 $hash = md5($card . $tab);
 
 return [[

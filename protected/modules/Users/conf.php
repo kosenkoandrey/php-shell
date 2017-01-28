@@ -43,7 +43,8 @@ return [
         ['admin\/users\/roles\/rules\/(?P<role_id_hash>.*)\/add(\?.*)?',        'Users', 'AddRule'],                    // Add rule
         ['admin\/users\/roles\/rules\/(?P<role_id_hash>.*)(\?.*)?',             'Users', 'ManageRules'],                // Manage rules of role
         
-        ['admin\/users\/api\/dashboard\.json(\?.*)?',                           'Users', 'APIDashboard'],
+        ['admin\/users\/api\/dashboard\/all\.json(\?.*)?',                      'Users', 'APIDashboardAll'],
+        ['admin\/users\/api\/dashboard\/new\.json(\?.*)?',                      'Users', 'APIDashboardNew'],
         ['admin\/users\/api\/search\.json(\?.*)?',                              'Users', 'APISearchUsers'],
         ['admin\/users\/api\/action\.json(\?.*)?',                              'Users', 'APISearchUsersAction'],
         ['admin\/users\/api\/list\.json(\?.*)?',                                'Users', 'APIListUsers'],                   // [API] List users

@@ -29,8 +29,13 @@ class Billing {
         $this->payments_actions = new PaymentsActions();
     }
 
+    
     public function Admin() {
         return APP::Render('billing/admin/nav', 'content');
+    }
+    
+    public function Dashboard() {
+        return APP::Render('billing/admin/dashboard/index', 'return');
     }
     
 
@@ -419,6 +424,55 @@ class Billing {
         APP::Render('billing/admin/settings');
     }
 
+    
+    public function APIDashboard() {
+        $tmp = [];
+        
+        $metrics = [
+            'new',
+            'processed',
+            'success',
+            'revoked'
+        ];
+        
+        for ($x = $_POST['date']['to']; $x >= $_POST['date']['from']; $x = $x - 86400) {
+            foreach ($metrics as $value) {
+                $tmp[$value][date('d-m-Y', $x)] = [];
+            }
+        }
+
+        foreach (APP::Module('DB')->Select(
+            $this->settings['module_billing_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            [
+                'amount',
+                'state',
+                'UNIX_TIMESTAMP(cr_date) AS date'
+            ], 
+            'billing_invoices',
+            [['UNIX_TIMESTAMP(cr_date)', 'BETWEEN', $_POST['date']['from'] . ' AND ' . $_POST['date']['to']]]
+        ) as $data) {
+            $tmp[$data['state']][date('d-m-Y', $data['date'])][] = $data['amount'];
+        }
+
+        $out = [];
+
+        foreach ((array) $tmp as $source => $dates) {
+            foreach ((array) $dates as $key => $value) {
+                $out[$source][$key] = [strtotime($key) * 1000, count($value), array_sum($value)];
+            }
+        }
+        
+        foreach ($out as $key => $value) {
+            $out[$key] = array_values($value);
+        }
+
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode($out);
+        exit;
+    }
     
     public function APISearchProducts() {
         $request = json_decode(file_get_contents('php://input'), true);

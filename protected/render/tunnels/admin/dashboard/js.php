@@ -8,6 +8,17 @@
             dataType: 'json',
             success: function(data) {
                 $('#tunnels-list').html([
+                    '<button id="refresh-tunnels" type="button" class="btn btn-default waves-effect pull-right"><i class="zmdi zmdi-refresh"></i> Обновить</button>',
+                    '<div class="row m-b-20">',
+                        '<div class="col-md-6 media-body ns-item">',
+                            '<small class="c-black">Проходят туннели</small>',
+                            '<h3 class="c-black">' + data.states.active + '</h3>',
+                        '</div>',
+                        '<div class="col-md-6 media-body ns-item">',
+                            '<small class="c-black">Не проходят туннели</small>',
+                            '<h3 class="c-black">' + data.states.inactive + '</h3>',
+                        '</div>',
+                    '</div>',
                     '<div class="table-responsive m-b-25">',
                         '<table id="static-tunnels-table" class="table table-hover">',
                             '<thead>',
@@ -19,9 +30,9 @@
                             '</thead>',
                             '<tbody>',
                                 '<tr class="total">',
-                                    '<td></td>',
-                                    '<td>0</td>',
-                                    '<td>0</td>',
+                                    '<td>Итого</td>',
+                                    '<td class="static_tunnels_active_total"><a href="#"></a></td>',
+                                    '<td class="static_tunnels_total"><a href="#"></a></td>',
                                 '</tr>',
                             '</tbody>',
                         '</table>',
@@ -37,9 +48,9 @@
                             '</thead>',
                             '<tbody>',
                                 '<tr class="total">',
-                                    '<td></td>',
-                                    '<td>0</td>',
-                                    '<td>0</td>',
+                                    '<td>Итого</td>',
+                                    '<td class="dynamic_tunnels_active_total"><a href="#"></a></td>',
+                                    '<td class="dynamic_tunnels_total"><a href="#"></a></td>',
                                 '</tr>',
                             '</tbody>',
                         '</table>',
@@ -48,7 +59,7 @@
                 
                 var c_static = c_dynamic = [0, 0];
                 
-                $.each(data.static, function(id, tunnel) {
+                $.each(data.tunnels.static, function(id, tunnel) {
                     var s_color = tunnel.state === 'active' ? 'Teal' : 'Red';
                     
                     $('#static-tunnels-table > tbody').prepend([
@@ -59,11 +70,14 @@
                         '</tr>'
                     ].join(''));
                     
-                    c_static[0] += tunnel.subscribers.active[0];
-                    c_static[1] += tunnel.subscribers.total[0];
+                    c_static[0] += parseInt(tunnel.subscribers.active[0]);
+                    c_static[1] += parseInt(tunnel.subscribers.total[0]);
                 });
                 
-                $.each(data.dynamic, function(id, tunnel) {
+                $('.static_tunnels_active_total a').html(c_static[0]);
+                $('.static_tunnels_total a').html(c_static[1]);
+                
+                $.each(data.tunnels.dynamic, function(id, tunnel) {
                     var s_color = tunnel.state === 'active' ? 'Teal' : 'Red';
                     
                     $('#dynamic-tunnels-table > tbody').prepend([
@@ -74,9 +88,12 @@
                         '</tr>'
                     ].join(''));
                     
-                    c_dynamic[0] += tunnel.subscribers.active[0];
-                    c_dynamic[1] += tunnel.subscribers.total[0];
+                    c_dynamic[0] += parseInt(tunnel.subscribers.active[0]);
+                    c_dynamic[1] += parseInt(tunnel.subscribers.total[0]);
                 });
+                
+                $('.dynamic_tunnels_active_total a').html(c_dynamic[0]);
+                $('.dynamic_tunnels_total a').html(c_dynamic[1]);
             }
         });
     });

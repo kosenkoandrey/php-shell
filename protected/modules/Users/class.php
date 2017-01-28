@@ -139,7 +139,62 @@ class Users {
         return APP::Render('users/admin/dashboard/index', 'return');
     }
     
-    public function APIDashboard() {
+    public function APIDashboardAll() {
+        $roles = [];
+
+        foreach (APP::Module('Registry')->Get(['module_users_role'], ['value'])['module_users_role'] as $role) {
+            $roles[$role['value']] = APP::Module('DB')->Select(
+                $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                ['count(id)'], 'users', 
+                [['role', '=', $role['value'], PDO::PARAM_STR]]
+            );
+        }
+        
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+
+        echo json_encode([
+            'roles' => $roles,
+            'states' => [
+                'active' => APP::Module('DB')->Select(
+                    $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                    ['count(distinct user)'], 'users_about', 
+                    [
+                        ['item', '=', 'state', PDO::PARAM_STR],
+                        ['value', '=', 'active', PDO::PARAM_STR]
+                    ]
+                ),
+                'inactive' => APP::Module('DB')->Select(
+                    $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                    ['count(distinct user)'], 'users_about', 
+                    [
+                        ['item', '=', 'state', PDO::PARAM_STR],
+                        ['value', '=', 'inactive', PDO::PARAM_STR]
+                    ]
+                ),
+                'blacklist' => APP::Module('DB')->Select(
+                    $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                    ['count(distinct user)'], 'users_about', 
+                    [
+                        ['item', '=', 'state', PDO::PARAM_STR],
+                        ['value', '=', 'blacklist', PDO::PARAM_STR]
+                    ]
+                ),
+                'dropped' => APP::Module('DB')->Select(
+                    $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                    ['count(distinct user)'], 'users_about', 
+                    [
+                        ['item', '=', 'state', PDO::PARAM_STR],
+                        ['value', '=', 'dropped', PDO::PARAM_STR]
+                    ]
+                )
+            ]
+        ]);
+        exit;
+    }
+    
+    public function APIDashboardNew() {
         $range = [];
 
         for ($x = $_POST['date']['to']; $x >= $_POST['date']['from']; $x = $x - 86400) {

@@ -1,10 +1,10 @@
 <?
-$card = 'Mail';
+$card = 'Письма';
 
 $tabs = [
-    'report' => 'Report',
-    'fbl' => 'FBL',
-    'log' => 'Log'
+    'report' => 'Статистика',
+    'log' => 'Журнал',
+    'fbl' => 'FBL-отчеты'
 ];
 
 $out = [];

@@ -301,9 +301,9 @@ ob_end_clean();
             dataType: 'json',
             success: function(data) {
                 $.plot("#mail-list-chart", [
-                    { data: data.wait, label: 'Wait' },
-                    { data: data.success, label: 'Success'},
-                    { data: data.error, label: 'Error' },
+                    { data: data.wait, label: 'В очереди' },
+                    { data: data.success, label: 'Успешно'},
+                    { data: data.error, label: 'Ошибка' },
                 ], {
                     series: {
                         lines: {

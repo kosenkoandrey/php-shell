@@ -2411,6 +2411,262 @@ class Mail {
         echo json_encode($out);
     }
     
+    public function APIStatDashboard() {
+        $form = Array(
+            'mode' => 'extend',
+            'sender' => Array(),
+            'mailing' => Array(),
+            'letter' => Array()
+        );
+        
+        if (isset($_POST['form']['mode'])) $form['mode'] = $_POST['form']['mode'];
+        if (isset($_POST['form']['date'])) $form['date'] = $_POST['form']['date'];
+        if ((isset($_POST['form']['sender'])) && ($_POST['form']['sender'] != '')) $form['sender'] = $_POST['form']['sender'];
+        if ((isset($_POST['form']['letter'])) && ($_POST['form']['letter'] != '')) $form['letter'] = $_POST['form']['letter'];
+        
+        $where = Array('UNIX_TIMESTAMP(cr_date) BETWEEN ' . $_POST['date']['from'] . ' AND ' . $_POST['date']['to']);
+        
+        if (count($form['sender'])) $where[] = 'sender IN (' . implode(',', $form['sender']) . ')';
+        if (count($form['letter'])) $where[] = 'letter IN (' . implode(',', $form['letter']) . ')';
+        
+        $select = Array(
+            'mail_events.letter',
+            'mail_events.event'
+        );
+        
+        if ($form['mode'] == 'extend') {
+            $select[] = 'mail_events.token';
+        }
+
+        $read = APP::Module('DB')->Open($this->settings['module_mail_db_connection'])->prepare('
+            SELECT ' . implode(',', $select) . '
+            FROM mail_events 
+            WHERE 
+                mail_events.event != "deferred" && 
+                mail_events.log IN (
+                    SELECT mail_log.id 
+                    FROM mail_log 
+                    WHERE 
+                        ' . implode(' && ', $where) . '
+                )
+        ');
+
+        $read->execute();
+        $events_list = $read->fetchAll(PDO::FETCH_ASSOC);
+
+        $letters = Array();
+
+        foreach ($events_list as $event) {
+            switch ($event['event']) {
+                case 'delivered':
+                case 'processed':
+                case 'open':
+                case 'click':
+                case 'unsubscribe':
+                case 'spamreport':
+                    $letters[$event['event']][] = $event['letter'];
+                    break;
+                case 'dropped':
+                case 'bounce':
+                    switch ($form['mode']) {
+                        case 'default': $letters[$event['event']][] = $event['letter']; break;
+                        case 'extend': $letters[$event['event']][$event['token']][] = $event['letter']; break;
+                    }
+                    break;
+            }
+        }
+
+        $stat = Array();
+        
+        foreach ($letters as $event => $letters_id) {
+            switch ($event) {
+                case 'delivered':
+                case 'processed':
+                case 'open':
+                case 'click':
+                case 'unsubscribe':
+                case 'spamreport':
+                    $stat[$event] = count(array_unique($letters_id));
+                    break;
+                case 'dropped':
+                case 'bounce':
+                    switch ($form['mode']) {
+                        case 'default': 
+                            $stat[$event] = count(array_unique($letters_id)); 
+                            break;
+                        case 'extend':
+                            foreach ($letters_id as $status => $values) {
+                                $status_name = $status;
+                            
+                                if ($event == 'bounce') {
+                                    switch ($status) {
+                                        case '421': $status_name = 'Service not available, closing transmission channel'; break;
+                                        case '450': $status_name = 'Requested mail action not taken: mailbox unavailable (e.g., mailbox busy)'; break;
+                                        case '451': $status_name = 'Requested action aborted: error in processing'; break;
+                                        case '452': $status_name = 'Requested action not taken: insufficient system storage'; break;
+
+                                        case '500': $status_name = 'The server could not recognize the command due to a syntax error'; break;
+                                        case '501': $status_name = 'A syntax error was encountered in command arguments'; break;
+                                        case '502': $status_name = 'This command is not implemented'; break;
+                                        case '503': $status_name = 'The server has encountered a bad sequence of commands'; break;
+                                        case '504': $status_name = 'A command parameter is not implemented'; break;
+                                        case '550': $status_name = 'User’s mailbox was unavailable (such as not found)'; break;
+                                        case '551': $status_name = 'The recipient is not local to the server'; break;
+                                        case '552': $status_name = 'The action was aborted due to exceeded storage allocation'; break;
+                                        case '553': $status_name = 'The command was aborted because the mailbox name is invalid'; break;
+                                        case '554': $status_name = 'The transaction failed for some unstated reason'; break;
+
+                                        case '4.2.1': $status_name = 'Other Address Status'; break;
+                                        case '4.2.2': $status_name = 'Bad mailbox address'; break;
+                                        case '4.2.3': $status_name = 'Bad system address'; break;
+                                        case '4.2.4': $status_name = 'Bad mailbox address syntax'; break;
+                                        case '4.2.5': $status_name = 'Mailbox address ambiguous'; break;
+                                        case '4.2.6': $status_name = 'Address Valid'; break;
+                                        case '4.2.7': $status_name = 'Mailbox has moved, No forwarding address'; break;
+                                        case '4.3.1': $status_name = 'Other or undefined mailbox status'; break;
+                                        case '4.3.2': $status_name = 'Mailbox disabled, not accepting messages'; break;
+                                        case '4.3.3': $status_name = 'Mailbox full'; break;
+                                        case '4.3.4': $status_name = 'Message length exceeds administrative limit'; break;
+                                        case '4.3.5': $status_name = 'Mailing list expansion problem'; break;
+                                        case '4.3.6': $status_name = 'System Status'; break;
+                                        case '4.3.7': $status_name = 'Other or undefined system status'; break;
+                                        case '4.3.8': $status_name = 'System full'; break;
+                                        case '4.3.9': $status_name = 'System not accepting network messages'; break;
+                                        case '4.3.10': $status_name = 'System not capable of selected features'; break;
+                                        case '4.3.11': $status_name = 'Message too big for system'; break;
+                                        case '4.4.1': $status_name = 'Other or undefined network or routing status'; break;
+                                        case '4.4.2': $status_name = 'No answer from host'; break;
+                                        case '4.4.3': $status_name = 'Bad connection'; break;
+                                        case '4.4.4': $status_name = 'Routing server failure'; break;
+                                        case '4.4.5': $status_name = 'Unable to route'; break;
+                                        case '4.4.6': $status_name = 'Network congestion'; break;
+                                        case '4.4.7': $status_name = 'Routing loop detected'; break;
+                                        case '4.4.8': $status_name = 'Delivery time expired'; break;
+                                        case '4.5.1': $status_name = 'Other or undefined protocol status'; break;
+                                        case '4.5.2': $status_name = 'Invalid command'; break;
+                                        case '4.5.3': $status_name = 'Syntax error'; break;
+                                        case '4.5.4': $status_name = 'Too many recipients'; break;
+                                        case '4.5.5': $status_name = 'Invalid command arguments'; break;
+                                        case '4.5.6': $status_name = 'Wrong protocol version'; break;
+                                        case '4.6.1': $status_name = 'Other or undefined media error'; break;
+                                        case '4.6.2': $status_name = 'Media not supported'; break;
+                                        case '4.6.3': $status_name = 'Conversion required and prohibited'; break;
+                                        case '4.6.4': $status_name = 'Conversion required but not supported'; break;
+                                        case '4.6.5': $status_name = 'Conversion with loss performed'; break;
+                                        case '4.6.6': $status_name = 'Conversion Failed'; break;
+                                        case '4.7.1': $status_name = 'Other or undefined security status'; break;
+                                        case '4.7.2': $status_name = 'Delivery not authorized, message refused'; break;
+                                        case '4.7.3': $status_name = 'Mailing list expansion prohibited'; break;
+                                        case '4.7.4': $status_name = 'Security conversion required but not possible'; break;
+                                        case '4.7.5': $status_name = 'Security features not supported'; break;
+                                        case '4.7.6': $status_name = 'Cryptographic failure'; break;
+                                        case '4.7.7': $status_name = 'Cryptographic algorithm not supported'; break;
+                                        case '4.7.8': $status_name = 'Message integrity failure'; break;
+
+                                        case '5.0.0': $status_name = 'Address does not exist'; break;
+                                        case '5.1.0': $status_name = 'Other address status'; break;
+                                        case '5.1.1': $status_name = 'Bad destination mailbox address'; break;
+                                        case '5.1.2': $status_name = 'Bad destination system address'; break;
+                                        case '5.1.3': $status_name = 'Bad destination mailbox address syntax'; break;
+                                        case '5.1.4': $status_name = 'Destination mailbox address ambiguous'; break;
+                                        case '5.1.5': $status_name = 'Destination mailbox address valid'; break;
+                                        case '5.1.6': $status_name = 'Mailbox has moved'; break;
+                                        case '5.1.7': $status_name = 'Bad sender’s mailbox address syntax'; break;
+                                        case '5.1.8': $status_name = 'Bad sender’s system address'; break;
+                                        case '5.2.0': $status_name = 'Other or undefined mailbox status'; break;
+                                        case '5.2.1': $status_name = 'Mailbox disabled, not accepting messages'; break;
+                                        case '5.2.2': $status_name = 'Mailbox full'; break;
+                                        case '5.2.3': $status_name = 'Message length exceeds administrative limit'; break;
+                                        case '5.2.4': $status_name = 'Mailing list expansion problem'; break;
+                                        case '5.3.0': $status_name = 'Other or undefined mail system status'; break;
+                                        case '5.3.1': $status_name = 'Mail system full'; break;
+                                        case '5.3.2': $status_name = 'System not accepting network messages'; break;
+                                        case '5.3.3': $status_name = 'System not capable of selected features'; break;
+                                        case '5.3.4': $status_name = 'Message too big for system'; break;
+                                        case '5.4.0': $status_name = 'Other or undefined network or routing status'; break;
+                                        case '5.4.1': $status_name = 'No answer from host'; break;
+                                        case '5.4.2': $status_name = 'Bad connection'; break;
+                                        case '5.4.3': $status_name = 'Routing server failure'; break;
+                                        case '5.4.4': $status_name = 'Unable to route'; break;
+                                        case '5.4.5': $status_name = 'Network congestion'; break;
+                                        case '5.4.6': $status_name = 'Routing loop detected'; break;
+                                        case '5.4.7': $status_name = 'Delivery time expired'; break;
+                                        case '5.5.0': $status_name = 'Other or undefined protocol status'; break;
+                                        case '5.5.1': $status_name = 'Invalid command'; break;
+                                        case '5.5.2': $status_name = 'Syntax error'; break;
+                                        case '5.5.3': $status_name = 'Too many recipients'; break;
+                                        case '5.5.4': $status_name = 'Invalid command arguments'; break;
+                                        case '5.5.5': $status_name = 'Wrong protocol version'; break;
+                                        case '5.6.0': $status_name = 'Other or undefined media error'; break;
+                                        case '5.6.1': $status_name = 'Media not supported'; break;
+                                        case '5.6.2': $status_name = 'Conversion required and prohibited'; break;
+                                        case '5.6.3': $status_name = 'Conversion required but not supported'; break;
+                                        case '5.6.4': $status_name = 'Conversion with loss performed'; break;
+                                        case '5.6.5': $status_name = 'Conversion failed'; break;
+                                        case '5.7.0': $status_name = 'Other or undefined security status'; break;
+                                        case '5.7.1': $status_name = 'Delivery not authorized, message refused'; break;
+                                        case '5.7.2': $status_name = 'Mailing list expansion prohibited'; break;
+                                        case '5.7.3': $status_name = 'Security conversion required but not possible'; break;
+                                        case '5.7.4': $status_name = 'Security features not supported'; break;
+                                        case '5.7.5': $status_name = 'Cryptographic failure'; break;
+                                        case '5.7.6': $status_name = 'Cryptographic algorithm not supported'; break;
+                                        case '5.7.7': $status_name = 'Message integrity failure'; break;
+                                    }
+                                }
+                                
+                                $stat[$event][$status_name] = count(array_unique($values));
+                            }
+                            break;
+                    }
+
+                    break;
+            }
+        }
+        
+        $bounce_count = 0;
+        $dropped_count = 0;
+        
+        if (isset($stat['bounce'])) {
+            foreach ($stat['bounce'] as $values) {
+                $bounce_count += $values;
+            }
+        }
+        
+        if (isset($stat['dropped'])) {
+            foreach ($stat['dropped'] as $values) {
+                $dropped_count += $values;
+            }
+        }
+
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode([
+            'bounce' => $bounce_count,
+            'dropped' => $dropped_count,
+            'unsubscribe' => isset($stat['unsubscribe']) ? $stat['unsubscribe'] : false,
+            'spamreport' => isset($stat['spamreport']) ? $stat['spamreport'] : false,
+            'click' => isset($stat['click']) ? $stat['click'] : false,
+            'open' => isset($stat['open']) ? $stat['open'] : false,
+            'delivered' => isset($stat['delivered']) ? $stat['delivered'] : false,
+            'processed' => isset($stat['processed']) ? $stat['processed'] : false,
+            'details' => $stat,
+            'count_events' => count($events_list),
+            'form' => $form,
+            'hash' => Array(
+                'bounce' => '',
+                'click' => '',
+                'delivered' => '',
+                'dropped' => '',
+                'open' => '',
+                'processed' => '',
+                'spamreport' => '',
+                'unsubscribe' => ''
+            )
+        ]);
+    }
+    
     
     public function Spamreport() {
         $mail_log = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['mail_log_hash']);
