@@ -284,36 +284,38 @@ APP::$insert['js_strtotime'] = ['js', 'code', 'before', '</body>', ob_get_conten
 ob_end_clean();
 ?>
 <script>
-    function GetAnalytics(nav) {
-        $('#analytics-period > button').removeAttr('disabled');
-        if (nav) $('#analytics-period > button[data-period="' + nav + '"]').attr('disabled', 'disabled');
-        $('#analytics-chart').html('<div class="text-center"><div class="preloader pl-xxl"><svg class="pl-circular" viewBox="25 25 50 50"><circle class="plc-path" cx="50" cy="50" r="20" /></svg></div></div>');
+    function GetInvoices(nav) {
+        $('#billing-period > button').removeAttr('disabled');
+        if (nav) $('#billing-period > button[data-period="' + nav + '"]').attr('disabled', 'disabled');
+        $('#billing-chart').html('<div class="text-center"><div class="preloader pl-xxl"><svg class="pl-circular" viewBox="25 25 50 50"><circle class="plc-path" cx="50" cy="50" r="20" /></svg></div></div>');
         
         $.ajax({
-            url: '<?= APP::Module('Routing')->root ?>admin/analytics/api/dashboard.json',
+            url: '<?= APP::Module('Routing')->root ?>admin/billing/api/dashboard.json',
             data: {
                 date: {
-                    from: $('#analytics-date-from').val(),
-                    to: $('#analytics-date-to').val()
+                    from: $('#billing-date-from').val(),
+                    to: $('#billing-date-to').val()
                 }
             },
             type: 'POST',
             dataType: 'json',
             success: function(data) {
-                console.log(data);
-                
-                $.plot("#analytics-chart", [
+                $.plot("#billing-chart", [
                     { 
-                        label: "Визиты", 
-                        data: data.visits 
+                        label: "Новые", 
+                        data: data.new 
                     },
                     { 
-                        label: "Посетители", 
-                        data: data.users 
+                        label: "В обработке", 
+                        data: data.processed 
                     },
                     { 
-                        label: "Просмотры", 
-                        data: data.pageviews 
+                        label: "Аннулированные", 
+                        data: data.revoked 
+                    },
+                    { 
+                        label: "Оплаченные", 
+                        data: data.success 
                     }
                 ], {
                     series: {
@@ -366,7 +368,7 @@ ob_end_clean();
                     opacity: 0.80
 		}).appendTo("body");
 
-		$("#analytics-chart").bind("plothover", function (event, pos, item) {
+		$("#billing-chart").bind("plothover", function (event, pos, item) {
                     if (item) {
                         var date = new Date(item.datapoint[0]);
 
@@ -381,11 +383,65 @@ ob_end_clean();
                         $("#card-<?= $data['hash'] ?>-tooltip").hide();
                     }
 		});
+                
+                $('#billing-list').html([
+                    '<div class="table-responsive m-b-25">',
+                        '<table id="billing-invoices-table" class="table table-hover">',
+                            '<thead>',
+                                '<tr>',
+                                    '<th width="20%">Дата</th>',
+                                    '<th width="15%">Новые</th>',
+                                    '<th width="15%">В обработке</th>',
+                                    '<th width="15%">Аннулированные</th>',
+                                    '<th width="15%">Оплаченные</th>',
+                                    '<th width="20%">Заработано</th>',
+                                '</tr>',
+                            '</thead>',
+                            '<tbody>',
+                                '<tr class="total">',
+                                    '<td></td>',
+                                    '<td class="t_new"><a href="#"></a></td>',
+                                    '<td class="t_processed"><a href="#"></a></td>',
+                                    '<td class="t_revoked"><a href="#"></a></td>',
+                                    '<td class="t_success"><a href="#"></a></td>',
+                                    '<td class="t_profit"></td>',
+                                '</tr>',
+                            '</tbody>',
+                        '</table>',
+                    '</div>'
+                ].join(''));
+                
+                var billing_invoices = [0, 0, 0, 0, 0];
+                
+                $.each(data.success, function(key, invoices) {
+                    $('#billing-invoices-table > tbody').prepend([
+                        '<tr>',
+                            '<td>' + moment.unix(parseInt(invoices[0]) / 1000).format('DD-MM-YYYY') + '</td>',
+                            '<td><a href="#" target="_blank">' + data.new[key][1] + '</a></td>',
+                            '<td><a href="#" target="_blank">' + data.processed[key][1] + '</a></td>',
+                            '<td><a href="#" target="_blank">' + data.revoked[key][1] + '</a></td>',
+                            '<td><a href="#" target="_blank">' + invoices[1] + '</a></td>',
+                            '<td>' + invoices[2] + ' руб.</td>',
+                        '</tr>'
+                    ].join(''));
+                    
+                    billing_invoices[0] += data.new[key][1];
+                    billing_invoices[1] += data.processed[key][1];
+                    billing_invoices[2] += data.revoked[key][1];
+                    billing_invoices[3] += data.success[key][1];
+                    billing_invoices[4] += invoices[2];
+                });
+                
+                $('#billing-invoices-table .total .t_new a').html(billing_invoices[0]);
+                $('#billing-invoices-table .total .t_processed a').html(billing_invoices[1]);
+                $('#billing-invoices-table .total .t_revoked a').html(billing_invoices[2]);
+                $('#billing-invoices-table .total .t_success a').html(billing_invoices[3]);
+                $('#billing-invoices-table .total .t_profit').html(billing_invoices[4] + ' руб.');
             } 
         });
     }
 
-    $(document).on('click', "#analytics-period > button",function() {
+    $(document).on('click', "#billing-period > button",function() {
         var period = $(this).data('period');
 
         var to = Math.round(new Date().getTime() / 1000);
@@ -394,25 +450,25 @@ ob_end_clean();
         var to_date = new Date(to * 1000);
         var from_date = new Date(from * 1000);
 
-        $('#analytics-date-to').val(to);
-        $('#analytics-date-from').val(from);
+        $('#billing-date-to').val(to);
+        $('#billing-date-from').val(from);
 
-        $('#analytics-calendar-from').html(from_date.getDate() + '.' + (from_date.getMonth() + 1) + '.' + from_date.getFullYear());
-        $('#analytics-calendar-to').html(to_date.getDate() + '.' + (to_date.getMonth() + 1) + '.' + to_date.getFullYear());
+        $('#billing-calendar-from').html(from_date.getDate() + '.' + (from_date.getMonth() + 1) + '.' + from_date.getFullYear());
+        $('#billing-calendar-to').html(to_date.getDate() + '.' + (to_date.getMonth() + 1) + '.' + to_date.getFullYear());
 
-        GetAnalytics(period);
+        GetInvoices(period);
     }); 
 
-    $('#analytics-calendar').popover({
+    $('#billing-calendar').popover({
         html: true,
         content: [
             '<div class="form-group">',
                 '<div class="row">',
                     '<div class="col-md-6">',
-                        '<div id="analytics-calendar-from"></div>',
+                        '<div id="billing-calendar-from"></div>',
                     '</div>',
                     '<div class="col-md-6">',
-                        '<div id="analytics-calendar-to"></div>',
+                        '<div id="billing-calendar-to"></div>',
                     '</div>',
                 '</div>',
             '</div>'
@@ -426,41 +482,41 @@ ob_end_clean();
             'width': '640px'
         });
     }).on('shown.bs.popover', function() { 
-        var to_date = new Date(parseInt($('#analytics-date-to').val()) * 1000);
-        var from_date = new Date(parseInt($('#analytics-date-from').val()) * 1000);
+        var to_date = new Date(parseInt($('#billing-date-to').val()) * 1000);
+        var from_date = new Date(parseInt($('#billing-date-from').val()) * 1000);
 
-        $('#analytics-calendar-from').datetimepicker({
+        $('#billing-calendar-from').datetimepicker({
             inline: true,
             sideBySide: true,
             format: 'DD/MM/YYYY'
         });
-        $('#analytics-calendar-to').datetimepicker({
+        $('#billing-calendar-to').datetimepicker({
             useCurrent: false,
             inline: true,
             sideBySide: true,
             format: 'DD/MM/YYYY'
         });
 
-        $('#analytics-calendar-from').on('dp.change', function(e) {
-            $('#analytics-date-from').val(Math.round(e.date._d.getTime() / 1000));
-            $('#analytics-period > button').removeAttr('disabled');
-            $('#analytics-calendar-to').data('DateTimePicker').minDate(e.date);
-            $('#analytics-calendar-from').html(e.date._d.getDate() + '.' + (e.date._d.getMonth() + 1) + '.' + e.date._d.getFullYear());
-            GetAnalytics(false);
+        $('#billing-calendar-from').on('dp.change', function(e) {
+            $('#billing-date-from').val(Math.round(e.date._d.getTime() / 1000));
+            $('#billing-period > button').removeAttr('disabled');
+            $('#billing-calendar-to').data('DateTimePicker').minDate(e.date);
+            $('#billing-calendar-from').html(e.date._d.getDate() + '.' + (e.date._d.getMonth() + 1) + '.' + e.date._d.getFullYear());
+            GetInvoices(false);
         });
-        $('#analytics-calendar-to').on('dp.change', function(e) {
-            $('#analytics-date-to').val(Math.round(e.date._d.getTime() / 1000));
-            $('#analytics-period > button').removeAttr('disabled');
-            $('#analytics-calendar-from').data('DateTimePicker').maxDate(e.date);
-            $('#analytics-calendar-to').html(e.date._d.getDate() + '.' + (e.date._d.getMonth() + 1) + '.' + e.date._d.getFullYear());
-            GetAnalytics(false);
+        $('#billing-calendar-to').on('dp.change', function(e) {
+            $('#billing-date-to').val(Math.round(e.date._d.getTime() / 1000));
+            $('#billing-period > button').removeAttr('disabled');
+            $('#billing-calendar-from').data('DateTimePicker').maxDate(e.date);
+            $('#billing-calendar-to').html(e.date._d.getDate() + '.' + (e.date._d.getMonth() + 1) + '.' + e.date._d.getFullYear());
+            GetInvoices(false);
         });
 
-        $('#analytics-calendar-from').data('DateTimePicker').date(moment(from_date));
-        $('#analytics-calendar-to').data('DateTimePicker').date(moment(to_date));
+        $('#billing-calendar-from').data('DateTimePicker').date(moment(from_date));
+        $('#billing-calendar-to').data('DateTimePicker').date(moment(to_date));
     });
     
     $(document).on('click', '#tab-nav-<?= $data['hash'] ?> > a',function() {
-        $('#analytics-period > button[data-period="1 months"]').trigger('click');
+        $('#billing-period > button[data-period="1 months"]').trigger('click');
     });
 </script>

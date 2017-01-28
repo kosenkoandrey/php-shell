@@ -13,7 +13,10 @@ return [
         ['admin\/billing\/payments(\?.*)?',                             'Billing', 'ManagePayments'],
         ['billing\/payments\/make\/(?P<invoice_id_hash>.*)',            'Billing', 'PaymentMake'],
         ['admin\/billing\/settings(\?.*)?',                             'Billing', 'Settings'],
+        
         // API
+        ['admin\/billing\/api\/dashboard\.json(\?.*)?',                 'Billing', 'APIDashboard'],
+        
         ['admin\/billing\/products\/api\/search\.json(\?.*)?',          'Billing', 'APISearchProducts'],
         ['admin\/billing\/products\/api\/action\.json(\?.*)?',          'Billing', 'APISearchProductsAction'],
         ['admin\/billing\/products\/api\/add\.json(\?.*)?',             'Billing', 'APIAddProduct'],

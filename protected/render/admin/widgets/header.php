@@ -1,7 +1,7 @@
 <header id="header" class="media">
     <div class="pull-left h-logo">
         <a href="<?= APP::Module('Routing')->root ?>admin" class="hidden-xs">
-            <i class="zmdi zmdi-email"></i> <span style="font-size: 21px">PULT</span>   
+            <span style="font-size: 21px">PULT</span>   
             <small>GLAMURNENKO.RU</small>
         </a>
     </div>

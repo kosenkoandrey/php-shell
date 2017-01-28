@@ -106,13 +106,13 @@ class Tunnels {
     
     
     public function APIDashboard() { 
-        $out = [];
+        $tunnels = [];
         
         foreach (APP::Module('DB')->Select(
             $this->settings['module_tunnels_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
             ['id', 'type', 'state', 'name'], 'tunnels'
         ) as $tunnel) {
-            $out[$tunnel['type']][$tunnel['id']] = [
+            $tunnels[$tunnel['type']][$tunnel['id']] = [
                 'hash' => APP::Module('Crypt')->Encode($tunnel['id']),
                 'state' => $tunnel['state'],
                 'name' => $tunnel['name'],
@@ -146,7 +146,39 @@ class Tunnels {
         header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
         header('Content-Type: application/json');
 
-        echo json_encode($out);
+        echo json_encode([
+            'states' => [
+                'active' => APP::Module('DB')->Select(
+                    $this->settings['module_tunnels_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                    ['COUNT(DISTINCT id)'], 'tunnels_users',
+                    [
+                        ['state', '=', 'active', PDO::PARAM_STR]
+                    ]
+                ),
+                'inactive' => APP::Module('DB')->Select(
+                    APP::Module('Users')->settings['module_users_db_connection'], ['fetch', PDO::FETCH_COLUMN], 
+                    ['COUNT(id)'], 'users',
+                    [
+                        ['id', 'NOT IN', APP::Module('DB')->Select(
+                            $this->settings['module_tunnels_db_connection'], ['fetchAll', PDO::FETCH_COLUMN], 
+                            ['DISTINCT id'], 'tunnels_users',
+                            [
+                                ['state', '=', 'active', PDO::PARAM_STR]
+                            ]
+                        )],
+                        ['id', 'IN', APP::Module('DB')->Select(
+                            APP::Module('Users')->settings['module_users_db_connection'], ['fetchAll', PDO::FETCH_COLUMN], 
+                            ['DISTINCT id'], 'users_about',
+                            [
+                                ['item', '=', 'state', PDO::PARAM_STR],
+                                ['value', '=', 'active', PDO::PARAM_STR]
+                            ]
+                        )],
+                    ]
+                )
+            ],
+            'tunnels' => $tunnels
+        ]);
     }
 
     public function APISearchTunnels() {

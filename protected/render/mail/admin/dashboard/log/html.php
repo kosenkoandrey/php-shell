@@ -1,9 +1,9 @@
 <div id="mail-log-period" class="btn-group m-b-15 m-r-15">
-    <button data-period="0 days" type="button" class="btn btn-default waves-effect">Today</button>
-    <button data-period="1 weeks" type="button" class="btn btn-default waves-effect">Week</button>
-    <button data-period="1 months" type="button" class="btn btn-default waves-effect">Month</button>
-    <button data-period="3 months" type="button" class="btn btn-default waves-effect">Quarter</button>
-    <button data-period="1 years" type="button" class="btn btn-default waves-effect">Year</button>
+    <button data-period="0 days" type="button" class="btn btn-default waves-effect">Сегодня</button>
+    <button data-period="1 weeks" type="button" class="btn btn-default waves-effect">Неделя</button>
+    <button data-period="1 months" type="button" class="btn btn-default waves-effect">Месяц</button>
+    <button data-period="3 months" type="button" class="btn btn-default waves-effect">Квартал</button>
+    <button data-period="1 years" type="button" class="btn btn-default waves-effect">Год</button>
 </div>
 <div class="btn-group m-b-15">
     <button id="mail-log-calendar" type="button" class="btn btn-default waves-effect"><i class="zmdi zmdi-calendar"></i> <span id="mail-log-calendar-from">...</span> - <span id="mail-log-calendar-to">...</span></button>

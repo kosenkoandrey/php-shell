@@ -82,5 +82,6 @@ return [
         ['admin\/mail\/api\/spam_lists\/ip\/status\.json(\?.*)?',       'Mail', 'APIStatusIPSpamLists'],    // [API] Status IP spam lists
         
         ['admin\/mail\/api\/fbl\/dashboard\.json(\?.*)?',               'Mail', 'APIFBLReportsDashboard'],  // [API] FBL reports dashboard
+        ['admin\/mail\/api\/stat\/dashboard\.json(\?.*)?',              'Mail', 'APIStatDashboard'],        // [API] Stat dashboard
     ]
 ];
