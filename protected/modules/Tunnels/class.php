@@ -3820,31 +3820,10 @@ class TunnelsSearch {
                     false,
                     ['cr_date', 'DESC']
                 );
+                break;
             case 'not_exist': 
-                /*
-                $users = Shell::$app->Get('extensions','EModDB')->Open('pult_mailing')->prepare('
-                    SELECT DISTINCT tunnels_subscriptions.user_id 
-                    FROM tunnels_subscriptions 
-                    WHERE tunnels_subscriptions.user_id NOT IN (
-                        SELECT DISTINCT tunnels_subscriptions.user_id  
-                            FROM tunnels_labels 
-                            JOIN tunnels_subscriptions ON 
-                                tunnels_subscriptions.id = tunnels_labels.tunnel_id && 
-                                tunnels_subscriptions.tunnel_id = :tunnel_id
-                            WHERE 
-                                tunnels_labels.label_id = :label_id && 
-                                tunnels_labels.label_data = :label_data
-                    )
-                ');
-                $users->bindParam(':tunnel_id', $settings['tunnel_id'], PDO::PARAM_INT);
-                $users->bindParam(':label_id', $settings['label_id'], PDO::PARAM_STR);
-                $users->bindParam(':label_data', $settings['label_data'], PDO::PARAM_STR);
-                $users->execute();
-                
-                return $users->fetchAll(PDO::FETCH_COLUMN);
-                 * 
-                 */
                 return [];
+                break;
         }
     }
     

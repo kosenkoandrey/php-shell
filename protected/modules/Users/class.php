@@ -2814,7 +2814,466 @@ class UsersSearch {
             [['role', $settings['logic'], $settings['value'], PDO::PARAM_STR]]
         );
     }
+    
+    public function state($settings) {
+        return APP::Module('DB')->Select(
+            APP::Module('Users')->settings['module_users_db_connection'], 
+            ['fetchAll', PDO::FETCH_COLUMN], 
+            ['user'], 'users_about',
+            [
+                ['item', '=', 'state', PDO::PARAM_STR],
+                ['value', $settings['logic'], $settings['value'], PDO::PARAM_STR]
+            ]
+        );
+    }
+    
+    public function source($settings) {
+        return APP::Module('DB')->Select(
+            APP::Module('Users')->settings['module_users_db_connection'], 
+            ['fetchAll', PDO::FETCH_COLUMN], 
+            ['user'], 'users_about',
+            [
+                ['item', '=', 'source', PDO::PARAM_STR],
+                ['value', $settings['logic'], $settings['value'], PDO::PARAM_STR]
+            ]
+        );
+    }
+    
+    public function firstname($settings) {
+        return APP::Module('DB')->Select(
+            APP::Module('Users')->settings['module_users_db_connection'], 
+            ['fetchAll', PDO::FETCH_COLUMN], 
+            ['user'], 'users_about',
+            [
+                ['value', $settings['logic'], $settings['value'], PDO::PARAM_STR],
+                ['item', '=', 'firstname', PDO::PARAM_STR]
+            ]
+        );
+    }
+    
+    public function lastname($settings) {
+        return APP::Module('DB')->Select(
+            APP::Module('Users')->settings['module_users_db_connection'], 
+            ['fetchAll', PDO::FETCH_COLUMN], 
+            ['user'], 'users_about',
+            [
+                ['value', $settings['logic'], $settings['value'], PDO::PARAM_STR],
+                ['item', '=', 'lastname', PDO::PARAM_STR]
+            ]
+        );
+    }
+    
+    public function tel($settings) {
+        return APP::Module('DB')->Select(
+            APP::Module('Users')->settings['module_users_db_connection'], 
+            ['fetchAll', PDO::FETCH_COLUMN], 
+            ['user'], 'users_about',
+            [
+                ['value', $settings['logic'], $settings['value'], PDO::PARAM_STR],
+                ['item', 'IN', ['tel', 'mobile_phone'], PDO::PARAM_STR]
+            ]
+        );
+    }
+    
+    public function city($settings) {
+        return APP::Module('DB')->Select(
+            APP::Module('Users')->settings['module_users_db_connection'], 
+            ['fetchAll', PDO::FETCH_COLUMN], 
+            ['user'], 'users_about',
+            [
+                ['value', $settings['logic'], $settings['value'], PDO::PARAM_STR],
+                ['item', '=', 'city_name_ru', PDO::PARAM_STR]
+            ]
+        );
+    }
+    
+    public function country($settings) {
+        return APP::Module('DB')->Select(
+            APP::Module('Users')->settings['module_users_db_connection'], 
+            ['fetchAll', PDO::FETCH_COLUMN], 
+            ['user'], 'users_about',
+            [
+                ['value', $settings['logic'], $settings['value'], PDO::PARAM_STR],
+                ['item', '=', 'country_name_ru', PDO::PARAM_STR]
+            ]
+        );
+    }
+    
+    public function reg_date($settings) {
+        return APP::Module('DB')->Select(
+            APP::Module('Users')->settings['module_users_db_connection'], 
+            ['fetchAll', PDO::FETCH_COLUMN], 
+            ['id'], 'users',
+            [
+                ['reg_date', 'BETWEEN', '"' . $settings['date_from'] . ' 00:00:00" AND "' . $settings['date_to'] . ' 23:59:59"', PDO::PARAM_STR]
+            ]
+        );
+    }
+    
+    public function utm($settings) {
+        $where = [
+            ['value', '=', $settings['value'], PDO::PARAM_STR],
+            ['item', '=', $settings['item'], PDO::PARAM_STR]
+        ];
+        
+        if((int)$settings['num']){
+            $where[] = ['num', '=', $settings['num'], PDO::PARAM_INT];
+        }
+        
+        return APP::Module('DB')->Select(
+            APP::Module('Users')->settings['module_users_db_connection'], 
+            ['fetchAll', PDO::FETCH_COLUMN], 
+            ['user'], 'users_utm', $where
+        );
+    }
+    
+    public function social_id($settings) {
+        return APP::Module('DB')->Select(
+            APP::Module('Users')->settings['module_users_db_connection'], 
+            ['fetchAll', PDO::FETCH_COLUMN], 
+            ['user_id'], 'users_accounts',
+            [
+                ['service', '=', $settings['service'], PDO::PARAM_STR],
+                ['extra', $settings['logic'], $settings['value'], PDO::PARAM_STR]
+            ]
+        );
+    }
 
+    public function tags($settings) {
+        switch ($settings['logic']) {
+            case 'exist':
+                return APP::Module('DB')->Select(
+                    APP::Module('Users')->settings['module_users_db_connection'], 
+                    ['fetchAll', PDO::FETCH_COLUMN], 
+                    ['user'], 'users_tags',
+                    [
+                        ['item', '=', $settings['value'], PDO::PARAM_STR],
+                        ['cr_date', 'BETWEEN', '"' . $settings['date_from'] . ' 00:00:00" AND "' . $settings['date_to'] . ' 23:59:59"', PDO::PARAM_STR]
+                    ]
+                );
+                break;
+            case 'not_exist':
+
+                $u_id = APP::Module('DB')->Select(
+                    APP::Module('Users')->settings['module_users_db_connection'], 
+                    ['fetchAll', PDO::FETCH_COLUMN], 
+                    ['user'], 'users_tags',
+                    [
+                        ['item', '=', $settings['value'], PDO::PARAM_STR],
+                        ['cr_date', 'BETWEEN', '"' . $settings['date_from'] . ' 00:00:00" AND "' . $settings['date_to'] . ' 23:59:59"', PDO::PARAM_STR]
+                    ]
+                );
+                
+                return APP::Module('DB')->Select(
+                    APP::Module('Users')->settings['module_users_db_connection'], 
+                    ['fetchAll', PDO::FETCH_COLUMN], 
+                    ['user'], 'users_tags',
+                    [
+                        ['user', 'NOT IN', $u_id, PDO::PARAM_INT],
+                        ['cr_date', 'BETWEEN', '"' . $settings['date_from'] . ' 00:00:00" AND "' . $settings['date_to'] . ' 23:59:59"', PDO::PARAM_STR]
+                    ]
+                );
+                break;
+        }
+    }
+    
+    public function tunnels($settings) {
+        switch ($settings['logic']) {
+            case 'exist':
+                return APP::Module('DB')->Select(
+                    APP::Module('Tunnels')->settings['module_tunnels_db_connection'], 
+                    ['fetchAll', PDO::FETCH_COLUMN], 
+                    ['tunnels_users.user_id'], 'tunnels_users',
+                    [['tunnel_id', '=', $settings['value'], PDO::PARAM_INT]]
+                );
+                break;
+
+            case 'not_exist':
+                $u_id = APP::Module('DB')->Select(
+                    APP::Module('Tunnels')->settings['module_tunnels_db_connection'], 
+                    ['fetchAll', PDO::FETCH_COLUMN], 
+                    ['user_id'], 'tunnels_users',
+                    [['tunnels_users.tunnel_id', '=', $settings['value'], PDO::PARAM_INT]]
+                );
+                
+                return APP::Module('DB')->Select(
+                    APP::Module('Users')->settings['module_users_db_connection'], 
+                    ['fetchAll', PDO::FETCH_COLUMN], 
+                    ['users.id'], 'users',
+                    [['users.id', 'NOT IN', $u_id, PDO::PARAM_INT]]
+                );
+                break;
+
+            case 'active' : 
+                return APP::Module('DB')->Select(
+                    APP::Module('Tunnels')->settings['module_tunnels_db_connection'], 
+                    ['fetchAll', PDO::FETCH_COLUMN], 
+                    ['tunnels_users.user_id'], 'tunnels_users',
+                    [
+                        ['tunnel_id', '=', $settings['value'], PDO::PARAM_INT],
+                        ['state', '=', 'active', PDO::PARAM_STR]
+                    ]
+                );
+                break;
+
+            case 'complete':
+                return APP::Module('DB')->Select(
+                    APP::Module('Tunnels')->settings['module_tunnels_db_connection'], 
+                    ['fetchAll', PDO::FETCH_COLUMN], 
+                    ['tunnels_users.user_id'], 'tunnels_users',
+                    [
+                        ['tunnel_id', '=', $settings['value'], PDO::PARAM_INT],
+                        ['state', '=', 'complete', PDO::PARAM_STR]
+                    ]
+                );
+                break;
+
+            case 'pause':
+                return APP::Module('DB')->Select(
+                    APP::Module('Tunnels')->settings['module_tunnels_db_connection'], 
+                    ['fetchAll', PDO::FETCH_COLUMN], 
+                    ['tunnels_users.user_id'], 'tunnels_users',
+                    [
+                        ['tunnel_id', '=', $settings['value'], PDO::PARAM_INT],
+                        ['state', '=', 'pause', PDO::PARAM_STR]
+                    ]
+                );
+                break;
+        }
+    }
+    
+    public function tunnels_type($settings) {       
+        $users = APP::Module('DB')->Select(
+            APP::Module('Tunnels')->settings['module_tunnels_db_connection'], ['fetchAll', PDO::FETCH_COLUMN], 
+            ['tunnels_users.user_id'], 'tunnels_users',
+            [
+                ['tunnels_users.state', '=', 'active', PDO::PARAM_INT],
+                ['tunnels.type', '=', $settings['value'], PDO::PARAM_INT]
+            ],
+            [
+                'join/tunnels' => [
+                    ['tunnels.id', '=', 'tunnels_users.tunnel_id']
+                ]
+            ]
+        );
+        
+        return APP::Module('DB')->Select(
+            APP::Module('Users')->settings['module_users_db_connection'], 
+            ['fetchAll', PDO::FETCH_COLUMN], 
+            ['user'], 'users_about',
+            [
+                ['item', '=', 'state', PDO::PARAM_STR],
+                ['value', '=', 'active', PDO::PARAM_STR],
+                ['user', $settings['logic'], $users, PDO::PARAM_INT]
+            ]
+        );
+    }
+    
+    public function tunnels_tags($settings) {
+        return APP::Module('DB')->Select(
+            APP::Module('Tunnels')->settings['module_tunnels_db_connection'], 
+            ['fetchAll', PDO::FETCH_COLUMN], 
+            ['DISTINCT tunnels_users.user_id'], 'tunnels_tags',
+            [
+                ['tunnels_tags.token', '=', $settings['token'], PDO::PARAM_STR],
+                ['tunnels_tags.label_id', '=', $settings['label'], PDO::PARAM_STR]
+            ],
+            [
+                'join/tunnels_users' => [
+                    ['tunnels_users.id', '=', 'tunnels_tags.user_tunnel_id']
+                ]
+            ],
+            false,
+            false,
+            ['tunnels_tags.cr_date', 'DESC']
+        );
+    }
+    
+    public function tunnels_queue($settings) {
+        $users_in_queue = APP::Module('DB')->Select(
+            APP::Module('Tunnels')->settings['module_tunnels_db_connection'], ['fetchAll', PDO::FETCH_COLUMN], 
+            ['user_id'], 'tunnels_queue'
+        );
+        
+        return APP::Module('DB')->Select(
+            APP::Module('Users')->settings['module_users_db_connection'], 
+            ['fetchAll', PDO::FETCH_COLUMN], 
+            ['user'], 'users_about',
+            [
+                ['item', '=', 'state', PDO::PARAM_STR],
+                ['value', '=', 'active', PDO::PARAM_STR],
+                ['user', $settings['logic'], $users_in_queue, PDO::PARAM_INT]
+            ]
+        );
+    }
+    
+    public function tunnels_object($settings) {
+        return APP::Module('DB')->Select(
+            APP::Module('Tunnels')->settings['module_tunnels_db_connection'], 
+            ['fetchAll', PDO::FETCH_COLUMN], 
+            ['user_id'], 'tunnels_users',
+            [
+                ['tunnel_id', '=', $settings['value'], PDO::PARAM_INT],
+                ['object', '=', $settings['object'], PDO::PARAM_INT]
+            ]
+        );
+    }
+    
+    public function tunnels_label($settings) {
+        $settings['label_data'] = isset($settings['label_data']) ? $settings['label_data'] : '';
+
+        if(isset($settings['from']) || isset($settings['to'])){
+            if(!isset($settings['from'])){
+                $date_from = APP::Module('DB')->Select(
+                    APP::Module('Tunnels')->settings['module_tunnels_db_connection'], 
+                    ['fetchAll', PDO::FETCH_COLUMN],
+                    ['UNIX_TIMESTAMP(cr_date)'], 
+                    'tunnels_tags',
+                    false,
+                    false,
+                    false,
+                    false,
+                    ['cr_date', 'ASC']
+                );
+            }
+
+            $date_range = [
+                'from' => (isset($settings['from']) ? $settings['from'] : date('Y-m-d', $date_from)). ' 00:00:00',
+                'to' => (isset($settings['to']) ? $settings['to'] : date('Y-m-d', time())) . ' 23:59:59'
+            ];
+        }
+
+        switch ($settings['mode']) {
+            case 'exist':
+                $timeout = 0;
+                $cr_date = 0;
+                $where = false;
+                $join = false;
+
+                if (isset($settings['timeout'])) {
+                    switch ($settings['timeout']['mode']) {
+                        case 'min': $timeout = (int) $settings['timeout']['value'] * 60; break;
+                        case 'hours': $timeout = (int) $settings['timeout']['value'] * 3600; break;
+                        case 'days': $timeout = (int) $settings['timeout']['value'] * 86400; break;
+                        default: $timeout = (int) $settings['timeout']['value'];
+                    }
+                }
+
+                if (isset($settings['cr_date_mode'])) {
+                    switch ($settings['cr_date_mode']) {
+                        case 'min': $cr_date = (int) $settings['cr_date_value'] * 60; break;
+                        case 'hours': $cr_date = (int) $settings['cr_date_value'] * 3600; break;
+                        case 'days': $cr_date = (int) $settings['cr_date_value'] * 86400; break;
+                        default: $cr_date = (int) $settings['cr_date_value'];
+                    }
+                }
+
+                if(isset($settings['label_id'])){
+                    $where[] = ['label_id', '=', $settings['label_id'], PDO::PARAM_STR];
+                }
+
+                if($timeout){
+                    $where[] = ['UNIX_TIMESTAMP(cr_date)', '<=', (time() - $timeout), PDO::PARAM_STR];
+                }
+
+                if ($cr_date) {
+                    $where[] = ['cr_date', 'BETWEEN', '"' . date('Y-m-d H:i:s', (time() - $cr_date)) . '" AND "' . date('Y-m-d H:i:s',time()) . '"', PDO::PARAM_STR];
+                }
+
+                if (isset($date_range)) {
+                    $where[] = ['cr_date', 'BETWEEN', '"' . $date_range['from'] . '" AND "' . $date_range['to'] . '"', PDO::PARAM_STR];
+                }
+                
+                if (isset($settings['token'])) {
+                    $where[] = ['token', '=', $settings['token'], PDO::PARAM_STR];
+                }
+
+
+                $join['join/tunnels_users'][] = ['tunnels_users.id', '=', 'tunnels_tags.user_tunnel_id'];
+
+                if (isset($settings['tunnel_id'])) {
+                    $join['join/tunnels_users'][] = ['tunnels_users.tunnel_id', '=', $settings['tunnel_id']];
+                }
+
+                return  APP::Module('DB')->Select(
+                    APP::Module('Tunnels')->settings['module_tunnels_db_connection'], 
+                    ['fetchAll', PDO::FETCH_COLUMN],
+                    ['DISTINCT tunnels_users.user_id'], 
+                    'tunnels_tags',
+                    $where,
+                    $join,
+                    false,
+                    false,
+                    ['cr_date', 'DESC']
+                );
+                break;
+            case 'not_exist': 
+                return [];
+                break;
+        }
+    }
+    
+    public function mail_count($settings) {
+        return APP::Module('DB')->Select(
+            APP::Module('Mail')->settings['module_mail_db_connection'], 
+            ['fetchAll', PDO::FETCH_COLUMN],
+            ['user'], 'mail_log',
+            false,
+            false,
+            ['user'],
+            [['COUNT(id)', $settings['logic'], $settings['value']]]
+        );
+    }
+    
+    public function mail_events($settings) {  
+        $where[] = ['mail_log.state', '=', 'success', PDO::PARAM_INT];
+        
+        if(isset($settings['letter_id']) && count($settings['letter_id'])){
+            $where[] = ['mail_log.letter', 'IN', $settings['letter_id']];
+        }
+
+        return APP::Module('DB')->Select(
+            APP::Module('Mail')->settings['module_mail_db_connection'], 
+            ['fetchAll', PDO::FETCH_COLUMN],
+            ['mail_log.user'], 'mail_log',
+            [
+                ['mail_events.event', $settings['logic'], $settings['value'], PDO::PARAM_STR],
+                ['mail_log.state', '=', 'success', PDO::PARAM_STR],
+                ['mail_log.cr_date', 'BETWEEN', '"' . $settings['date_from'] . ' 00:00:00" AND "' . $settings['date_to'] . ' 23:59:59"', PDO::PARAM_STR]
+                
+            ],
+            [
+                'join/mail_events' => [
+                    ['mail_events.log', '=', 'mail_log.id']
+                ]
+            ],
+            ['mail_log.user']
+        );
+    }
+    
+    public function mail_open_pct($settings) {
+
+        if (($settings['from'] == 0) && ($settings['to'] == 100))  return []; 
+        
+        return APP::Module('DB')->Select(
+            APP::Module('Mail')->settings['module_mail_db_connection'], 
+            ['fetchAll', PDO::FETCH_COLUMN],
+            ['user'], 'mail_open_pct',
+            [['pct', 'BETWEEN', '"'.$settings['from'] . '" AND "' . $settings['to'].'"', PDO::PARAM_INT]]
+        );
+    }
+    
+    public function mail_open_pct30($settings) {
+
+        if (($settings['from'] == 0) && ($settings['to'] == 100))  return []; 
+        
+        return APP::Module('DB')->Select(
+            APP::Module('Mail')->settings['module_mail_db_connection'], 
+            ['fetchAll', PDO::FETCH_COLUMN],
+            ['user'], 'mail_open_pct30',
+            [['pct', 'BETWEEN', '"'.$settings['from'] . '" AND "' . $settings['to'].'"', PDO::PARAM_INT]]
+        );
+    }
 }
 
 class UsersActions {

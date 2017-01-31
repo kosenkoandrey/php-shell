@@ -17,6 +17,7 @@ $filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Deco
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bootgrid/jquery.bootgrid.min.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/css/bootstrap-select.css" rel="stylesheet">
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" rel="stylesheet"> 
         <link href="<?= APP::Module('Routing')->root ?>public/modules/users/rules.css" rel="stylesheet">
         <style>
             #users-table-header .actionBar .actions > button {
@@ -125,13 +126,17 @@ $filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Deco
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bootgrid/jquery.bootgrid.updated.min.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bootstrap-wizard/jquery.bootstrap.wizard.min.js"></script>
-                
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/moment/min/moment.min.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+        
+        <script src="<?= APP::Module('Routing')->root ?>public/modules/tunnels/scheme/tunnel-selector/script.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/modules/users/rules.js"></script> 
         <? APP::Render('core/widgets/js') ?>
         <script>
             $(document).ready(function() {
                 $('#search').RefRulesEditor({
-                    'debug': true
+                    'debug': true,
+                    'url' : '<?= APP::Module('Routing')->root ?>'
                 });
                 
                 var user_modal = {
