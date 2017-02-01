@@ -147,6 +147,7 @@ foreach (APP::$modules as $key => $value) {
                         case 'Users': echo 'Пользователи'; break;
                         case 'Quiz': echo 'Викторина'; break;
                         case 'Groups': echo 'Группы'; break;
+                        case 'Cloning': echo 'Клонирование'; break;
                         default: echo $key; break;
                     }
                 ?></a>

@@ -1,5 +1,5 @@
 <?
-define('DEFAULT_DOMAIN', 'pult2.glamurnenko.ru');
+define('DEFAULT_DOMAIN', '');
 
 return [
     'location'          => ['http', isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : DEFAULT_DOMAIN, '/'],
