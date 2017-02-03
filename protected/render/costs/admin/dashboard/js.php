@@ -405,10 +405,10 @@ ob_end_clean();
             '<div class="form-group">',
                 '<div class="row">',
                     '<div class="col-md-6">',
-                        '<div id="costs-calendar-from"></div>',
+                        '<div id="costs-calendar-from-block"></div>',
                     '</div>',
                     '<div class="col-md-6">',
-                        '<div id="costs-calendar-to"></div>',
+                        '<div id="costs-calendar-to-block"></div>',
                     '</div>',
                 '</div>',
             '</div>'
@@ -425,35 +425,35 @@ ob_end_clean();
         var to_date = new Date(parseInt($('#costs-date-to').val()) * 1000);
         var from_date = new Date(parseInt($('#costs-date-from').val()) * 1000);
 
-        $('#costs-calendar-from').datetimepicker({
+        $('#costs-calendar-from-block').datetimepicker({
             inline: true,
             sideBySide: true,
             format: 'DD/MM/YYYY'
         });
-        $('#costs-calendar-to').datetimepicker({
+        $('#costs-calendar-to-block').datetimepicker({
             useCurrent: false,
             inline: true,
             sideBySide: true,
             format: 'DD/MM/YYYY'
         });
 
-        $('#costs-calendar-from').on('dp.change', function(e) {
+        $('#costs-calendar-from-block').on('dp.change', function(e) {
             $('#costs-date-from').val(Math.round(e.date._d.getTime() / 1000));
             $('#costs-period > button').removeAttr('disabled');
-            $('#costs-calendar-to').data('DateTimePicker').minDate(e.date);
+            $('#costs-calendar-to-block').data('DateTimePicker').minDate(e.date);
             $('#costs-calendar-from').html(e.date._d.getDate() + '.' + (e.date._d.getMonth() + 1) + '.' + e.date._d.getFullYear());
             GetCosts(false);
         });
-        $('#costs-calendar-to').on('dp.change', function(e) {
+        $('#costs-calendar-to-block').on('dp.change', function(e) {
             $('#costs-date-to').val(Math.round(e.date._d.getTime() / 1000));
             $('#costs-period > button').removeAttr('disabled');
-            $('#costs-calendar-from').data('DateTimePicker').maxDate(e.date);
+            $('#costs-calendar-from-block').data('DateTimePicker').maxDate(e.date);
             $('#costs-calendar-to').html(e.date._d.getDate() + '.' + (e.date._d.getMonth() + 1) + '.' + e.date._d.getFullYear());
             GetCosts(false);
         });
 
-        $('#costs-calendar-from').data('DateTimePicker').date(moment(from_date));
-        $('#costs-calendar-to').data('DateTimePicker').date(moment(to_date));
+        $('#costs-calendar-from-block').data('DateTimePicker').date(moment(from_date));
+        $('#costs-calendar-to-block').data('DateTimePicker').date(moment(to_date));
     });
     
     $(document).on('click', '#tab-nav-<?= $data['hash'] ?> > a',function() {

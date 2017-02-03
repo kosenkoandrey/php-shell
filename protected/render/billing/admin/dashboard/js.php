@@ -465,10 +465,10 @@ ob_end_clean();
             '<div class="form-group">',
                 '<div class="row">',
                     '<div class="col-md-6">',
-                        '<div id="billing-calendar-from"></div>',
+                        '<div id="billing-calendar-from-block"></div>',
                     '</div>',
                     '<div class="col-md-6">',
-                        '<div id="billing-calendar-to"></div>',
+                        '<div id="billing-calendar-to-block"></div>',
                     '</div>',
                 '</div>',
             '</div>'
@@ -485,35 +485,35 @@ ob_end_clean();
         var to_date = new Date(parseInt($('#billing-date-to').val()) * 1000);
         var from_date = new Date(parseInt($('#billing-date-from').val()) * 1000);
 
-        $('#billing-calendar-from').datetimepicker({
+        $('#billing-calendar-from-block').datetimepicker({
             inline: true,
             sideBySide: true,
             format: 'DD/MM/YYYY'
         });
-        $('#billing-calendar-to').datetimepicker({
+        $('#billing-calendar-to-block').datetimepicker({
             useCurrent: false,
             inline: true,
             sideBySide: true,
             format: 'DD/MM/YYYY'
         });
 
-        $('#billing-calendar-from').on('dp.change', function(e) {
+        $('#billing-calendar-from-block').on('dp.change', function(e) {
             $('#billing-date-from').val(Math.round(e.date._d.getTime() / 1000));
             $('#billing-period > button').removeAttr('disabled');
-            $('#billing-calendar-to').data('DateTimePicker').minDate(e.date);
+            $('#billing-calendar-to-block').data('DateTimePicker').minDate(e.date);
             $('#billing-calendar-from').html(e.date._d.getDate() + '.' + (e.date._d.getMonth() + 1) + '.' + e.date._d.getFullYear());
             GetInvoices(false);
         });
-        $('#billing-calendar-to').on('dp.change', function(e) {
+        $('#billing-calendar-to-block').on('dp.change', function(e) {
             $('#billing-date-to').val(Math.round(e.date._d.getTime() / 1000));
             $('#billing-period > button').removeAttr('disabled');
-            $('#billing-calendar-from').data('DateTimePicker').maxDate(e.date);
+            $('#billing-calendar-from-block').data('DateTimePicker').maxDate(e.date);
             $('#billing-calendar-to').html(e.date._d.getDate() + '.' + (e.date._d.getMonth() + 1) + '.' + e.date._d.getFullYear());
             GetInvoices(false);
         });
 
-        $('#billing-calendar-from').data('DateTimePicker').date(moment(from_date));
-        $('#billing-calendar-to').data('DateTimePicker').date(moment(to_date));
+        $('#billing-calendar-from-block').data('DateTimePicker').date(moment(from_date));
+        $('#billing-calendar-to-block').data('DateTimePicker').date(moment(to_date));
     });
     
     $(document).on('click', '#tab-nav-<?= $data['hash'] ?> > a',function() {

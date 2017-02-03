@@ -398,10 +398,10 @@ ob_end_clean();
             '<div class="form-group">',
                 '<div class="row">',
                     '<div class="col-md-6">',
-                        '<div id="likes-calendar-from"></div>',
+                        '<div id="likes-calendar-from-block"></div>',
                     '</div>',
                     '<div class="col-md-6">',
-                        '<div id="likes-calendar-to"></div>',
+                        '<div id="likes-calendar-to-block"></div>',
                     '</div>',
                 '</div>',
             '</div>'
@@ -418,35 +418,35 @@ ob_end_clean();
         var to_date = new Date(parseInt($('#likes-date-to').val()) * 1000);
         var from_date = new Date(parseInt($('#likes-date-from').val()) * 1000);
 
-        $('#likes-calendar-from').datetimepicker({
+        $('#likes-calendar-from-block').datetimepicker({
             inline: true,
             sideBySide: true,
             format: 'DD/MM/YYYY'
         });
-        $('#likes-calendar-to').datetimepicker({
+        $('#likes-calendar-to-block').datetimepicker({
             useCurrent: false,
             inline: true,
             sideBySide: true,
             format: 'DD/MM/YYYY'
         });
 
-        $('#likes-calendar-from').on('dp.change', function(e) {
+        $('#likes-calendar-from-block').on('dp.change', function(e) {
             $('#likes-date-from').val(Math.round(e.date._d.getTime() / 1000));
             $('#likes-period > button').removeAttr('disabled');
-            $('#likes-calendar-to').data('DateTimePicker').minDate(e.date);
+            $('#likes-calendar-to-block').data('DateTimePicker').minDate(e.date);
             $('#likes-calendar-from').html(e.date._d.getDate() + '.' + (e.date._d.getMonth() + 1) + '.' + e.date._d.getFullYear());
             GetLikes(false);
         });
-        $('#likes-calendar-to').on('dp.change', function(e) {
+        $('#likes-calendar-to-block').on('dp.change', function(e) {
             $('#likes-date-to').val(Math.round(e.date._d.getTime() / 1000));
             $('#likes-period > button').removeAttr('disabled');
-            $('#likes-calendar-from').data('DateTimePicker').maxDate(e.date);
+            $('#likes-calendar-from-block').data('DateTimePicker').maxDate(e.date);
             $('#likes-calendar-to').html(e.date._d.getDate() + '.' + (e.date._d.getMonth() + 1) + '.' + e.date._d.getFullYear());
             GetLikes(false);
         });
 
-        $('#likes-calendar-from').data('DateTimePicker').date(moment(from_date));
-        $('#likes-calendar-to').data('DateTimePicker').date(moment(to_date));
+        $('#likes-calendar-from-block').data('DateTimePicker').date(moment(from_date));
+        $('#likes-calendar-to-block').data('DateTimePicker').date(moment(to_date));
     });
     
     $(document).on('click', '#tab-nav-<?= $data['hash'] ?> > a',function() {

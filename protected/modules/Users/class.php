@@ -3288,7 +3288,7 @@ class UsersActions {
             ['email'], 'users',
             [['id', 'IN', $id, PDO::PARAM_INT]]
         ) as $email) {
-            $out = APP::Module('Tunnels')->Subscribe([
+            $result = APP::Module('Tunnels')->Subscribe([
                 'email'             => $email,
                 'tunnel'            => $settings['tunnel'],
                 'activation'        => $settings['activation'],
@@ -3310,6 +3310,173 @@ class UsersActions {
             }
         }
         
+        return $out;
+    }
+    
+    public function tunnel_pause($id, $settings){
+        $out['status'] = 'success';
+        
+        foreach(APP::Module('DB')->Select(
+            APP::Module('Tunnels')->settings['module_tunnels_db_connection'], ['fetchAll', PDO::FETCH_COLUMN], 
+            ['id'], 'tunnels_users',
+            [
+                ['tunnel_id', '=', $settings['tunnel_id'], PDO::PARAM_INT],
+                ['user_id', 'IN', $id, PDO::PARAM_INT],
+                ['state', '=', 'active', PDO::PARAM_STR]
+            ]
+        ) as $id){
+            if(APP::Module('DB')->Insert(
+                APP::Module('Tunnels')->settings['module_tunnels_db_connection'], 'tunnels_tags',
+                [
+                    'id' => 'NULL',
+                    'user_tunnel_id' => [$id, PDO::PARAM_INT],
+                    'label_id' => ['pause', PDO::PARAM_STR],
+                    'token' => '""',
+                    'info' => '""',
+                    'cr_date' => 'NOW()'
+                ]
+            )){
+                APP::Module('DB')->Update(APP::Module('Tunnels')->settings['module_tunnels_db_connection'], 'tunnels_users', [
+                    'state' => 'pause'
+                ], [
+                    ['id', '=', $id, PDO::PARAM_INT]
+                ]);
+            }
+        }
+        
+        return $out;
+    }
+    
+    public function tunnel_complete($id, $settings) {
+        $out['status'] = 'success';
+        
+        foreach (APP::Module('DB')->Select(
+            APP::Module('Tunnels')->settings['module_tunnels_db_connection'], ['fetchAll', PDO::FETCH_COLUMN], 
+            ['id'], 'tunnels_users', 
+            [
+                ['tunnel_id', '=', $settings['tunnel_id'], PDO::PARAM_INT],
+                ['user_id', 'IN', $id, PDO::PARAM_INT],
+                ['state', '=', 'active', PDO::PARAM_STR]
+            ]
+        ) as $id) {
+            APP::Module('DB')->Insert(
+                APP::Module('Tunnels')->settings['module_tunnels_db_connection'], 'tunnels_tags',
+                [
+                    'id' => 'NULL',
+                    'user_tunnel_id' => [$id, PDO::PARAM_INT],
+                    'label_id' => ['complete', PDO::PARAM_STR],
+                    'token' => '""',
+                    'info' => '""',
+                    'cr_date' => 'NOW()'
+                ]
+            );
+
+            APP::Module('DB')->Update(APP::Module('Tunnels')->settings['module_tunnels_db_connection'], 'tunnels_users', [
+                'state' => 'complete',
+                'resume_date' => '0000-00-00 00:00:00',
+                'object' => '',
+                'input_data' => ''
+            ], [
+                ['id', '=', $id, PDO::PARAM_INT]
+            ]);
+        }
+        return $out;
+    }
+    
+    public function tunnel_manually_complete($id, $settings){
+        $out['status'] = 'success';
+        
+        foreach ($id as $user_id) {
+            if(!APP::Module('DB')->Select(
+                APP::Module('Tunnels')->settings['module_tunnels_db_connection'], ['fetchAll', PDO::FETCH_COLUMN], 
+                ['id'], 'tunnels_users', 
+                [
+                    ['tunnel_id', '=', $settings['tunnel_id'], PDO::PARAM_INT],
+                    ['user_id', '=', $user_id, PDO::PARAM_INT]
+                ]
+            )){
+                if($user_tunnel_id = APP::Module('DB')->Insert(
+                    APP::Module('Tunnels')->settings['module_tunnels_db_connection'], 'tunnels_users',
+                    [
+                        'id' => 'NULL',
+                        'tunnel_id' => [$settings['tunnel_id'], PDO::PARAM_INT],
+                        'user_id' => [$user_id, PDO::PARAM_INT],
+                        'state' => ['complete', PDO::PARAM_STR],
+                        'resume_date' => ['0000-00-00 00:00:00', PDO::PARAM_STR],
+                        'object' => ['', PDO::PARAM_STR],
+                        'input_data' => ['{}', PDO::PARAM_STR]
+                    ]
+                )){
+                    APP::Module('DB')->Insert(
+                        APP::Module('Tunnels')->settings['module_tunnels_db_connection'], 'tunnels_tags',
+                        [
+                            'id' => 'NULL',
+                            'user_tunnel_id' => [$user_tunnel_id, PDO::PARAM_INT],
+                            'label_id' => ['manually_complete', PDO::PARAM_STR],
+                            'token' => '""',
+                            'info' => '""',
+                            'cr_date' => 'NOW()'
+                        ]
+                    );
+                }
+            }
+        }
+        return $out;
+    }
+    
+    public function add_tag($id, $settings){
+        $out['status'] = 'success';
+        foreach ($id as $user_id) {
+            APP::Module('DB')->Insert(
+                APP::Module('Users')->settings['module_users_db_connection'], 'users_tags',
+                [
+                    'id' => 'NULL',
+                    'user' => [$user_id, PDO::PARAM_INT],
+                    'item' => [$settings['item'], PDO::PARAM_STR],
+                    'value' => [$settings['value'], PDO::PARAM_STR],
+                    'cr_date' => 'NOW()'
+                ]
+            );
+        }
+        return $out;
+    }
+    
+    public function change_state($id, $settings){
+        $out['status'] = 'error';
+        
+        if(APP::Module('DB')->Delete(
+            APP::Module('Users')->settings['module_users_db_connection'], 'users_about',
+            [
+                ['user', 'IN', $id, PDO::PARAM_INT],
+                ['item', '=', 'state', PDO::PARAM_STR]
+            ]
+        )){
+            $out['status'] = 'success';
+            foreach ($id as $user_id) {
+                $result = APP::Module('DB')->Insert(
+                    APP::Module('Users')->settings['module_users_db_connection'], ' users_about',
+                    [
+                        'id' => 'NULL',
+                        'user' => [$user_id, PDO::PARAM_INT],
+                        'item' => ['state', PDO::PARAM_STR],
+                        'value' => [$settings['value'], PDO::PARAM_STR],
+                        'up_date' => 'CURRENT_TIMESTAMP'
+                    ]
+                );
+            }
+        }
+        return $out;
+    }
+    
+    public function send_mail($id, $settings){
+        $out['status'] = 'success';
+        foreach (APP::Module('DB')->Select(
+            APP::Module('Users')->settings['module_users_db_connection'], ['fetchAll', PDO::FETCH_COLUMN], 
+            ['email'], 'users',
+            [['id', 'IN', $id, PDO::PARAM_INT]]
+        ) as $email) {
+            APP::Module('Mail')->Send($email, $settings['letter'], false);
+        }
         return $out;
     }
 }

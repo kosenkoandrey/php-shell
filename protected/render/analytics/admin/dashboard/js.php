@@ -409,10 +409,10 @@ ob_end_clean();
             '<div class="form-group">',
                 '<div class="row">',
                     '<div class="col-md-6">',
-                        '<div id="analytics-calendar-from"></div>',
+                        '<div id="analytics-calendar-from-block"></div>',
                     '</div>',
                     '<div class="col-md-6">',
-                        '<div id="analytics-calendar-to"></div>',
+                        '<div id="analytics-calendar-to-block"></div>',
                     '</div>',
                 '</div>',
             '</div>'
@@ -429,35 +429,35 @@ ob_end_clean();
         var to_date = new Date(parseInt($('#analytics-date-to').val()) * 1000);
         var from_date = new Date(parseInt($('#analytics-date-from').val()) * 1000);
 
-        $('#analytics-calendar-from').datetimepicker({
+        $('#analytics-calendar-from-block').datetimepicker({
             inline: true,
             sideBySide: true,
             format: 'DD/MM/YYYY'
         });
-        $('#analytics-calendar-to').datetimepicker({
+        $('#analytics-calendar-to-block').datetimepicker({
             useCurrent: false,
             inline: true,
             sideBySide: true,
             format: 'DD/MM/YYYY'
         });
 
-        $('#analytics-calendar-from').on('dp.change', function(e) {
+        $('#analytics-calendar-from-block').on('dp.change', function(e) {
             $('#analytics-date-from').val(Math.round(e.date._d.getTime() / 1000));
             $('#analytics-period > button').removeAttr('disabled');
-            $('#analytics-calendar-to').data('DateTimePicker').minDate(e.date);
+            $('#analytics-calendar-to-block').data('DateTimePicker').minDate(e.date);
             $('#analytics-calendar-from').html(e.date._d.getDate() + '.' + (e.date._d.getMonth() + 1) + '.' + e.date._d.getFullYear());
             GetAnalytics(false);
         });
-        $('#analytics-calendar-to').on('dp.change', function(e) {
+        $('#analytics-calendar-to-block').on('dp.change', function(e) {
             $('#analytics-date-to').val(Math.round(e.date._d.getTime() / 1000));
             $('#analytics-period > button').removeAttr('disabled');
-            $('#analytics-calendar-from').data('DateTimePicker').maxDate(e.date);
+            $('#analytics-calendar-from-block').data('DateTimePicker').maxDate(e.date);
             $('#analytics-calendar-to').html(e.date._d.getDate() + '.' + (e.date._d.getMonth() + 1) + '.' + e.date._d.getFullYear());
             GetAnalytics(false);
         });
 
-        $('#analytics-calendar-from').data('DateTimePicker').date(moment(from_date));
-        $('#analytics-calendar-to').data('DateTimePicker').date(moment(to_date));
+        $('#analytics-calendar-from-block').data('DateTimePicker').date(moment(from_date));
+        $('#analytics-calendar-to-block').data('DateTimePicker').date(moment(to_date));
     });
     
     $(document).on('click', '#tab-nav-<?= $data['hash'] ?> > a',function() {

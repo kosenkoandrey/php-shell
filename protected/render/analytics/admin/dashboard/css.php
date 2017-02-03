@@ -1,5 +1,5 @@
 <?
-APP::$insert['css_datetimepicker'] = ['css', 'file', 'before', '</head>', APP::Module('Routing')->root . 'public/ui/vendors/bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css'];
+APP::$insert['css_datetimepicker'] = ['css', 'file', 'after', '</title>', APP::Module('Routing')->root . 'public/ui/vendors/bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css'];
 ?>
 <style>
     #analytics-chart {
@@ -7,5 +7,8 @@ APP::$insert['css_datetimepicker'] = ['css', 'file', 'before', '</head>', APP::M
 	height: 300px;
 	font-size: 14px;
 	line-height: 1.2em;
+    }
+    #analytics-calendar{
+        z-index:999;
     }
 </style>

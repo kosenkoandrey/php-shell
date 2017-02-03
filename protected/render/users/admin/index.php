@@ -19,6 +19,7 @@ $filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Deco
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/css/bootstrap-select.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" rel="stylesheet"> 
         <link href="<?= APP::Module('Routing')->root ?>public/modules/users/rules.css" rel="stylesheet">
+        <link href="<?= APP::Module('Routing')->root ?>public/modules/tunnels/scheme/letter-selector/style.css" rel="stylesheet">
         <style>
             #users-table-header .actionBar .actions > button {
                 display: none;
@@ -70,7 +71,14 @@ $filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Deco
                                     </button>
                                     <ul id="search_results_actions" class="dropdown-menu" role="menu">
                                         <li><a data-action="remove" href="javascript:void(0)">Remove</a></li>
+                                        <li><a data-action="add_tag" href="javascript:void(0)">Add Tag</a></li>
+                                        <li><a data-action="change_state" href="javascript:void(0)">Change state</a></li>
+                                        <li><a data-action="send_mail" href="javascript:void(0)">Send mail</a></li>
+                                        
                                         <li><a data-action="tunnel_subscribe" href="javascript:void(0)">Subscribe Tunnel</a></li>
+                                        <li><a data-action="tunnel_pause" href="javascript:void(0)">Tunnel pause</a></li>
+                                        <li><a data-action="tunnel_complete" href="javascript:void(0)">Tunnel complete</a></li>
+                                        <li><a data-action="tunnel_manually_complete" href="javascript:void(0)">Subscribe tunnel and complete</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -103,7 +111,7 @@ $filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Deco
                             <form id="user-action-form" method="post" class="form-horizontal"></form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-link" id="send_action">Subscribe</button>
+                            <button type="button" class="btn palette-Teal bg waves-effect" id="send_action">Done</button>
                             <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
                         </div>
                     </div>
@@ -129,6 +137,7 @@ $filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Deco
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/moment/min/moment.min.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
         
+        <script src="<?= APP::Module('Routing')->root ?>public/modules/tunnels/scheme/letter-selector/script.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/modules/tunnels/scheme/tunnel-selector/script.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/modules/users/rules.js"></script> 
         <? APP::Render('core/widgets/js') ?>
@@ -281,6 +290,118 @@ $filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Deco
                             case 'remove' :
                                 var data = form.serialize();
                                 user_modal.send(data);
+                                break;
+                            case 'add_tag' :
+                                $('.modal-title', modal).html('Add Tag');
+                                form.append(
+                                    [
+                                        '<div class="form-group">',
+                                            '<label for="" class="col-sm-2 control-label">Item</label>',
+                                            '<div class="col-sm-4">',
+                                                '<div class="fg-line">',
+                                                    '<input type="text" value="" name="settings[item]" class="form-control" />',
+                                                '</div>',
+                                            '</div>',
+                                        '</div>',
+                                        '<div class="form-group">',
+                                            '<label for="" class="col-sm-2 control-label">Value</label>',
+                                            '<div class="col-sm-4">',
+                                                '<div class="fg-line">',
+                                                    '<input type="text" value="" name="settings[value]" class="form-control" />',
+                                                '</div>',
+                                            '</div>',
+                                        '</div>'
+                                    ].join('')
+                                );
+                                modal.modal('show');
+                                break;
+                            case 'change_state' :
+                                $('.modal-title', modal).html('Change state');
+                                form.append(
+                                    [
+                                        '<div class="form-group">',
+                                            '<label for="" class="col-sm-2 control-label">State</label>',
+                                            '<div class="col-sm-4">',
+                                                '<div class="select">',
+                                                    '<select name="settings[value]"  class="form-control">',
+                                                        '<option value="active">Активный</option>',
+                                                        '<option value="inactive">Неактивный</option>',
+                                                        '<option value="blacklist">В черном списке</option>',
+                                                    '</select>',
+                                                '</div>',
+                                            '</div>',
+                                        '</div>'
+                                    ].join('')
+                                );
+                                modal.modal('show');
+                                break;
+                            case 'send_mail' :
+                                $('.modal-title', modal).html('Send mail');
+                                form.append(
+                                    [
+                                        '<div class="form-group">',
+                                            '<label for="" class="col-sm-2 control-label">Letter</label>',
+                                            '<div class="col-sm-6">',
+                                                '<div class="fg-line">',
+                                                    '<input type="hidden" id="in_letter" value="" name="settings[letter]" class="form-control" />',
+                                                '</div>',
+                                            '</div>',
+                                        '</div>'
+                                    ].join('')
+                                );
+                                $('#in_letter', modal).MailingLetterSelector({'url':'<?= APP::Module('Routing')->root ?>'});
+                                modal.modal('show');
+                                break;
+                            case 'tunnel_pause' :
+                                $('.modal-title', modal).html('Tunnel pause');
+                                form.append(
+                                    [
+                                        '<div class="form-group">',
+                                            '<label for="" class="col-sm-2 control-label">Tunnel</label>',
+                                            '<div class="col-sm-6">',
+                                                '<div class="fg-line">',
+                                                    '<input type="hidden" id="tunnel_id" value="" name="settings[tunnel_id]" class="form-control" />',
+                                                '</div>',
+                                            '</div>',
+                                        '</div>'
+                                    ].join('')
+                                );
+                                $('#tunnel_id', modal).TunnelSelector({'url':'<?= APP::Module('Routing')->root ?>'});
+                                modal.modal('show');
+                                break;
+                            case 'tunnel_complete' :
+                                $('.modal-title', modal).html('Tunnel complete');
+                                form.append(
+                                    [
+                                        '<div class="form-group">',
+                                            '<label for="" class="col-sm-2 control-label">Tunnel</label>',
+                                            '<div class="col-sm-6">',
+                                                '<div class="fg-line">',
+                                                    '<input type="hidden" id="tunnel_id" value="" name="settings[tunnel_id]" class="form-control" />',
+                                                '</div>',
+                                            '</div>',
+                                        '</div>'
+                                    ].join('')
+                                );
+                                $('#tunnel_id', modal).TunnelSelector({'url':'<?= APP::Module('Routing')->root ?>'});
+                                modal.modal('show');
+                                break;
+                            case 'tunnel_manually_complete' :
+                                $('.modal-title', modal).html('Subscribe tunnel and complete');
+                                form.append(
+                                    [
+                                        '<div class="form-group">',
+                                            '<label for="" class="col-sm-2 control-label">Tunnel</label>',
+                                            '<div class="col-sm-6">',
+                                                '<div class="fg-line">',
+                                                    '<input type="hidden" id="tunnel_id" value="" name="settings[tunnel_id]" class="form-control" />',
+                                                '</div>',
+                                            '</div>',
+                                        '</div>'
+                                    ].join('')
+                                );
+                                $('#tunnel_id', modal).TunnelSelector({'url':'<?= APP::Module('Routing')->root ?>'});
+                                modal.modal('show');
                                 break;
                         }
                         

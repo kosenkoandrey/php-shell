@@ -11,6 +11,7 @@
         init: function(options) { 
             var tunnel_selector = $(this);
             var data = tunnel_selector.data();
+            var name = tunnel_selector.attr('name');
             
             settings = $.extend( {
                 'debug': false,
@@ -38,6 +39,10 @@
                             }).html(item.name));
                         }
                     });
+                    
+                    if(name){
+                        selector.attr('name', name);
+                    }
                     
                     $.each(data, function(k, i){
                         selector.attr('data-'+k, i);

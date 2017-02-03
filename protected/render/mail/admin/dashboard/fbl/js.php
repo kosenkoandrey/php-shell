@@ -394,10 +394,10 @@ ob_end_clean();
             '<div class="form-group">',
                 '<div class="row">',
                     '<div class="col-md-6">',
-                        '<div id="fbl-log-calendar-from"></div>',
+                        '<div id="fbl-log-calendar-from-block"></div>',
                     '</div>',
                     '<div class="col-md-6">',
-                        '<div id="fbl-log-calendar-to"></div>',
+                        '<div id="fbl-log-calendar-to-block"></div>',
                     '</div>',
                 '</div>',
             '</div>'
@@ -414,35 +414,35 @@ ob_end_clean();
         var to_date = new Date(parseInt($('#fbl-log-date-to').val()) * 1000);
         var from_date = new Date(parseInt($('#fbl-log-date-from').val()) * 1000);
 
-        $('#fbl-log-calendar-from').datetimepicker({
+        $('#fbl-log-calendar-from-block').datetimepicker({
             inline: true,
             sideBySide: true,
             format: 'DD/MM/YYYY'
         });
-        $('#fbl-log-calendar-to').datetimepicker({
+        $('#fbl-log-calendar-to-block').datetimepicker({
             useCurrent: false,
             inline: true,
             sideBySide: true,
             format: 'DD/MM/YYYY'
         });
 
-        $('#fbl-log-calendar-from').on('dp.change', function(e) {
+        $('#fbl-log-calendar-from-block').on('dp.change', function(e) {
             $('#fbl-log-date-from').val(Math.round(e.date._d.getTime() / 1000));
             $('#fbl-reports-period > button').removeAttr('disabled');
-            $('#fbl-log-calendar-to').data('DateTimePicker').minDate(e.date);
+            $('#fbl-log-calendar-to-block').data('DateTimePicker').minDate(e.date);
             $('#fbl-reports-calendar-from').html(e.date._d.getDate() + '.' + (e.date._d.getMonth() + 1) + '.' + e.date._d.getFullYear());
             GetFBLReports(false);
         });
-        $('#fbl-log-calendar-to').on('dp.change', function(e) {
+        $('#fbl-log-calendar-to-block').on('dp.change', function(e) {
             $('#fbl-log-date-to').val(Math.round(e.date._d.getTime() / 1000));
             $('#fbl-reports-period > button').removeAttr('disabled');
-            $('#fbl-log-calendar-from').data('DateTimePicker').maxDate(e.date);
+            $('#fbl-log-calendar-from-block').data('DateTimePicker').maxDate(e.date);
             $('#fbl-reports-calendar-to').html(e.date._d.getDate() + '.' + (e.date._d.getMonth() + 1) + '.' + e.date._d.getFullYear());
             GetFBLReports(false);
         });
 
-        $('#fbl-log-calendar-from').data('DateTimePicker').date(moment(from_date));
-        $('#fbl-log-calendar-to').data('DateTimePicker').date(moment(to_date));
+        $('#fbl-log-calendar-from-block').data('DateTimePicker').date(moment(from_date));
+        $('#fbl-log-calendar-to-block').data('DateTimePicker').date(moment(to_date));
     });
     
     $(document).on('click', '#tab-nav-<?= $data['hash'] ?> > a',function() {

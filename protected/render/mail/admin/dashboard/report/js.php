@@ -746,10 +746,10 @@ ob_end_clean();
             '<div class="form-group">',
                 '<div class="row">',
                     '<div class="col-md-6">',
-                        '<div id="mail-stat-calendar-from"></div>',
+                        '<div id="mail-stat-calendar-from-block"></div>',
                     '</div>',
                     '<div class="col-md-6">',
-                        '<div id="mail-stat-calendar-to"></div>',
+                        '<div id="mail-stat-calendar-to-block"></div>',
                     '</div>',
                 '</div>',
             '</div>'
@@ -766,35 +766,35 @@ ob_end_clean();
         var to_date = new Date(parseInt($('#mail-stat-date-to').val()) * 1000);
         var from_date = new Date(parseInt($('#mail-stat-date-from').val()) * 1000);
 
-        $('#mail-stat-calendar-from').datetimepicker({
+        $('#mail-stat-calendar-from-block').datetimepicker({
             inline: true,
             sideBySide: true,
             format: 'DD/MM/YYYY'
         });
-        $('#mail-stat-calendar-to').datetimepicker({
+        $('#mail-stat-calendar-to-block').datetimepicker({
             useCurrent: false,
             inline: true,
             sideBySide: true,
             format: 'DD/MM/YYYY'
         });
 
-        $('#mail-stat-calendar-from').on('dp.change', function(e) {
+        $('#mail-stat-calendar-from-block').on('dp.change', function(e) {
             $('#mail-stat-date-from').val(Math.round(e.date._d.getTime() / 1000));
             $('#mail-stat-period > button').removeAttr('disabled');
-            $('#mail-stat-calendar-to').data('DateTimePicker').minDate(e.date);
+            $('#mail-stat-calendar-to-block').data('DateTimePicker').minDate(e.date);
             $('#mail-stat-calendar-from').html(e.date._d.getDate() + '.' + (e.date._d.getMonth() + 1) + '.' + e.date._d.getFullYear());
             GetMailStat(false);
         });
-        $('#mail-stat-calendar-to').on('dp.change', function(e) {
+        $('#mail-stat-calendar-to-block').on('dp.change', function(e) {
             $('#mail-stat-date-to').val(Math.round(e.date._d.getTime() / 1000));
             $('#mail-stat-period > button').removeAttr('disabled');
-            $('#mail-stat-calendar-from').data('DateTimePicker').maxDate(e.date);
+            $('#mail-stat-calendar-from-block').data('DateTimePicker').maxDate(e.date);
             $('#mail-stat-calendar-to').html(e.date._d.getDate() + '.' + (e.date._d.getMonth() + 1) + '.' + e.date._d.getFullYear());
             GetMailStat(false);
         });
 
-        $('#mail-stat-calendar-from').data('DateTimePicker').date(moment(from_date));
-        $('#mail-stat-calendar-to').data('DateTimePicker').date(moment(to_date));
+        $('#mail-stat-calendar-from-block').data('DateTimePicker').date(moment(from_date));
+        $('#mail-stat-calendar-to-block').data('DateTimePicker').date(moment(to_date));
     });
     
     $(document).on('click', '#tab-nav-<?= $data['hash'] ?> > a',function() {
