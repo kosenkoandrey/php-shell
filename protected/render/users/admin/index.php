@@ -89,6 +89,8 @@ $filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Deco
                                     <tr>
                                         <th data-column-id="id" data-type="numeric" data-order="desc">ID</th>
                                         <th data-column-id="email" data-formatter="email">E-Mail</th>
+                                        <th data-column-id="tel">Phone</th>
+                                        <th data-column-id="social" data-formatter="social">Social</th>
                                         <th data-column-id="role">Role</th>
                                         <th data-column-id="reg_date">Reg date</th>
                                         <th data-column-id="last_visit">Last visit</th>
@@ -502,6 +504,20 @@ $filters = htmlspecialchars(isset($_GET['filters']) ? APP::Module('Crypt')->Deco
                         actions: function(column, row) {
                             return  '<a target="_blank" href="<?= APP::Module('Routing')->root ?>admin/users/edit/' + row.user_id_token + '" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-edit"></span></a> ' + 
                                     '<a href="javascript:void(0)" class="btn btn-sm btn-default btn-icon waves-effect waves-circle remove-user" data-user-id="' + row.id + '"><span class="zmdi zmdi-delete"></span></a>';
+                        },
+                        social: function(column, row) {
+                            var html = '';
+                            $.each(row.social, function(i, j){
+                                switch(j.service){
+                                    case 'vk' :
+                                        html += '<a target="_blank" href="https://vk.com/id'+j.extra+'" class="btn btn-sm btn-default btn-icon waves-effect waves-circle">'+j.service+'</a>';
+                                        break;
+                                    case 'fb' :
+                                        html += '<a target="_blank" href="http://facebook.com/profile.php?id='+j.extra+'" class="btn btn-sm btn-default btn-icon waves-effect waves-circle">'+j.service+'</a>';
+                                        break;
+                                }
+                            });
+                            return html;
                         }
                     }
                 }).on('loaded.rs.jquery.bootgrid', function () {

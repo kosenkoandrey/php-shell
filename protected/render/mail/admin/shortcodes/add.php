@@ -13,7 +13,8 @@
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/google-material-color/dist/palette.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/css/bootstrap-select.css" rel="stylesheet">
         <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.css" rel="stylesheet">
-
+        <link href="<?= APP::Module('Routing')->root ?>/public/nifty/ui/plugins/codemirror/lib/codemirror.css" rel="stylesheet">
+        <link href="<?= APP::Module('Routing')->root ?>/public/nifty/ui/plugins/codemirror/addon/display/fullscreen.css" rel="stylesheet">
         <? APP::Render('core/widgets/css') ?>
     </head>
     <body data-ma-header="teal">
@@ -44,7 +45,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="content" class="col-sm-2 control-label">Value</label>
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-10">
                                         <div class="fg-line">
                                             <textarea id="value" name="value" class="form-control"></textarea>
                                         </div>
@@ -76,12 +77,34 @@
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.min.js"></script>
         <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/autosize/dist/autosize.min.js"></script>
-
+        <script src="<?= APP::Module('Routing')->root ?>/public/nifty/ui/plugins/codemirror/lib/codemirror.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>/public/nifty/ui/plugins/codemirror/addon/edit/matchbrackets.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>/public/nifty/ui/plugins/codemirror/addon/display/fullscreen.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>/public/nifty/ui/plugins/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>/public/nifty/ui/plugins/codemirror/mode/xml/xml.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>/public/nifty/ui/plugins/codemirror/mode/javascript/javascript.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>/public/nifty/ui/plugins/codemirror/mode/css/css.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>/public/nifty/ui/plugins/codemirror/mode/clike/clike.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>/public/nifty/ui/plugins/codemirror/mode/php/php.js"></script>
+        
         <? APP::Render('core/widgets/js') ?>
         
         <script>
             $(document).ready(function() {
                 autosize($('#value'));
+                
+                var value = CodeMirror.fromTextArea(document.getElementById('value'), {
+                    lineNumbers: true,
+                    mode: "application/x-httpd-php",
+                    extraKeys: {
+                        "F11": function(cm) {
+                            cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+                        },
+                        "Esc": function(cm) {
+                            if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+                        }
+                    }
+                });
 
                 $('#add-shortcode').submit(function(event) {
                     event.preventDefault();

@@ -1082,14 +1082,24 @@ class Users {
 
         foreach (APP::Module('DB')->Select(
             $this->settings['module_users_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
-            ['id', 'email', 'password', 'role', 'reg_date', 'last_visit'], 'users',
-            [['id', 'IN', $out, PDO::PARAM_INT]], 
-            false, false, false,
+            ['users.id', 'users.email', 'users.password', 'users.role', 'users.reg_date', 'users.last_visit', 'users_about.value as tel'], 'users',
+            [['users.id', 'IN', $out, PDO::PARAM_INT]], 
+            [
+                'left join/users_about' => [
+                    ['users_about.user', '=', 'users.id'],
+                    ['users_about.item', '=', '"mobile_phone"']
+                ]
+            ], false, false,
             [$request['sort_by'], $request['sort_direction']],
             $request['rows'] === -1 ? false : [($request['current'] - 1) * $request['rows'], $request['rows']]
         ) as $row) {
             $row['auth_token'] = APP::Module('Crypt')->Encode(json_encode([$row['email'], $row['password']]));
             $row['user_id_token'] = APP::Module('Crypt')->Encode($row['id']);
+            $row['social'] = APP::Module('DB')->Select(
+                $this->settings['module_users_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+                ['extra', 'service'], 'users_accounts',
+                [['user_id', '=', $row['id'], PDO::PARAM_INT]]
+            );
             array_push($rows, $row);
         }
         
